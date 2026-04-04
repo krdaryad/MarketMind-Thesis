@@ -16,7 +16,7 @@ DEBUG_MODE = True  # Set to False in production
 # ============================================================================
 # FILE PATHS
 # ============================================================================
-CSV_FILE_PATH = "/Users/daryakrautsova/Desktop/Thesis/Zoomba/reddit_posts_clean.csv"
+CSV_FILE_PATH = "reddit_posts_clean.csv"
 MODELS_DIR = "models/"
 
 # Create models directory if it doesn't exist
