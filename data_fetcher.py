@@ -140,46 +140,43 @@ def filter_by_score(df, min_score):
 
 @st.cache_data(ttl=3600)
 def fetch_market_data(start_date, end_date):
-    """Fetch S&P 500, VIX, and 10Y Treasury from Yahoo Finance and FRED."""
+    """Fetch market data using yfinance and fredapi (avoiding pandas_datareader)."""
     import yfinance as yf
-    import pandas_datareader.data as web
+    from fredapi import Fred
     
     try:
-        # Download S&P 500 and VIX
+        # 1. Download S&P 500 and VIX using yfinance (Stable)
         spy = yf.download("^GSPC", start=start_date, end=end_date, progress=False)
         vix = yf.download("^VIX", start=start_date, end=end_date, progress=False)
 
-        # Combine - reset index to have date as column
         df = pd.DataFrame(index=spy.index)
-        df['spy'] = spy['Close']
-        df['vix'] = vix['Close'] if not vix.empty else np.nan
-        df['volume'] = spy['Volume']
+        
+        # Handle yfinance MultiIndex columns if necessary
+        if isinstance(spy.columns, pd.MultiIndex):
+            df['spy'] = spy['Close'].iloc[:, 0]
+            df['vix'] = vix['Close'].iloc[:, 0] if not vix.empty else np.nan
+        else:
+            df['spy'] = spy['Close']
+            df['vix'] = vix['Close'] if not vix.empty else np.nan
 
-        # Add 10Y Treasury from FRED
+        # 2. Use fredapi for Treasury data (Replaces the crashing pandas_datareader)
         try:
-            treasury = web.DataReader('DGS10', 'fred', start_date, end_date)
-            df['treasury'] = treasury['DGS10']
+            fred = Fred(api_key=st.secrets["FRED_API_KEY"])
+            treasury_series = fred.get_series('DGS10', start_date, end_date)
+            df['treasury'] = treasury_series
         except Exception as e:
-            if DEBUG_MODE:
-                st.warning(f"Could not fetch Treasury data: {e}")
+            st.sidebar.warning(f"FRED Error: {e}")
             df['treasury'] = np.nan
 
-        # Reset index to have a 'date' column
-        df = df.reset_index()
-        df = df.rename(columns={'index': 'date'}) if 'index' in df.columns else df.rename(columns={'Date': 'date'})
-        
-        # Handle empty data
-        if df.empty or df['spy'].isna().all():
-            if DEBUG_MODE:
-                st.warning("Market data not available for the selected date range")
-            return pd.DataFrame()
-        
-        return df
+        # 3. Final formatting
+        df = df.reset_index().rename(columns={'Date': 'date', 'index': 'date'})
+        return df.ffill().fillna(0) # Fill gaps for weekends/holidays
         
     except Exception as e:
         if DEBUG_MODE:
-            st.warning(f"Could not fetch market data: {e}")
+            st.warning(f"Market Data Error: {e}")
         return pd.DataFrame()
+
 
 def add_sentiment(df):
     """Add VADER sentiment scores to each post."""
