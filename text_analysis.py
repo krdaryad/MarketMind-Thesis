@@ -214,7 +214,7 @@ def get_real_model_results(posts_df):
 def load_financial_phrasebank():
     """Load the Financial PhraseBank dataset for training."""
     try:
-        df = pd.read_csv('/Users/daryakrautsova/Desktop/Thesis/all-data.csv')
+        df = pd.read_csv('all-data.csv')
         # Rename columns to match your existing code
         df = df.rename(columns={
             'Sentence': 'text',
