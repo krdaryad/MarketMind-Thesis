@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from config import CATEGORIES, DEFAULT_START, DEFAULT_END, DEBUG_MODE, apply_theme
 from data_fetcher import get_companies_list, load_reddit_data, validate_data_quality, check_for_new_data
-
+import base64
 def onboarding_step(step):
     steps = {
     1: {
@@ -219,23 +219,26 @@ def track_user_session():
     st.session_state.page_views[current_page] += 1
 
 def render_sidebar():
-    """Render sidebar with all filters and data quality info."""
+    """Render sidebar with a prominent corner logo."""
     
-    # Track user session
     track_user_session()
     
     with st.sidebar:
-        st.markdown("""
-        <div style="text-align: center; padding: 1rem 0 1.5rem 0;">
-            <h2 style="background: linear-gradient(135deg, #3B82F6 0%, #F59E0B 100%);
-                       -webkit-background-clip: text;
-                       -webkit-text-fill-color: transparent;
-                       font-size: 1.5rem;">
-                MarketMind
-            </h2>
-            <p class="text-muted" style="font-size: 0.7rem;">AI Consumer Behavior Analysis</p>
-        </div>
-        """, unsafe_allow_html=True)
+        try:
+            # 1. Load and encode the logo
+            with open("logo.png", "rb") as f:
+                logo_data = base64.b64encode(f.read()).decode()
+            
+            # 2. Render logo: Centered, no glow, no text
+            st.markdown(f"""
+                <div style="display: flex; justify-content: center; padding: 0.5rem 0 2rem 0;">
+                    <img src="data:image/png;base64,{logo_data}" 
+                         style="width: 180px; opacity: 1;">
+                </div>
+            """, unsafe_allow_html=True)
+            
+        except FileNotFoundError:
+            st.sidebar.markdown("<h2 style='text-align: center;'>MarketMind</h2>", unsafe_allow_html=True)
 
         # ====================================================================
         # THEME TOGGLE - MODERN CAPSULE BUTTON
