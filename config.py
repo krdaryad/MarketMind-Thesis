@@ -632,7 +632,9 @@ div[data-baseweb="select"] div[aria-hidden="true"] {
 # ============================================================================
 CATEGORIES = {
     "Dashboard": ["Dashboard"],
-    "Economic Dashboard": ["Economic Dashboard"],
+    "Economic Dashboard": [
+        "Economic Dashboard"
+    ],
     "AI Analysis": [
         "Sentiment Trends",
         "Pattern Mining", 
@@ -641,7 +643,11 @@ CATEGORIES = {
         "Correlation Analysis",
         "AI Analysis", 
         "Classifier Demo", 
-        "Model Accuracy"
+        "Model Accuracy",
+        "Causality Analysis", 
+        "Shock Detection",
+        "Volatility Analysis",
+        "Event Impact",
     ],
     "Knowledge Hub": [
         "Learning Hub",

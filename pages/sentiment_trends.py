@@ -10,7 +10,7 @@ from visualizations import create_sentiment_trend_chart, create_heatmap, create_
 from data_fetcher import get_companies_list, filter_by_company
 
 def sentiment_trends_page():
-    st.markdown('<h1>📈 Sentiment Trends</h1>', unsafe_allow_html=True)
+    st.markdown('<h1> Sentiment Trends</h1>', unsafe_allow_html=True)
     st.markdown('<p class="text-muted">Multi-dimensional analysis of sentiment patterns over time</p>', unsafe_allow_html=True)
     st.markdown('<br>', unsafe_allow_html=True)
 

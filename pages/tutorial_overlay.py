@@ -35,7 +35,7 @@ def get_tutorial_steps():
         },
         {
             "id": 3,
-            "title": "📈 Sentiment Trends",
+            "title": " Sentiment Trends",
             "message": "Let's explore sentiment analysis. This chart shows how sentiment changes over time.",
             "target_page": "Sentiment Trends",
             "target_category": "Market Intelligence",

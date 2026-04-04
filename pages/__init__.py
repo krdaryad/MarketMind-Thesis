@@ -13,3 +13,4 @@ from .company_comparison import company_comparison_page
 from .correlation_analysis import correlation_analysis_page
 from .tutorial_overlay import apply_highlight
 from pages.tutorial_overlay import show_tutorial_overlay, handle_tutorial_actions, apply_highlight
+from .causality_analysis import causality_analysis_page

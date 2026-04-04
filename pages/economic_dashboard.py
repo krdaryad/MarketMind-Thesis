@@ -108,7 +108,7 @@ def economic_dashboard_page():
     fig_price = go.Figure()
 
     fig_price.add_trace(go.Scatter(
-        x=econ_df.index, 
+        x=econ_df['date'], 
         y=econ_df['close'], 
         name=f'{ticker} Price',
         line=dict(color='#3B82F6', width=2)
@@ -116,7 +116,7 @@ def economic_dashboard_page():
 
     if 'consumer_sentiment' in econ_df.columns:
         fig_price.add_trace(go.Scatter(
-            x=econ_df.index, 
+            x=econ_df['date'], 
             y=econ_df['consumer_sentiment'], 
             name='Consumer Sentiment',
             line=dict(color='#F59E0B', width=2, dash='dot'),
@@ -625,8 +625,8 @@ def economic_dashboard_page():
     
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # ========================================================================
-    # ECONOMIC INDICATORS OVER TIME
+        # ========================================================================
+    # ECONOMIC INDICATORS OVER TIME - FIXED DATES
     # ========================================================================
     st.markdown('''
     <div class="card" style="padding: 1rem;">
@@ -647,7 +647,7 @@ def economic_dashboard_page():
     
     if 'gdp_growth' in econ_df.columns:
         fig.add_trace(go.Scatter(
-            x=econ_df.index, y=econ_df['gdp_growth'],
+            x=econ_df['date'], y=econ_df['gdp_growth'],  # FIXED
             mode='lines', name='GDP Growth',
             line=dict(color='#3B82F6', width=2),
             fill='tozeroy'
@@ -656,7 +656,7 @@ def economic_dashboard_page():
     
     if 'inflation_rate' in econ_df.columns:
         fig.add_trace(go.Scatter(
-            x=econ_df.index, y=econ_df['inflation_rate'],
+            x=econ_df['date'], y=econ_df['inflation_rate'],  # FIXED
             mode='lines', name='Inflation',
             line=dict(color='#F59E0B', width=2),
             fill='tozeroy'
@@ -665,14 +665,14 @@ def economic_dashboard_page():
     
     if 'interest_rate' in econ_df.columns:
         fig.add_trace(go.Scatter(
-            x=econ_df.index, y=econ_df['interest_rate'],
+            x=econ_df['date'], y=econ_df['interest_rate'],  # FIXED
             mode='lines', name='Fed Funds',
             line=dict(color='#EF4444', width=2)
         ), row=2, col=1)
     
     if 'unemployment' in econ_df.columns:
         fig.add_trace(go.Scatter(
-            x=econ_df.index, y=econ_df['unemployment'],
+            x=econ_df['date'], y=econ_df['unemployment'],  # FIXED
             mode='lines', name='Unemployment',
             line=dict(color='#8B5CF6', width=2),
             fill='tozeroy'
@@ -681,7 +681,7 @@ def economic_dashboard_page():
     
     if 'consumer_sentiment' in econ_df.columns:
         fig.add_trace(go.Scatter(
-            x=econ_df.index, y=econ_df['consumer_sentiment'],
+            x=econ_df['date'], y=econ_df['consumer_sentiment'],  # FIXED
             mode='lines+markers', name='Consumer Sentiment',
             line=dict(color='#EC4899', width=2),
             marker=dict(size=4)
@@ -692,7 +692,7 @@ def economic_dashboard_page():
     
     if 'financial_stress' in econ_df.columns:
         fig.add_trace(go.Scatter(
-            x=econ_df.index, y=econ_df['financial_stress'],
+            x=econ_df['date'], y=econ_df['financial_stress'],  # FIXED
             mode='lines', name='Financial Stress',
             line=dict(color='#EF4444', width=2),
             fill='tozeroy'
@@ -701,7 +701,7 @@ def economic_dashboard_page():
     
     if 'm2_money_supply' in econ_df.columns:
         fig.add_trace(go.Scatter(
-            x=econ_df.index, y=econ_df['m2_money_supply'],
+            x=econ_df['date'], y=econ_df['m2_money_supply'],  # FIXED
             mode='lines', name='M2 Supply',
             line=dict(color='#10B981', width=2),
             fill='tozeroy'
@@ -709,7 +709,7 @@ def economic_dashboard_page():
     
     if 'yield_spread' in econ_df.columns:
         fig.add_trace(go.Scatter(
-            x=econ_df.index, y=econ_df['yield_spread'],
+            x=econ_df['date'], y=econ_df['yield_spread'],  # FIXED
             mode='lines', name='Yield Spread',
             line=dict(color='#3B82F6', width=2),
             fill='tozeroy'
@@ -726,7 +726,6 @@ def economic_dashboard_page():
     
     st.plotly_chart(fig, use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
-    
     # ========================================================================
     # RECESSION SIGNAL INDICATOR
     # ========================================================================

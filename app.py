@@ -21,7 +21,10 @@ from pages.learning_hub import learning_hub_page
 from pages.model_accuracy import model_accuracy_page
 from pages.methodology import methodology_page
 from pages.economic_dashboard import economic_dashboard_page
-
+from pages.shock_detection import shock_detection_page
+from pages.causality_analysis import causality_analysis_page
+from pages.volatility_analysis import volatility_analysis_page
+from pages.event_impact import event_impact_page
 try:
     from pages.company_comparison import company_comparison_page
 except ImportError:
@@ -97,7 +100,7 @@ def load_all_data():
         progress_bar.progress(20)
 
         status_message.text("Loading economic indicators...")
-        economic_data, econ_df = load_economic_data("/Users/daryakrautsova/Desktop/Thesis/financial_forecasting_dataset.csv")
+        economic_data, econ_df = load_economic_data('financial_forecasting_dataset.csv')
         st.session_state.economic_data = economic_data
         st.session_state.econ_df = econ_df
         steps["econ"].success("Economics")
@@ -149,20 +152,24 @@ def render_page_content():
     current_page = st.session_state.current_page
     
     page_functions = {
-        "Dashboard": dashboard_page,
-        "Economic Dashboard": economic_dashboard_page,
-        "Sentiment Trends": sentiment_trends_page,
-        "Pattern Mining": pattern_mining_page,
-        "Entity Analysis": entity_analysis_page,
-        "Company Comparison": company_comparison_page,
-        "Correlation Analysis": correlation_analysis_page,
-        "AI Analysis": ai_analysis_page,
-        "Classifier Demo": classifier_demo_page,
-        "Model Accuracy": model_accuracy_page,
-        "Learning Hub": learning_hub_page,
-        "Methodology": methodology_page,
-        "Glossary": glossary_page,
-    }
+    "Dashboard": dashboard_page,
+    "Economic Dashboard": economic_dashboard_page,
+    "Sentiment Trends": sentiment_trends_page,
+    "Pattern Mining": pattern_mining_page,
+    "Entity Analysis": entity_analysis_page,
+    "Company Comparison": company_comparison_page,
+    "Correlation Analysis": correlation_analysis_page,
+    "AI Analysis": ai_analysis_page,
+    "Classifier Demo": classifier_demo_page,
+    "Model Accuracy": model_accuracy_page,
+    "Learning Hub": learning_hub_page,
+    "Methodology": methodology_page,
+    "Glossary": glossary_page,
+    "Causality Analysis": causality_analysis_page,
+    "Shock Detection": shock_detection_page,
+    "Volatility Analysis": volatility_analysis_page,
+    "Event Impact": event_impact_page,
+}
     
     if category == "Dashboard":
         dashboard_page()
