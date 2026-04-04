@@ -88,10 +88,11 @@ def load_real_economic_data(ticker, start_date="2020-01-01", end_date=None):
         macro_cols = list(macro_series.keys())
         for col in macro_cols:
             if col in final_df.columns:
-                final_df[col] = final_df[col].fillna(method='ffill')
+                final_df[col] = final_df[col] = final_df[col].ffill()
+
         
         # Fill any remaining NaN values
-        final_df = final_df.fillna(method='bfill')
+        final_df = final_df = final_df.bfill()
         
         # 5. Calculate Derived Indicators
         final_df['Ticker'] = ticker
