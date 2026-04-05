@@ -20,7 +20,9 @@ def dashboard_page():
     st.markdown('<p class="text-muted">Overview · Market Correlation · Sentiment Trends</p>', unsafe_allow_html=True)
     st.markdown('<br>', unsafe_allow_html=True)
 
-    # Load CSV data
+    # ========================================================================
+    # DATA LOADING WITH CACHE (Improvement #1 - already in data_fetcher.py)
+    # ========================================================================
     posts_df = load_reddit_data()
     
     if posts_df.empty:
@@ -59,16 +61,22 @@ def dashboard_page():
     posts_df = add_sentiment(posts_df)
     sentiment_df = aggregate_sentiment(posts_df)
     
-    # Store in session state
+    # ========================================================================
+    # SESSION STATE OPTIMIZATION (Improvement #3 - Store only derived data)
+    # ========================================================================
+    # Only store what's needed for other pages
     st.session_state.posts_data = posts_df
     st.session_state.sentiment_data = sentiment_df
     
-    # Get topics and patterns (if enough data)
+    # ========================================================================
+    # DATA GHOSTING FIX (Improvement #5 - Clear state when data insufficient)
+    # ========================================================================
     if len(posts_df) >= 10:
         st.session_state.topics = get_real_topics(posts_df)
         st.session_state.patterns = get_real_patterns(posts_df)
         st.session_state.model_results = get_real_model_results(posts_df)
     else:
+        # Clear ghost data when insufficient posts
         st.session_state.topics = {"Not enough data": ["Need at least 10 posts"]}
         st.session_state.patterns = pd.DataFrame(columns=['pattern', 'support', 'confidence', 'lift'])
         st.session_state.model_results = pd.DataFrame(columns=['Model', 'Accuracy', 'AUC', 'Precision', 'Recall'])
@@ -105,7 +113,7 @@ def dashboard_page():
         """, unsafe_allow_html=True)
     
     with col3:
-        avg_score = posts_df['score'].mean()
+        avg_score = posts_df['score'].mean() if not posts_df.empty else 0
         st.markdown(f"""
         <div class="metric-card" style="padding: 0.75rem;">
             <p class="tech-label" style="font-size: 0.7rem;">Avg Post Score</p>
@@ -114,7 +122,7 @@ def dashboard_page():
         """, unsafe_allow_html=True)
     
     with col4:
-        total_comments = posts_df['num_comments'].sum()
+        total_comments = posts_df['num_comments'].sum() if not posts_df.empty else 0
         st.markdown(f"""
         <div class="metric-card" style="padding: 0.75rem;">
             <p class="tech-label" style="font-size: 0.7rem;">Total Comments</p>
@@ -175,11 +183,9 @@ def dashboard_page():
     
     with tab1:
         # ====================================================================
-        # COMPANY STATS - TUTORIAL HIGHLIGHT - FIXED WITH SANDWICH METHOD
+        # COMPANY STATS - WITH EMPTY STATE HANDLING (Improvement #2)
         # ====================================================================
-        # Only show the card if there's data
-        if not company_stats.empty:
-            # OPEN the div with title inside
+        if company_stats is not None and not company_stats.empty:
             st.markdown('''
             <div class="card" data-tutorial="company-stats" style="padding: 1rem;">
                 <h3 style="font-size: 1.1rem; margin-top: 0;">Company Statistics</h3>
@@ -187,25 +193,26 @@ def dashboard_page():
             
             # Display top companies chart
             top_companies = company_stats.head(10)
-            fig = go.Figure()
-            fig.add_trace(go.Bar(
-                x=top_companies['post_count'],
-                y=top_companies['company_standard'],
-                orientation='h',
-                marker_color='#3B82F6',
-                text=top_companies['post_count'],
-                textposition='outside'
-            ))
-            fig.update_layout(
-                plot_bgcolor='rgba(0,0,0,0)',
-                paper_bgcolor='rgba(0,0,0,0)',
-                font=dict(color='#8A8F99', size=11),
-                xaxis_title="Number of Posts",
-                yaxis_title="Company",
-                height=350,
-                margin=dict(l=0, r=0, t=20, b=0)
-            )
-            st.plotly_chart(fig, use_container_width=True)
+            if not top_companies.empty:
+                fig = go.Figure()
+                fig.add_trace(go.Bar(
+                    x=top_companies['post_count'],
+                    y=top_companies['company_standard'],
+                    orientation='h',
+                    marker_color='#3B82F6',
+                    text=top_companies['post_count'],
+                    textposition='outside'
+                ))
+                fig.update_layout(
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    font=dict(color='#8A8F99', size=11),
+                    xaxis_title="Number of Posts",
+                    yaxis_title="Company",
+                    height=350,
+                    margin=dict(l=0, r=0, t=20, b=0)
+                )
+                st.plotly_chart(fig, use_container_width=True)
             
             # Display stats table
             st.markdown('<h4 style="font-size: 0.9rem;">Detailed Stats</h4>', unsafe_allow_html=True)
@@ -214,18 +221,17 @@ def dashboard_page():
                 display_stats['avg_compound'] = display_stats['avg_compound'].round(3)
             st.dataframe(display_stats, use_container_width=True)
             
-            # CLOSE the div
             st.markdown('</div>', unsafe_allow_html=True)
         else:
-            st.info("No company stats available for the selected filters.")
+            st.info("No company statistics available for the selected filters. Try selecting a different date range or company.")
     
     with tab2:
+        # ====================================================================
+        # MARKET OVERVIEW - WITH EMPTY STATE HANDLING (Improvement #2)
+        # ====================================================================
         col1, col2 = st.columns(2)
         
         with col1:
-            # ================================================================
-            # MARKET CHARTS - TUTORIAL HIGHLIGHT - FIXED
-            # ================================================================
             if not market_df.empty and 'spy' in market_df.columns and 'date' in market_df.columns:
                 st.markdown('''
                 <div class="card" data-tutorial="market-charts" style="padding: 1rem;">
@@ -257,9 +263,6 @@ def dashboard_page():
                 st.markdown('<div class="card" style="padding: 1rem;"><h3 style="font-size: 1.1rem;">Market Performance</h3><p>No market data available for the selected date range.</p></div>', unsafe_allow_html=True)
 
         with col2:
-            # ================================================================
-            # VIX CHART - FIXED
-            # ================================================================
             if (not market_df.empty and 'vix' in market_df.columns and 'date' in market_df.columns 
                 and not market_df['vix'].isna().all()):
                 st.markdown('''
@@ -295,9 +298,9 @@ def dashboard_page():
     
     with tab3:
         # ====================================================================
-        # SENTIMENT CHART - TUTORIAL HIGHLIGHT - FIXED
+        # SENTIMENT TRENDS - WITH EMPTY STATE HANDLING (Improvement #2)
         # ====================================================================
-        if not sentiment_df.empty:
+        if sentiment_df is not None and not sentiment_df.empty:
             st.markdown('''
             <div class="card" data-tutorial="sentiment-chart" style="padding: 1rem;">
                 <h3 style="font-size: 1.1rem; margin-top: 0;">Sentiment Trends Over Time</h3>
@@ -308,60 +311,61 @@ def dashboard_page():
             
             st.markdown('</div>', unsafe_allow_html=True)
         else:
-            st.markdown('<div class="card" style="padding: 1rem;"><h3 style="font-size: 1.1rem;">Sentiment Trends</h3><p>No sentiment data available.</p></div>', unsafe_allow_html=True)
+            st.markdown('<div class="card" style="padding: 1rem;"><h3 style="font-size: 1.1rem;">Sentiment Trends</h3><p>No sentiment data available for the selected filters.</p></div>', unsafe_allow_html=True)
         
-        # Sentiment stats row - these don't need to be in a card (they're separate)
-        col1, col2, col3 = st.columns(3)
-        total_posts_sentiment = sentiment_df[['positive', 'neutral', 'negative']].sum().sum() if not sentiment_df.empty else 0
-        
-        with col1:
-            pos_count = sentiment_df['positive'].sum() if not sentiment_df.empty else 0
-            pos_pct = (pos_count / total_posts_sentiment * 100) if total_posts_sentiment > 0 else 0
-            st.markdown(f"""
-            <div class="metric-card" style="padding: 0.75rem;">
-                <p class="tech-label" style="font-size: 0.7rem;">Positive Posts</p>
-                <p class="tech-val" style="font-size: 1.5rem;">{pos_count:,}</p>
-                <p class="tech-label" style="font-size:0.6rem;">{pos_pct:.1f}% of total</p>
-            </div>
-            """, unsafe_allow_html=True)
-        with col2:
-            neu_count = sentiment_df['neutral'].sum() if not sentiment_df.empty else 0
-            neu_pct = (neu_count / total_posts_sentiment * 100) if total_posts_sentiment > 0 else 0
-            st.markdown(f"""
-            <div class="metric-card" style="padding: 0.75rem;">
-                <p class="tech-label" style="font-size: 0.7rem;">Neutral Posts</p>
-                <p class="tech-val" style="font-size: 1.5rem;">{neu_count:,}</p>
-                <p class="tech-label" style="font-size:0.6rem;">{neu_pct:.1f}% of total</p>
-            </div>
-            """, unsafe_allow_html=True)
-        with col3:
-            neg_count = sentiment_df['negative'].sum() if not sentiment_df.empty else 0
-            neg_pct = (neg_count / total_posts_sentiment * 100) if total_posts_sentiment > 0 else 0
-            st.markdown(f"""
-            <div class="metric-card" style="padding: 0.75rem;">
-                <p class="tech-label" style="font-size: 0.7rem;">Negative Posts</p>
-                <p class="tech-val" style="font-size: 1.5rem;">{neg_count:,}</p>
-                <p class="tech-label" style="font-size:0.6rem;">{neg_pct:.1f}% of total</p>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        # Add average sentiment score
-        if not sentiment_df.empty and 'avg_compound' in sentiment_df.columns:
-            avg_sentiment = sentiment_df['avg_compound'].mean()
-            sentiment_color = "#10B981" if avg_sentiment > 0.05 else ("#EF4444" if avg_sentiment < -0.05 else "#F59E0B")
-            st.markdown(f"""
-            <div class="metric-card" style="padding: 0.75rem; margin-top: 0.5rem;">
-                <p class="tech-label" style="font-size: 0.7rem;">Average Sentiment Score</p>
-                <p class="tech-val" style="font-size: 1.5rem; color: {sentiment_color};">{avg_sentiment:.3f}</p>
-                <p class="tech-label" style="font-size:0.6rem;">(Positive > 0.05, Neutral -0.05 to 0.05, Negative < -0.05)</p>
-            </div>
-            """, unsafe_allow_html=True)
+        # Sentiment stats row
+        if sentiment_df is not None and not sentiment_df.empty:
+            col1, col2, col3 = st.columns(3)
+            total_posts_sentiment = sentiment_df[['positive', 'neutral', 'negative']].sum().sum()
+            
+            with col1:
+                pos_count = sentiment_df['positive'].sum()
+                pos_pct = (pos_count / total_posts_sentiment * 100) if total_posts_sentiment > 0 else 0
+                st.markdown(f"""
+                <div class="metric-card" style="padding: 0.75rem;">
+                    <p class="tech-label" style="font-size: 0.7rem;">Positive Posts</p>
+                    <p class="tech-val" style="font-size: 1.5rem;">{pos_count:,}</p>
+                    <p class="tech-label" style="font-size:0.6rem;">{pos_pct:.1f}% of total</p>
+                </div>
+                """, unsafe_allow_html=True)
+            with col2:
+                neu_count = sentiment_df['neutral'].sum()
+                neu_pct = (neu_count / total_posts_sentiment * 100) if total_posts_sentiment > 0 else 0
+                st.markdown(f"""
+                <div class="metric-card" style="padding: 0.75rem;">
+                    <p class="tech-label" style="font-size: 0.7rem;">Neutral Posts</p>
+                    <p class="tech-val" style="font-size: 1.5rem;">{neu_count:,}</p>
+                    <p class="tech-label" style="font-size:0.6rem;">{neu_pct:.1f}% of total</p>
+                </div>
+                """, unsafe_allow_html=True)
+            with col3:
+                neg_count = sentiment_df['negative'].sum()
+                neg_pct = (neg_count / total_posts_sentiment * 100) if total_posts_sentiment > 0 else 0
+                st.markdown(f"""
+                <div class="metric-card" style="padding: 0.75rem;">
+                    <p class="tech-label" style="font-size: 0.7rem;">Negative Posts</p>
+                    <p class="tech-val" style="font-size: 1.5rem;">{neg_count:,}</p>
+                    <p class="tech-label" style="font-size:0.6rem;">{neg_pct:.1f}% of total</p>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            # Add average sentiment score
+            if 'avg_compound' in sentiment_df.columns:
+                avg_sentiment = sentiment_df['avg_compound'].mean()
+                sentiment_color = "#10B981" if avg_sentiment > 0.05 else ("#EF4444" if avg_sentiment < -0.05 else "#F59E0B")
+                st.markdown(f"""
+                <div class="metric-card" style="padding: 0.75rem; margin-top: 0.5rem;">
+                    <p class="tech-label" style="font-size: 0.7rem;">Average Sentiment Score</p>
+                    <p class="tech-val" style="font-size: 1.5rem; color: {sentiment_color};">{avg_sentiment:.3f}</p>
+                    <p class="tech-label" style="font-size:0.6rem;">(Positive > 0.05, Neutral -0.05 to 0.05, Negative < -0.05)</p>
+                </div>
+                """, unsafe_allow_html=True)
     
     with tab4:
         # ====================================================================
-        # RECENT POSTS - FIXED
+        # RECENT POSTS - WITH EMPTY STATE HANDLING (Improvement #2)
         # ====================================================================
-        if not posts_df.empty:
+        if posts_df is not None and not posts_df.empty:
             st.markdown('''
             <div class="card" style="padding: 1rem;">
                 <h3 style="font-size: 1.1rem; margin-top: 0;">Recent Posts</h3>
@@ -384,6 +388,7 @@ def dashboard_page():
             st.markdown('</div>', unsafe_allow_html=True)
         else:
             st.markdown('<div class="card" style="padding: 1rem;"><h3 style="font-size: 1.1rem;">Recent Posts</h3><p>No posts available for the selected filters.</p></div>', unsafe_allow_html=True)
+
 
 if __name__ == "__main__":
     dashboard_page()

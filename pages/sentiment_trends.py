@@ -45,7 +45,7 @@ def sentiment_trends_page():
         # ====================================================================
         st.markdown('<div class="card" data-tutorial="sentiment-chart">', unsafe_allow_html=True)
         fig = create_sentiment_trend_chart(sentiment_df)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, use_container_width=True, key="sentiment_trend_main")
         st.markdown("""
         <p class="text-muted">Sentiment volume over time. Positive (green), Neutral (gray), Negative (red).</p>
         """, unsafe_allow_html=True)
@@ -87,7 +87,7 @@ def sentiment_trends_page():
                     yaxis_title="Positive Sentiment Ratio",
                     height=400
                 )
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, use_container_width=True, key="sentiment_vix_scatter")
                 
                 # Add correlation info
                 correlation = merged['vix'].corr(merged['sentiment_ratio'])
@@ -109,7 +109,7 @@ def sentiment_trends_page():
         st.markdown('<div class="card">', unsafe_allow_html=True)
         st.markdown('<h3>Sentiment Correlation Heatmap</h3>', unsafe_allow_html=True)
         fig = create_heatmap()
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, use_container_width=True, key="sentiment_heatmap")
         st.markdown('</div>', unsafe_allow_html=True)
 
     with tab4:
@@ -147,7 +147,7 @@ def sentiment_trends_page():
                 font=dict(color='#8A8F99'), xaxis_title="Date", yaxis_title="Predicted Positive Ratio",
                 height=400
             )
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, use_container_width=True, key="sentiment_forecast")
         else:
             st.info("No data for forecast.")
         st.markdown('</div>', unsafe_allow_html=True)
@@ -157,7 +157,7 @@ def sentiment_trends_page():
         st.markdown('<h3>Sentiment Flow (Sankey Diagram)</h3>', unsafe_allow_html=True)
         st.markdown('<p class="text-muted">Shows how sentiment shifts between months.</p>', unsafe_allow_html=True)
         fig = create_sankey_diagram()
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, use_container_width=True, key="sentiment_sankey")
         st.markdown('</div>', unsafe_allow_html=True)
 
     with tab6:

@@ -44,10 +44,11 @@ from data_loader import load_economic_data
 # ============================================================================
 def initialize_session_state():
     """Initialize all session state variables."""
+    # Set default page to GLOBAL MACRO category
     if 'current_page' not in st.session_state:
-        st.session_state.current_page = "Dashboard"
+        st.session_state.current_page = "Economic Dashboard"  # First page in GLOBAL MACRO
     if 'current_category' not in st.session_state:
-        st.session_state.current_category = "Dashboard"
+        st.session_state.current_category = "GLOBAL MACRO"    # First category
     if 'posts_data' not in st.session_state:
         st.session_state.posts_data = pd.DataFrame()
     if 'sentiment_data' not in st.session_state:

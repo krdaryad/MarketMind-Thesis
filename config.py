@@ -631,30 +631,32 @@ div[data-baseweb="select"] div[aria-hidden="true"] {
 # CATEGORY MAPPING
 # ============================================================================
 CATEGORIES = {
-    "Dashboard": ["Dashboard"],
-    "Economic Dashboard": [
-        "Economic Dashboard"
+    "GLOBAL MACRO": [
+        "Economic Dashboard",  # The broad context
+        "Causality Analysis"   # Testing macro indicators vs returns
     ],
-    "AI Analysis": [
-        "Sentiment Trends",
-        "Pattern Mining", 
-        "Entity Analysis", 
-        "Company Comparison", 
-        "Correlation Analysis",
-        "AI Analysis", 
-        "Classifier Demo", 
-        "Model Accuracy",
-        "Causality Analysis", 
-        "Shock Detection",
-        "Volatility Analysis",
-        "Event Impact",
+    "2021 STOCK CASE STUDY": [
+        "Dashboard",           # The 2021 "Front Page"
+        "Sentiment Trends",    # Time-series flow
+        "Entity Analysis",     # Who was discussed?
+        "Company Comparison",  # Side-by-side deep dive
+        "Volatility Analysis", # Sentiment instability
+        "Event Impact"         # Specific shocks (e.g., GME squeeze)
     ],
-    "Knowledge Hub": [
-        "Learning Hub",
-        "Methodology", 
-        "Glossary"
+    "AI ENGINE & PATTERN MINING": [
+        "AI Analysis",         # Model outputs/Topics
+        "Correlation Analysis",# Sentiment vs Market stats
+        "Pattern Mining",      # Frequent terms/Association rules
+        "Classifier Demo",     # Live interactive test
+        "Model Accuracy"       # Technical validation (ROC/Clusters)
+    ],
+    "KNOWLEDGE & THEORY": [
+        "Learning Hub",        # Interactive courses
+        "Methodology",         # Technical approach
+        "Glossary"             # Term definitions
     ]
 }
+
 
 # ============================================================================
 # DEFAULTS
