@@ -24,7 +24,7 @@ class DataProcessor:
     def load_data(self, filepath):
         """Load and prepare the dataset"""
         self.df = pd.read_csv(filepath)
-        print(f"Loaded dataset: {self.df.shape}")
+       # print(f"Loaded dataset: {self.df.shape}")
         
         # Create main dataframe with text and label
         X = self.df[['text', 'label']].copy()

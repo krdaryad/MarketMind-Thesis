@@ -11,7 +11,7 @@ warnings.filterwarnings('ignore')
 # ============================================================================
 # DEBUG SETTINGS
 # ============================================================================
-DEBUG_MODE = True  # Set to False in production
+DEBUG_MODE = False  # Set to False in production
 
 # ============================================================================
 # FILE PATHS
@@ -253,7 +253,123 @@ div.stButton > button:disabled {
     opacity: 0.5 !important;
     transform: none !important;
 }
+
+/* ===== SMALLER BUTTONS - GLOBAL OVERRIDE ===== */
+/* Sidebar buttons specifically */
+[data-testid="stSidebar"] .stButton > button {
+    font-size: 0.65rem !important;
+    padding: 0.2rem 0.4rem !important;
+    min-height: 26px !important;
+}
+
+
+/* Refresh button in sidebar */
+[data-testid="stSidebar"] .stButton button {
+    font-size: 0.6rem !important;
+    padding: 0.2rem 0.3rem !important;
+    min-height: 24px !important;
+}
+/* ===== SIDEBAR TEXT-ONLY BUTTONS (No circles, just underline) ===== */
+[data-testid="stSidebar"] .stButton > button {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0.25rem 0 !important;
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+    color: #8A8F99 !important;
+    text-align: left !important;
+    border-radius: 0 !important;
+    transition: all 0.2s ease !important;
+}
+
+[data-testid="stSidebar"] .stButton > button:hover {
+    color: #3B82F6 !important;
+    text-decoration: underline !important;
+    background: transparent !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+[data-testid="stSidebar"] .stButton > button:active,
+[data-testid="stSidebar"] .stButton > button:focus {
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+}
+
+/* Primary buttons in sidebar (keep subtle) */
+[data-testid="stSidebar"] .stButton > button[kind="primary"] {
+    background: transparent !important;
+    color: #3B82F6 !important;
+    font-weight: 600 !important;
+}
+
+[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
+    color: #2563EB !important;
+    text-decoration: underline !important;
+}
+
+/* Download buttons in sidebar */
+[data-testid="stSidebar"] .stDownloadButton button {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: #8A8F99 !important;
+    text-align: left !important;
+    padding: 0.25rem 0 !important;
+}
+
+[data-testid="stSidebar"] .stDownloadButton button:hover {
+    color: #3B82F6 !important;
+    text-decoration: underline !important;
+    background: transparent !important;
+}
+/* ===== EXPANDER STYLING - Clean text, no circle/box ===== */
+.streamlit-expanderHeader {
+    background: transparent !important;
+    border: none !important;
+    padding: 0.5rem 0 !important;
+    font-size: 0.65rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 1px !important;
+    color: #8A8F99 !important;
+    text-transform: uppercase !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+}
+
+.streamlit-expanderHeader:hover {
+    color: #3B82F6 !important;
+    background: transparent !important;
+}
+
+.streamlit-expanderHeader svg {
+    display: none !important;
+}
+
+.streamlit-expanderHeader p {
+    margin: 0 !important;
+}
+
+
+
+/* Content area styling */
+.streamlit-expanderContent {
+    background: transparent !important;
+    border: none !important;
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+}
+/* ===== REDUCE SIDEBAR WIDTH - Alternative selectors ===== */
+section[data-testid="stSidebar"] {
+    width: 260px !important;
+    min-width: 260px !important;
+    max-width: 260px !important;
+}
+
 </style>
+
 """
 
 # ============================================================================

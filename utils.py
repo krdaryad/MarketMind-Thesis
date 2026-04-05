@@ -97,7 +97,8 @@ def show_onboarding():
                     st.session_state.onboarding_active = False
                     st.rerun()
         
-        st.markdown("---")
+                 # Single faint divider between branding and controls
+        st.markdown('<hr style="opacity: 0.1; margin: 0.5rem 0;">', unsafe_allow_html=True)
     else:
         if st.button("Restart Tour", key="restart_tour", use_container_width=True):
             st.session_state.onboarding_active = True
@@ -105,22 +106,37 @@ def show_onboarding():
             st.rerun()
 
 def toggle_theme():
-    """Toggle between dark and light mode using a modern capsule button."""
-    is_dark = st.session_state.get('dark_mode', True)
-    icon = "" if is_dark else "☀️"
-    mode_text = "Dark Mode" if is_dark else "Light Mode"
+    """Single-button modern theme toggle with dynamic icon and label."""
+    # 1. Initialize State
+    if 'dark_mode' not in st.session_state:
+        st.session_state.dark_mode = True
+
+    is_dark = st.session_state.dark_mode
+
+    # 2. Section Label
+    st.sidebar.markdown('<p style="font-size:0.65rem; color:#8A8F99; letter-spacing:1px; margin-bottom:10px;">APPEARANCE</p>', unsafe_allow_html=True)
     
-    st.sidebar.markdown("""
-        <div style="font-size: 0.65rem; color: #8A8F99; margin-bottom: 5px; margin-left: 5px;">
-            SYSTEM THEME
-        </div>
-    """, unsafe_allow_html=True)
+    # 3. Dynamic Styling based on State
+    # If Dark: Show Sun icon to switch to Light. If Light: Show Moon icon to switch to Dark.
+    label = "Light Mode" if is_dark else "Dark Mode"
+    help_text = "Switch to high-contrast light mode" if is_dark else "Switch to eye-friendly dark mode"
     
-    if st.sidebar.button(f"{icon} {mode_text}", use_container_width=True):
+    # 4. Functional Toggle Button
+    if st.sidebar.button(label, use_container_width=True, help=help_text):
         st.session_state.dark_mode = not is_dark
+        # Import and apply theme instantly
         from config import apply_theme
         apply_theme()
         st.rerun()
+
+    # 5. Visual "Active State" Indicator (Subtle underline)
+    active_color = "#3B82F6" if is_dark else "#F59E0B" # Blue for Dark, Amber for Light
+    st.sidebar.markdown(f"""
+        <div style="width: 100%; height: 2px; background: rgba(255,255,255,0.05); margin-top: -10px;">
+            <div style="width: 100%; height: 100%; background: {active_color}; opacity: 0.6;"></div>
+        </div>
+    """, unsafe_allow_html=True)
+
 
 def render_data_quality():
     """Displays a high-tech data health indicator."""
@@ -156,9 +172,7 @@ def render_data_quality():
     """, unsafe_allow_html=True)
 
 def render_system_controls(posts_df):
-    """Modern buttons for technical operations."""
-    st.sidebar.markdown('<br>', unsafe_allow_html=True)
-    st.sidebar.markdown('<p class="tech-label" style="font-size:0.6rem; color:#8A8F99;">SYSTEM UTILITIES</p>', unsafe_allow_html=True)
+    
     
     col1, col2 = st.sidebar.columns(2)
     
@@ -225,46 +239,36 @@ def render_sidebar():
     
     with st.sidebar:
         try:
-            # 1. Load and encode the logo
-            with open("logo.png", "rb") as f:
+            # 1. Determine which logo to use based on theme
+            is_dark = st.session_state.get('dark_mode', True)
+            logo_filename = "logo.png" if is_dark else "logo_light.png"
+            
+            # 2. Load and encode the logo
+            with open(logo_filename, "rb") as f:
                 logo_data = base64.b64encode(f.read()).decode()
             
-            # 2. Render logo: Centered, no glow, no text
+            # 3. Render logo with slight transition effect
             st.markdown(f"""
-                <div style="display: flex; justify-content: center; padding: 0.5rem 0 2rem 0;">
+                <div style="display: flex; justify-content: center; padding: 0.5rem 0 2rem 0; transition: opacity 0.3s ease;">
                     <img src="data:image/png;base64,{logo_data}" 
-                         style="width: 180px; opacity: 1;">
+                        style="width: 180px; opacity: 1;">
                 </div>
             """, unsafe_allow_html=True)
             
         except FileNotFoundError:
+            # Fallback to text if no logo found
             st.sidebar.markdown("<h2 style='text-align: center;'>MarketMind</h2>", unsafe_allow_html=True)
-
         # ====================================================================
         # THEME TOGGLE - MODERN CAPSULE BUTTON
         # ====================================================================
         toggle_theme()
         
-        st.markdown("---")
         
-        # ====================================================================
-        # REFRESH BUTTON
-        # ====================================================================
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("Refresh", use_container_width=True, help="Clear cache and reload data"):
-                st.cache_data.clear()
-                st.success("Cache cleared!")
-                st.rerun()
-        
-        with col2:
-            if check_for_new_data():
-                st.info("New data!")
         
         # ====================================================================
         # ANALYSIS FILTERS
         # ====================================================================
-        with st.expander("ANALYSIS FILTERS", expanded=True):
+        with st.expander("ANALYSIS FILTERS", expanded=False):
             # Load data for filters
             posts_df = load_reddit_data()
             
@@ -305,7 +309,7 @@ def render_sidebar():
         # ====================================================================
         # DATA QUALITY MONITOR
         # ====================================================================
-        render_data_quality()
+        #render_data_quality()
         
         # ====================================================================
         # SYSTEM CONTROLS (Export + Debug)
@@ -313,31 +317,6 @@ def render_sidebar():
         posts_df = st.session_state.get('posts_data', None)
         render_system_controls(posts_df)
         
-        # ====================================================================
-        # SYSTEM KERNEL ID (Academic Power Move)
-        # ====================================================================
-        if 'session_id' in st.session_state:
-            session_id_short = str(st.session_state.session_id)[-8:]
-            st.markdown(f"""
-            <div style="margin-top: 1rem; padding: 0.5rem; border-top: 1px solid rgba(59,130,246,0.2);">
-                <p style="font-family: monospace; font-size: 0.55rem; color: #64748B; text-align: center; margin: 0;">
-                    SYSTEM KERNEL: {session_id_short}
-                </p>
-                <p style="font-family: monospace; font-size: 0.5rem; color: #64748B; text-align: center; margin: 0.25rem 0 0 0;">
-                    SESSION: {st.session_state.session_start.strftime('%Y-%m-%d %H:%M') if 'session_start' in st.session_state else 'N/A'}
-                </p>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        # ====================================================================
-        # VERSION FOOTER
-        # ====================================================================
-        st.markdown("""
-            <div style="margin-top: 1rem; text-align: center; opacity: 0.4; font-size: 0.55rem;">
-                MARKETMIND ENGINE v2.4.0<br>
-                © 2026 THESIS PROJECT
-            </div>
-        """, unsafe_allow_html=True)
 
 def render_top_menu():
     """Render top menu with categories."""
@@ -379,10 +358,29 @@ def render_footer():
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown("""
-    <div style="text-align: center; padding: 1rem 0 1rem 0; border-top: 1px solid rgba(59,130,246,0.2); margin-top: 1rem;">
-        <p class="text-muted" style="font-size: 0.7rem;">
-            MarketMind - AI Consumer Behavior Analysis | Thesis Prototype 2021
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
+    # ====================================================================
+        # SYSTEM KERNEL ID (Academic Power Move)
+        # ====================================================================
+    if 'session_id' in st.session_state:
+            session_id_short = str(st.session_state.session_id)[-8:]
+            st.markdown(f"""
+            <div style="margin-top: 1rem; padding: 0.5rem; border-top: 1px solid rgba(59,130,246,0.2);">
+                <p style="font-family: monospace; font-size: 0.55rem; color: #64748B; text-align: center; margin: 0;">
+                    SYSTEM KERNEL: {session_id_short}
+                </p>
+                <p style="font-family: monospace; font-size: 0.5rem; color: #64748B; text-align: center; margin: 0.25rem 0 0 0;">
+                    SESSION: {st.session_state.session_start.strftime('%Y-%m-%d %H:%M') if 'session_start' in st.session_state else 'N/A'}
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+    '''''   # ====================================================================
+        # VERSION FOOTER
+        # ====================================================================
+            st.markdown("""
+            <div style="margin-top: 1rem; text-align: center; opacity: 0.4; font-size: 0.55rem;">
+                MARKETMIND ENGINE v2.4.0<br>
+                © 2026 THESIS PROJECT
+            </div>
+        """, unsafe_allow_html=True)
+    '''''

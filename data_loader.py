@@ -117,7 +117,7 @@ def load_real_economic_data(ticker, start_date="2020-01-01", end_date=None):
         # Create the dictionary structure your dashboard expects
         ticker_data = {ticker: final_df.set_index('date')}
         
-        st.success(f" Loaded {len(final_df)} days of data for {ticker}")
+       # st.success(f" Loaded {len(final_df)} days of data for {ticker}")
         return ticker_data, final_df
 
     except Exception as e:
