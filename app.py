@@ -8,7 +8,12 @@ from config import CATEGORIES, apply_theme
 from utils import (
     show_onboarding, render_sidebar, render_top_menu, render_header, render_footer
 )
-
+st.set_page_config(
+    page_title="MarketMind AI",
+    page_icon="📊",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 # Import all page functions
 from pages.dashboard import dashboard_page
 from pages.sentiment_trends import sentiment_trends_page
