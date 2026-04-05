@@ -11,7 +11,7 @@ import numpy as np
 
 # Initialize FRED (Replace with your actual API key)
 # Get a free key at: https://fred.stlouisfed.org
-FRED_API_KEY = 'b228803d95c70e457261e97fed70b4b4'  # Replace with your actual key
+FRED_API_KEY = st.secrets["FRED_API_KEY"]
 fred = Fred(api_key=FRED_API_KEY)
 
 @st.cache_data(ttl=86400)  # Cache for 24 hours
