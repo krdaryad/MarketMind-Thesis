@@ -767,6 +767,7 @@ CATEGORIES = {
         "Model Accuracy"       # Technical validation (ROC/Clusters)
     ],
     "KNOWLEDGE & THEORY": [
+        "Market History",
         "Learning Hub",        # Interactive courses
         "Methodology",         # Technical approach
         "Glossary"             # Term definitions

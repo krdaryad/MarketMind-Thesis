@@ -28,8 +28,10 @@ from pages.methodology import methodology_page
 from pages.economic_dashboard import economic_dashboard_page
 from pages.shock_detection import shock_detection_page
 from pages.causality_analysis import causality_analysis_page
+from pages.market_history import market_history_page
 from pages.volatility_analysis import volatility_analysis_page
 from pages.event_impact import event_impact_page
+
 try:
     from pages.company_comparison import company_comparison_page
 except ImportError:
@@ -174,7 +176,9 @@ def render_page_content():
     "Causality Analysis": causality_analysis_page,
     "Shock Detection": shock_detection_page,
     "Volatility Analysis": volatility_analysis_page,
+    "Market History": market_history_page,
     "Event Impact": event_impact_page,
+    
 }
     
     if category == "Dashboard":
