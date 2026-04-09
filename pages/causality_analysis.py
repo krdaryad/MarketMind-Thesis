@@ -123,9 +123,11 @@ def causality_analysis_page():
     # ========================================================================
     from statsmodels.tsa.stattools import grangercausalitytests
     
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.markdown('<h3 style="font-size: 1.1rem; margin-top: 0;">Test: Consumer Sentiment -> S&P 500 Returns</h3>', unsafe_allow_html=True)
-    
+    st.markdown('''
+            <div class="card" data-tutorial="company-stats" style="padding: 0.5rem;">
+                <h3 style="font-size: 1.1rem; margin-top: 0;">Test: Consumer Sentiment -> S&P 500 Returns</h3>
+            ''', unsafe_allow_html=True)
+
     results = {}
     for lag in range(1, max_lag + 1):
         try:
@@ -263,9 +265,10 @@ def causality_analysis_page():
     # REVERSE CAUSALITY TEST (Control)
     # ========================================================================
     if show_reverse:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown('<h3 style="font-size: 1.1rem; margin-top: 0;">Control Test: Returns -> Consumer Sentiment</h3>', unsafe_allow_html=True)
-        
+        st.markdown('''
+            <div class="card" data-tutorial="company-stats" style="padding: 0.5rem;">
+               <h3 style="font-size: 1.1rem; margin-top: 0;">Control Test: Returns -> Consumer Sentiment</h3>
+            ''', unsafe_allow_html=True)
         reverse_data = df[['consumer_sentiment', 'market_return']].dropna()
         
         reverse_results = {}

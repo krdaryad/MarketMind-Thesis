@@ -35,7 +35,6 @@ def event_impact_page():
         'Congress Hearing': '2021-02-18'
     }
     
-    st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown('<h3>Select Event to Analyze</h3>', unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)

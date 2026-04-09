@@ -47,7 +47,46 @@ def onboarding_step(step):
     }
 }
     return steps.get(step, steps[1])
+def play_success_sound():
+    """Play success sound using numpy-generated sine wave."""
+    sample_rate = 44100
+    duration = 0.25
+    num_samples = int(sample_rate * duration)
+    t = np.linspace(0, duration, num_samples, False)
+    
+    # Create wave array
+    wave = np.zeros(num_samples)
+    
+    # First half: 880Hz
+    half_point = num_samples // 2
+    wave[:half_point] = np.sin(880 * t[:half_point] * 2 * np.pi)
+    
+    # Second half: 1046Hz
+    wave[half_point:] = np.sin(1046 * t[half_point:] * 2 * np.pi) * 0.8
+    
+    # Fade out
+    fade = np.linspace(1, 0, num_samples)
+    wave = wave * fade
+    
+    st.audio(wave, sample_rate=sample_rate, autoplay=True)
 
+def play_error_sound():
+    """Play error sound using numpy-generated sawtooth wave."""
+    sample_rate = 44100
+    duration = 0.3
+    num_samples = int(sample_rate * duration)
+    t = np.linspace(0, duration, num_samples, False)
+    
+    # Generate sawtooth wave
+    frequency = 220
+    wave = 2 * (frequency * t - np.floor(0.5 + frequency * t))
+    wave = wave - 1  # Center around 0
+    
+    # Fade out
+    fade = np.exp(-5 * t)
+    wave = wave * fade
+    
+    st.audio(wave, sample_rate=sample_rate, autoplay=True)
 def show_onboarding():
     """Display onboarding tour as a floating glass card."""
     if "onboarding_step" not in st.session_state:

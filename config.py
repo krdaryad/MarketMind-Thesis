@@ -361,12 +361,6 @@ div.stButton > button:disabled {
     padding-top: 0.5rem !important;
     padding-bottom: 0.5rem !important;
 }
-/* ===== REDUCE SIDEBAR WIDTH - Alternative selectors ===== */
-section[data-testid="stSidebar"] {
-    width: 260px !important;
-    min-width: 260px !important;
-    max-width: 260px !important;
-}
 
 </style>
 

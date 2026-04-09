@@ -34,7 +34,6 @@ def ai_analysis_page():
         # ====================================================================
         # TOPICS CARD - TUTORIAL HIGHLIGHT
         # ====================================================================
-        st.markdown('<div class="card" data-tutorial="topics-card">', unsafe_allow_html=True)
         
         # Header with educational popup
         header_col1, header_col2 = st.columns([4, 1])
@@ -76,7 +75,6 @@ def ai_analysis_page():
         # ====================================================================
         # RADAR CHART - TUTORIAL HIGHLIGHT
         # ====================================================================
-        st.markdown('<div class="card" data-tutorial="radar-chart">', unsafe_allow_html=True)
         
         # Header with badge
         st.markdown("""
@@ -176,7 +174,6 @@ def ai_analysis_page():
     # ========================================================================
     # VADER SENTIMENT SECTION
     # ========================================================================
-    st.markdown('<div class="card">', unsafe_allow_html=True)
     
     # Header with educational popup
     header_col1, header_col2 = st.columns([4, 1])

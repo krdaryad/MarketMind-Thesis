@@ -52,8 +52,7 @@ def company_comparison_page():
     # ========================================================================
     # METRICS OVERVIEW
     # ========================================================================
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.markdown('<h3>Key Metrics Comparison</h3>', unsafe_allow_html=True)
+    st.markdown('<h3> Key Metrics Comparison</h3>', unsafe_allow_html=True)
     
     # Calculate metrics for selected companies
     metrics_data = []
@@ -95,9 +94,10 @@ def company_comparison_page():
     # ========================================================================
     # POST VOLUME CHART
     # ========================================================================
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.markdown('<h3>Post Volume by Company</h3>', unsafe_allow_html=True)
-    
+    st.markdown('''
+            <div class="card" data-tutorial="company-stats" style="padding: 0.5rem;">
+                <h4> Post Volume by Company</h4>
+            ''', unsafe_allow_html=True)
     fig = go.Figure()
     fig.add_trace(go.Bar(
         x=df_metrics['Company'],
@@ -122,9 +122,11 @@ def company_comparison_page():
     # ENGAGEMENT METRICS (if multiple companies)
     # ========================================================================
     if len(selected_companies) > 1:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown('<h3>Engagement Metrics</h3>', unsafe_allow_html=True)
         
+        st.markdown('''
+            <div class="card" data-tutorial="company-stats" style="padding: 0.5rem;">
+                <h4> Engagement Metrics</h4>
+            ''', unsafe_allow_html=True)
         fig = make_subplots(specs=[[{"secondary_y": True}]])
         
         # Avg Score bars
@@ -166,9 +168,11 @@ def company_comparison_page():
     # SENTIMENT DISTRIBUTION
     # ========================================================================
     if 'Positive %' in df_metrics.columns:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown('<h3>Sentiment Distribution Comparison</h3>', unsafe_allow_html=True)
         
+        st.markdown('''
+            <div class="card" data-tutorial="company-stats" style="padding: 0.5rem;">
+                <h4> Sentiment Distribution Comparison</h4>
+            ''', unsafe_allow_html=True)
         fig = go.Figure()
         
         for _, row in df_metrics.iterrows():
@@ -194,9 +198,11 @@ def company_comparison_page():
         
         # Average sentiment score if available
         if 'Avg Sentiment' in df_metrics.columns:
-            st.markdown('<div class="card">', unsafe_allow_html=True)
-            st.markdown('<h3>Average Sentiment Score</h3>', unsafe_allow_html=True)
             
+            st.markdown('''
+            <div class="card" data-tutorial="company-stats" style="padding: 0.5rem;">
+                <h4> Average Sentiment Score</h4>
+            ''', unsafe_allow_html=True)
             fig = go.Figure()
             colors = ['#10B981' if x > 0.05 else '#EF4444' if x < -0.05 else '#F59E0B' for x in df_metrics['Avg Sentiment']]
             
@@ -221,13 +227,47 @@ def company_comparison_page():
             st.plotly_chart(fig, use_container_width=True)
             st.markdown('</div>', unsafe_allow_html=True)
     
-    # ========================================================================
-    # TIME SERIES COMPARISON (if data available)
+         # ========================================================================
+    # TIME SERIES COMPARISON (with company-specific events)
     # ========================================================================
     if len(selected_companies) <= 5:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown('<h3>Sentiment Over Time</h3>', unsafe_allow_html=True)
-        st.markdown('<p class="text-muted">Daily net sentiment (positive - negative) / total posts</p>', unsafe_allow_html=True)
+        st.markdown('''
+            <div class="card" data-tutorial="company-stats" style="padding: 0.5rem;">
+                <h4>Sentiment Over Time</h4>
+            </div>
+        ''', unsafe_allow_html=True)
+        st.markdown('<p class="text-muted">Daily net sentiment (positive - negative) / total posts. Hover over markers for company events.</p>', unsafe_allow_html=True)
+        
+        # ========================================================================
+        # COMPANY-SPECIFIC EVENTS (February-March 2021)
+        # ========================================================================
+        company_events = {
+            'Tesla': [
+                {'date': '2021-02-08', 'title': 'Tesla Buys $1.5B Bitcoin', 'desc': 'Tesla announced $1.5 billion Bitcoin purchase', 'impact': 'Massive positive sentiment spike', 'color': '#10B981'},
+                {'date': '2021-02-23', 'title': 'Tech Sell-off', 'desc': 'Tesla stock dropped 8% as yields rose', 'impact': 'Negative sentiment', 'color': '#EF4444'},
+                {'date': '2021-03-15', 'title': 'Tesla Model Y Price Hike', 'desc': 'Tesla raised Model Y prices by $1,000', 'impact': 'Mixed sentiment', 'color': '#F59E0B'}
+            ],
+            'Apple': [
+                {'date': '2021-02-17', 'title': 'Apple Car Rumors', 'desc': 'Reports of Apple developing electric vehicle', 'impact': 'Positive sentiment surge', 'color': '#10B981'},
+                {'date': '2021-02-23', 'title': 'Tech Sell-off', 'desc': 'Apple dropped 3% amid rate concerns', 'impact': 'Negative sentiment', 'color': '#EF4444'},
+                {'date': '2021-03-16', 'title': 'Apple M1 Chip Event', 'desc': 'Apple announced new M1-powered devices', 'impact': 'Positive sentiment', 'color': '#10B981'}
+            ],
+            'Amazon': [
+                {'date': '2021-02-02', 'title': 'Bezos to Step Down as CEO', 'desc': 'Jeff Bezos announced transition to Executive Chair', 'impact': 'Mixed market reaction', 'color': '#F59E0B'},
+                {'date': '2021-02-23', 'title': 'Tech Sell-off', 'desc': 'Amazon dropped 5% as yields rose', 'impact': 'Negative sentiment', 'color': '#EF4444'},
+                {'date': '2021-03-02', 'title': 'Amazon AI Investment', 'desc': '$200B investment in AI fulfillment centers', 'impact': 'High volume, positive sentiment', 'color': '#10B981'}
+            ],
+            'Google': [
+                {'date': '2021-02-01', 'title': 'Google Cloud & Ford Partnership', 'desc': 'Google Cloud announced partnership with Ford', 'impact': 'Tech sector optimism', 'color': '#10B981'},
+                {'date': '2021-02-23', 'title': 'Tech Sell-off', 'desc': 'Google dropped 4% amid rate concerns', 'impact': 'Negative sentiment', 'color': '#EF4444'},
+                {'date': '2021-03-23', 'title': 'Google $7B Office Investment', 'desc': 'Google announced $7B office expansion', 'impact': 'Positive sentiment', 'color': '#10B981'}
+            ],
+            'Microsoft': [
+                {'date': '2021-02-23', 'title': 'Tech Sell-off', 'desc': 'Microsoft dropped 5% as yields rose', 'impact': 'Negative sentiment', 'color': '#EF4444'},
+                {'date': '2021-03-09', 'title': 'Microsoft Teams Growth', 'desc': 'Teams hit 145M daily active users', 'impact': 'Positive sentiment', 'color': '#10B981'},
+                {'date': '2021-03-26', 'title': 'Microsoft $22B Army Contract', 'desc': 'Microsoft awarded $22B AR headset contract', 'impact': 'Strong positive sentiment', 'color': '#10B981'}
+            ]
+        }
         
         fig = go.Figure()
         
@@ -251,106 +291,96 @@ def company_comparison_page():
                 daily['date'] = pd.to_datetime(daily['date'])
                 daily = daily.sort_values('date')
                 
+                # Add main sentiment line for the company
                 fig.add_trace(go.Scatter(
                     x=daily['date'],
                     y=daily['net_sentiment'],
-                    mode='lines+markers',
+                    mode='lines',
                     name=company,
                     line=dict(width=2),
-                    marker=dict(size=4),
                     hovertemplate=f'{company}<br>Date: %{{x|%Y-%m-%d}}<br>Net Sentiment: %{{y:.2f}}<extra></extra>'
                 ))
-        
-        if fig.data:
-            fig.update_layout(
-                plot_bgcolor='rgba(0,0,0,0)',
-                paper_bgcolor='rgba(0,0,0,0)',
-                font=dict(color='#8A8F99'),
-                xaxis_title="Date",
-                yaxis_title="Net Sentiment",
-                yaxis=dict(range=[-1, 1], tickformat='.2f'),
-                height=450,
-                legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1)
-            )
-            st.plotly_chart(fig, use_container_width=True)
-        else:
-            st.info("Not enough time series data for sentiment comparison")
-        
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    # ========================================================================
-    # CO-OCCURRENCE ANALYSIS
-    # ========================================================================
-    if len(selected_companies) > 1:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown('<h3>Co-occurrence Analysis</h3>', unsafe_allow_html=True)
-        st.markdown('<p class="text-muted">How often are these companies mentioned together in the same post?</p>', unsafe_allow_html=True)
-        
-        # Calculate co-occurrence matrix
-        co_occurrence = {}
-        total_posts_with_companies = 0
-        
-        for _, row in posts_df.iterrows():
-            companies_in_post = row.get('company_standard', '')
-            if companies_in_post and pd.notna(companies_in_post):
-                # Handle multiple companies (if any are comma-separated)
-                if isinstance(companies_in_post, str):
-                    companies_list = [c.strip() for c in companies_in_post.split(',') if c.strip() in selected_companies]
-                else:
-                    companies_list = [companies_in_post] if companies_in_post in selected_companies else []
                 
-                if len(companies_list) >= 2:
-                    total_posts_with_companies += 1
-                    for i, c1 in enumerate(companies_list):
-                        for c2 in companies_list[i+1:]:
-                            key = tuple(sorted([c1, c2]))
-                            co_occurrence[key] = co_occurrence.get(key, 0) + 1
+                # Add company-specific event markers
+                if company in company_events:
+                    for event in company_events[company]:
+                        event_date = pd.to_datetime(event['date'])
+                        
+                        # Find sentiment value at event date
+                        event_row = daily[daily['date'].dt.strftime('%Y-%m-%d') == event['date']]
+                        if not event_row.empty:
+                            y_pos = event_row['net_sentiment'].iloc[0]
+                        else:
+                            # Find nearest date
+                            nearest_idx = (daily['date'] - event_date).abs().idxmin()
+                            y_pos = daily.loc[nearest_idx, 'net_sentiment']
+                        
+                        # Add marker
+                        fig.add_trace(go.Scatter(
+                            x=[event_date],
+                            y=[y_pos],
+                            mode='markers',
+                            marker=dict(
+                                size=12, 
+                                color=event['color'], 
+                                symbol='circle', 
+                                line=dict(color='white', width=2)
+                            ),
+                            name=f"{company}: {event['title']}",
+                            showlegend=False,
+                            hovertemplate=f"""
+                            <b>{company} - {event['title']}</b><br>
+                             {event['date']}<br>
+                             {event['desc']}<br>
+                             Impact: {event['impact']}<br>
+                             Sentiment: {y_pos:.2f}<br>
+                            <extra></extra>
+                            """
+                        ))
+                        
+                        # Add vertical line for major events (NO annotation_text!)
+                        if event['impact'] in ['Massive positive sentiment spike', 'Strong positive sentiment']:
+                            fig.add_vline(
+                                x=event_date,
+                                line_dash="dot",
+                                line_color=event['color'],
+                                line_width=1,
+                                opacity=0.3
+                            )
         
-        # Create co-occurrence matrix
-        if co_occurrence:
-            cooc_matrix = pd.DataFrame(0, index=selected_companies, columns=selected_companies)
-            for (c1, c2), count in co_occurrence.items():
-                cooc_matrix.loc[c1, c2] = count
-                cooc_matrix.loc[c2, c1] = count
-            
-            # Display heatmap
-            fig = go.Figure(data=go.Heatmap(
-                z=cooc_matrix.values,
-                x=cooc_matrix.columns,
-                y=cooc_matrix.index,
-                colorscale='Viridis',
-                text=cooc_matrix.values,
-                texttemplate='%{text}',
-                textfont={"size": 10},
-                hoverongaps=False
-            ))
-            fig.update_layout(
-                plot_bgcolor='rgba(0,0,0,0)',
-                paper_bgcolor='rgba(0,0,0,0)',
-                font=dict(color='#8A8F99'),
-                height=450,
-                title="Number of posts mentioning both companies"
-            )
-            st.plotly_chart(fig, use_container_width=True)
-            
-            if total_posts_with_companies > 0:
-                st.markdown(f"""
-                <div style="margin-top: 1rem; background: rgba(59,130,246,0.05); border-radius: 8px; padding: 0.75rem;">
-                    <p style="font-size: 0.7rem; color: #8A8F99;">
-                        <strong>Analysis:</strong> Found {len(co_occurrence)} co-occurrence pairs across {total_posts_with_companies} posts.
-                        Darker cells indicate stronger relationships between companies.
-                    </p>
-                </div>
-                """, unsafe_allow_html=True)
-        else:
-            st.info(f"No co-occurrences found for selected companies. Try selecting companies that appear together in posts.")
+        
+        
+        
+        
+        fig.update_layout(
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='#8A8F99'),
+            xaxis_title="Date",
+            yaxis_title="Net Sentiment",
+            yaxis=dict(range=[-1, 1], tickformat='.2f'),
+            height=500,
+            legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1)
+        )
+        
+        st.plotly_chart(fig, use_container_width=True)
+        
+        # Add summary of company events
+        with st.expander(" Company-Specific Events (Feb-Mar 2021)"):
+            for company in selected_companies:
+                if company in company_events:
+                    st.markdown(f"**{company}**")
+                    for event in company_events[company]:
+                        color_icon = "🟢" if event['color'] == '#10B981' else ("🔴" if event['color'] == '#EF4444' else "🟡")
+                        st.markdown(f"&nbsp;&nbsp;{color_icon} **{event['date']}** - {event['title']}: {event['desc']}")
+                    st.markdown("")
         
         st.markdown('</div>', unsafe_allow_html=True)
     
     # ========================================================================
     # SUMMARY STATISTICS
     # ========================================================================
-    st.markdown('<div class="card">', unsafe_allow_html=True)
+
     st.markdown('<h3>Summary Statistics</h3>', unsafe_allow_html=True)
     
     total_posts_all = df_metrics['Total Posts'].sum()

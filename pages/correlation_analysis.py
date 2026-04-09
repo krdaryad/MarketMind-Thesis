@@ -66,7 +66,6 @@ def correlation_analysis_page():
     # ========================================================================
     # CURRENT MARKET INDICATORS
     # ========================================================================
-    st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown('<h3>Current Market Indicators</h3>', unsafe_allow_html=True)
     
     # Get latest values
@@ -151,7 +150,6 @@ def correlation_analysis_page():
     # ========================================================================
     # CORRELATION MATRIX
     # ========================================================================
-    st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown('<h3>Correlation Matrix</h3>', unsafe_allow_html=True)
     
     # Select columns for correlation
@@ -201,7 +199,7 @@ def correlation_analysis_page():
     # ========================================================================
     # SENTIMENT VS MARKET TIME SERIES
     # ========================================================================
-    st.markdown('<div class="card">', unsafe_allow_html=True)
+
     st.markdown('<h3>Sentiment vs Market Indicators Over Time</h3>', unsafe_allow_html=True)
     
     # Select market indicator to display
@@ -312,7 +310,6 @@ def correlation_analysis_page():
     # ========================================================================
     # SENTIMENT BREAKDOWN OVER TIME
     # ========================================================================
-    st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown('<h3>Sentiment Breakdown Over Time</h3>', unsafe_allow_html=True)
     
     if 'positive' in merged_data.columns and 'negative' in merged_data.columns:
@@ -368,7 +365,6 @@ def correlation_analysis_page():
     # ========================================================================
     # SENTIMENT-RETURN ALIGNMENT
     # ========================================================================
-    st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown('<h3>Sentiment-Return Alignment</h3>', unsafe_allow_html=True)
     st.markdown('<p class="text-muted">Comparing sentiment direction with actual market returns</p>', unsafe_allow_html=True)
 
@@ -474,7 +470,6 @@ def correlation_analysis_page():
     # ========================================================================
     # ECONOMIC INDICATOR MATRIX
     # ========================================================================
-    st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown('<h3>Economic Indicator Matrix</h3>', unsafe_allow_html=True)
     st.markdown('<p class="text-muted">Multi-indicator correlation matrix for economic analysis</p>', unsafe_allow_html=True)
 
@@ -549,7 +544,6 @@ def correlation_analysis_page():
     # ========================================================================
     # SUMMARY STATISTICS
     # ========================================================================
-    st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown('<h3>Summary Statistics</h3>', unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)

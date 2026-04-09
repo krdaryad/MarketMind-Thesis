@@ -14,7 +14,7 @@ from data_fetcher import (
 )
 from text_analysis import get_real_topics, get_real_patterns, get_real_model_results
 from visualizations import create_heatmap, create_sentiment_trend_chart
-
+from event_data import add_event_hover_text, MARKET_EVENTS
 def dashboard_page():
     st.markdown('<h1>Dashboard</h1>', unsafe_allow_html=True)
     st.markdown('<p class="text-muted">Overview · Market Correlation · Sentiment Trends</p>', unsafe_allow_html=True)
@@ -175,7 +175,32 @@ def dashboard_page():
             """, unsafe_allow_html=True)
         else:
             st.markdown("""<div class="metric-card" style="padding: 0.75rem;"><p class="tech-label" style="font-size: 0.7rem;">10Y Treasury</p><p class="tech-val" style="font-size: 1.5rem;">N/A</p></div>""", unsafe_allow_html=True)
-    
+        # In dashboard.py - Add an event timeline card
+
+    st.markdown('<h3 style="font-size: 1.1rem;">February 2021: Key Market Events</h3>', unsafe_allow_html=True)
+    st.markdown('<p class="text-muted">Hover over any sentiment spike in the charts above to see how these events drove market psychology.</p>', unsafe_allow_html=True)
+
+    # Create a timeline of events
+    event_cols = st.columns(4)
+    for i, (date_str, event) in enumerate(list(MARKET_EVENTS.items())[:8]):
+        with event_cols[i % 4]:
+            # Determine color
+            if 'positive' in event['impact'].lower():
+                color = '#10B981'
+            elif 'negative' in event['impact'].lower():
+                color = '#EF4444'
+            else:
+                color = '#F59E0B'
+            
+            st.markdown(f"""
+            <div style="border-left: 3px solid {color}; padding-left: 0.5rem; margin-bottom: 0.75rem;">
+                <p style="font-size: 0.6rem; color: {color}; margin: 0;">{date_str}</p>
+                <p style="font-size: 0.7rem; font-weight: bold; margin: 0;">{event['title'][:35]}</p>
+                <p style="font-size: 0.6rem; color: #8A8F99; margin: 0;">Impact: {event['impact'][:30]}</p>
+            </div>
+            """, unsafe_allow_html=True)
+
+    st.markdown('</div>', unsafe_allow_html=True)
     # ========================================================================
     # TABS
     # ========================================================================

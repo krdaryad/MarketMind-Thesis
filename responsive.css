@@ -32,9 +32,10 @@
         height: 300px !important;
     }
     
-    /* Adjust sidebar width */
+    /* Sidebar - let Streamlit handle collapse */
     [data-testid="stSidebar"] {
-        width: 280px !important;
+        width: auto !important;
+        min-width: 0px !important;
     }
     
     /* Make tabs scrollable */

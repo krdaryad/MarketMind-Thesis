@@ -26,7 +26,6 @@ def model_accuracy_page():
     col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
         
         # Header with educational popup
         header_col1, header_col2 = st.columns([4, 1])
@@ -52,7 +51,6 @@ def model_accuracy_page():
         st.markdown('</div>', unsafe_allow_html=True)
 
     with col2:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
         st.markdown('<h3>Classifier Performance</h3>', unsafe_allow_html=True)
         
         # Model data
@@ -111,7 +109,6 @@ def model_accuracy_page():
         st.markdown('</div>', unsafe_allow_html=True)
 
     # K-Means Silhouette Score Analysis Section
-    st.markdown('<div class="card">', unsafe_allow_html=True)
     
     # Header with educational popup
     header_col1, header_col2 = st.columns([4, 1])

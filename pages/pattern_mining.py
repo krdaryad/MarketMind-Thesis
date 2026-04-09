@@ -21,7 +21,6 @@ def pattern_mining_page():
         return
     
     # Topics section
-    st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown('<h3> Discovered Topics (LDA)</h3>', unsafe_allow_html=True)
     st.markdown('<p class="text-muted">Coherence score: 0.62 (k=5)</p>', unsafe_allow_html=True)
     
@@ -44,7 +43,6 @@ def pattern_mining_page():
     st.markdown('</div>', unsafe_allow_html=True)
     
     # Pattern mining results
-    st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown('<h3> Frequent Patterns (FP-Growth)</h3>', unsafe_allow_html=True)
     
     if not patterns.empty and 'pattern' in patterns.columns:
@@ -105,7 +103,6 @@ def pattern_mining_page():
     st.markdown('</div>', unsafe_allow_html=True)
     
     # Word frequency analysis
-    st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown('<h3> Word Frequency Analysis</h3>', unsafe_allow_html=True)
     
     # Extract word frequencies from posts
@@ -150,7 +147,7 @@ def pattern_mining_page():
     st.markdown('</div>', unsafe_allow_html=True)
     
     # Deep dive section
-    st.markdown('<div class="card">', unsafe_allow_html=True)
+
     st.markdown('<h3>Deep Dive: How LDA Works</h3>', unsafe_allow_html=True)
     st.markdown("""
     <p class="text-muted"><strong>Choosing k (Number of Topics)</strong><br>

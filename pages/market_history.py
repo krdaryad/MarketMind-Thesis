@@ -167,12 +167,17 @@ def market_history_page():
                 {"label": "Recovery Time", "value": "25 years"},
             ],
             "priceData": [
-                {"t": "1927", "v": 200, "phase": "euphoria"}, {"t": "1928", "v": 300, "phase": "euphoria"},
-                {"t": "Sep 29", "v": 381, "phase": "euphoria"}, {"t": "Oct 29", "v": 230, "phase": "panic"},
-                {"t": "Apr 30", "v": 294, "phase": "denial"}, {"t": "Dec 30", "v": 164, "phase": "capitulation"},
-                {"t": "Jul 32", "v": 41, "phase": "capitulation"}, {"t": "1933", "v": 99, "phase": "recovery"},
-                {"t": "1937", "v": 194, "phase": "recovery"},
-            ],
+                    {"t": 1927, "v": 200, "phase": "euphoria"},
+                    {"t": 1928, "v": 300, "phase": "euphoria"},
+                    {"t": 1929.75, "v": 381, "phase": "euphoria"},  # Sep 1929 = 1929.75
+                    {"t": 1929.83, "v": 230, "phase": "panic"},     # Oct 29 = 1929.83
+                    {"t": 1930.33, "v": 294, "phase": "denial"},    # Apr 1930 = 1930.33
+                    {"t": 1930.92, "v": 164, "phase": "capitulation"}, # Dec 1930 = 1930.92
+                    {"t": 1931.42, "v": 156, "phase": "capitulation"}, # Jun 1931 = 1931.42
+                    {"t": 1932.5, "v": 41, "phase": "capitulation"},   # Jul 1932 = 1932.5
+                    {"t": 1933, "v": 99, "phase": "recovery"},
+                    {"t": 1937, "v": 194, "phase": "recovery"},
+                ],
             "lessons": [
                 "Extreme leverage amplifies both gains and catastrophic losses",
                 "Public euphoria and new paradigm narratives are contrarian indicators",
@@ -210,10 +215,14 @@ def market_history_page():
                 {"label": "Recovery Time", "value": "2 years"},
             ],
             "priceData": [
-                {"t": "Jan 87", "v": 1900, "phase": "euphoria"}, {"t": "Aug 87", "v": 2722, "phase": "euphoria"},
-                {"t": "Oct 16", "v": 2400, "phase": "denial"}, {"t": "Oct 19", "v": 1738, "phase": "panic"},
-                {"t": "Oct 20", "v": 1841, "phase": "recovery"}, {"t": "Dec 87", "v": 1939, "phase": "recovery"},
-                {"t": "Jun 88", "v": 2100, "phase": "recovery"}, {"t": "Sep 89", "v": 2750, "phase": "recovery"},
+                {"t": "Jan 87", "v": 1900, "phase": "euphoria"},
+                {"t": "Aug 87", "v": 2722, "phase": "euphoria"},
+                {"t": "Oct 16", "v": 2400, "phase": "denial"}, 
+                {"t": "Oct 19", "v": 1738, "phase": "panic"},
+                {"t": "Oct 20", "v": 1841, "phase": "recovery"}, 
+                {"t": "Dec 87", "v": 1939, "phase": "recovery"},
+                {"t": "Jun 88", "v": 2100, "phase": "recovery"}, 
+                {"t": "Sep 89", "v": 2750, "phase": "recovery"},
             ],
             "lessons": [
                 "Algorithmic trading can create feedback loops that amplify crashes",
@@ -252,12 +261,17 @@ def market_history_page():
                 {"label": "Recovery Time", "value": "15 years"},
             ],
             "priceData": [
-                {"t": "1998", "v": 2000, "phase": "euphoria"}, {"t": "1999", "v": 4000, "phase": "euphoria"},
-                {"t": "Mar 00", "v": 5048, "phase": "euphoria"}, {"t": "Sep 00", "v": 3800, "phase": "denial"},
-                {"t": "Mar 01", "v": 2000, "phase": "panic"}, {"t": "Sep 01", "v": 1500, "phase": "panic"},
-                {"t": "Oct 02", "v": 1114, "phase": "capitulation"}, {"t": "2004", "v": 2000, "phase": "recovery"},
-                {"t": "2007", "v": 2800, "phase": "recovery"}, {"t": "2015", "v": 5000, "phase": "recovery"},
-            ],
+                    {"t": 1998, "v": 2000, "phase": "euphoria"},
+                    {"t": 1999, "v": 4000, "phase": "euphoria"},
+                    {"t": 2000.2, "v": 5048, "phase": "euphoria"},   # Mar 2000 = 2000.2
+                    {"t": 2000.75, "v": 3800, "phase": "denial"},    # Sep 2000 = 2000.75
+                    {"t": 2001.2, "v": 2000, "phase": "panic"},      # Mar 2001 = 2001.2
+                    {"t": 2001.75, "v": 1500, "phase": "panic"},     # Sep 2001 = 2001.75
+                    {"t": 2002.83, "v": 1114, "phase": "capitulation"}, # Oct 2002 = 2002.83
+                    {"t": 2004, "v": 2000, "phase": "recovery"},
+                    {"t": 2007, "v": 2800, "phase": "recovery"},
+                    {"t": 2015, "v": 5000, "phase": "recovery"},
+                ],
             "lessons": [
                 "Revenue and profit matter — eyeballs is not a business model",
                 "When taxi drivers discuss stock picks, the bubble is near its peak",
@@ -295,12 +309,16 @@ def market_history_page():
                 {"label": "Recovery Time", "value": "4 years"},
             ],
             "priceData": [
-                {"t": "2006", "v": 1400, "phase": "euphoria"}, {"t": "Oct 07", "v": 1565, "phase": "euphoria"},
-                {"t": "Mar 08", "v": 1300, "phase": "denial"}, {"t": "Sep 08", "v": 1200, "phase": "panic"},
-                {"t": "Nov 08", "v": 850, "phase": "panic"}, {"t": "Mar 09", "v": 666, "phase": "capitulation"},
-                {"t": "Dec 09", "v": 1115, "phase": "recovery"}, {"t": "2011", "v": 1260, "phase": "recovery"},
-                {"t": "2013", "v": 1565, "phase": "recovery"},
-            ],
+                    {"t": 2006, "v": 1400, "phase": "euphoria"},
+                    {"t": 2007.83, "v": 1565, "phase": "euphoria"},  # Oct 2007 = 2007.83
+                    {"t": 2008.2, "v": 1300, "phase": "denial"},    # Mar 2008 = 2008.2
+                    {"t": 2008.75, "v": 1200, "phase": "panic"},    # Sep 2008 = 2008.75
+                    {"t": 2008.92, "v": 850, "phase": "panic"},     # Nov 2008 = 2008.92
+                    {"t": 2009.2, "v": 666, "phase": "capitulation"}, # Mar 2009 = 2009.2
+                    {"t": 2009.92, "v": 1115, "phase": "recovery"}, # Dec 2009 = 2009.92
+                    {"t": 2011, "v": 1260, "phase": "recovery"},
+                    {"t": 2013, "v": 1565, "phase": "recovery"},
+                ],
             "lessons": [
                 "Complexity and opacity in financial instruments creates hidden systemic risk",
                 "Rating agency conflicts of interest can mask true risk levels",
@@ -338,11 +356,16 @@ def market_history_page():
                 {"label": "Recovery Time", "value": "5 months"},
             ],
             "priceData": [
-                {"t": "Jan 20", "v": 3300, "phase": "denial"}, {"t": "Feb 19", "v": 3386, "phase": "denial"},
-                {"t": "Mar 9", "v": 2746, "phase": "panic"}, {"t": "Mar 16", "v": 2386, "phase": "panic"},
-                {"t": "Mar 23", "v": 2237, "phase": "capitulation"}, {"t": "Apr 20", "v": 2870, "phase": "recovery"},
-                {"t": "Jun 20", "v": 3100, "phase": "recovery"}, {"t": "Aug 20", "v": 3500, "phase": "recovery"},
-                {"t": "Nov 20", "v": 3600, "phase": "euphoria"}, {"t": "Jan 21", "v": 3800, "phase": "euphoria"},
+                {"t": "Jan 20", "v": 3300, "phase": "denial"},
+                {"t": "Feb 19", "v": 3386, "phase": "denial"},
+                {"t": "Mar 9", "v": 2746, "phase": "panic"}, 
+                {"t": "Mar 16", "v": 2386, "phase": "panic"},
+                {"t": "Mar 23", "v": 2237, "phase": "capitulation"}, 
+                {"t": "Apr 20", "v": 2870, "phase": "recovery"},
+                {"t": "Jun 20", "v": 3100, "phase": "recovery"}, 
+                {"t": "Aug 20", "v": 3500, "phase": "recovery"},
+                {"t": "Nov 20", "v": 3600, "phase": "euphoria"}, 
+                {"t": "Jan 21", "v": 3800, "phase": "euphoria"},
             ],
             "lessons": [
                 "Central bank speed of response is the number one factor in sentiment recovery",

@@ -15,6 +15,8 @@ from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, r
 import joblib
 import os
 import hashlib
+from datetime import datetime
+
 # In classifier_demo.py, update to use models trained on PhraseBank
 
 @st.cache_resource
@@ -144,6 +146,19 @@ def classifier_demo_page():
     </div>
     """, unsafe_allow_html=True)
 
+    # Initialize feedback storage in session state
+    if 'feedback_history' not in st.session_state:
+        st.session_state.feedback_history = []
+    
+    if 'current_prediction' not in st.session_state:
+        st.session_state.current_prediction = None
+    
+    if 'current_confidence' not in st.session_state:
+        st.session_state.current_confidence = None
+    
+    if 'current_text' not in st.session_state:
+        st.session_state.current_text = ""
+
     # Get data from session state
     posts_df = st.session_state.get('posts_data', pd.DataFrame())
     
@@ -190,9 +205,9 @@ def classifier_demo_page():
         # Text input with example
         example_texts = [
             "Fed signals higher‑for‑longer rates, markets tumble.",
-            "Tesla earnings absolutely crushed it! 🚀 To the moon!",
+            "Tesla earnings absolutely crushed it! To the moon!",
             "CPI came in hot again. We're never getting rate cuts.",
-            "This market is insanely overvalued. Crash incoming 💀",
+            "This market is insanely overvalued. Crash incoming",
             "SPY closed at 5254 today. Volume was average.",
         ]
         
@@ -213,6 +228,11 @@ def classifier_demo_page():
             # Get prediction
             sentiment, confidence = predict_sentiment(user_text, model, vectorizer)
             
+            # Store current prediction for feedback
+            st.session_state.current_prediction = sentiment
+            st.session_state.current_confidence = confidence
+            st.session_state.current_text = user_text
+            
             # Word highlighting (simple lexicon-based for explainability)
             sentiment_lexicon = {
                 "fed": -0.3, "signals": -0.1, "higher": -0.8, "rates": -0.5,
@@ -221,10 +241,10 @@ def classifier_demo_page():
                 "bullish": 0.6, "bearish": -0.6, "positive": 0.7, "negative": -0.7,
                 "good": 0.5, "great": 0.8, "excellent": 0.9, "terrible": -0.8,
                 "awful": -0.8, "amazing": 0.8, "crashing": -0.9, "soaring": 0.8,
-                "moon": 0.9, "rocket": 0.8, "🚀": 0.8, "💀": -0.7
+                "moon": 0.9, "rocket": 0.8
             }
             
-            words = re.findall(r'\b\w+(?:[-‑]\w+)*\b|🚀|💀|😊|😞', user_text)
+            words = re.findall(r'\b\w+(?:[-‑]\w+)*\b', user_text)
             word_weights = []
             for word in words:
                 base_word = re.sub(r'[^\w\-]', '', word.lower())
@@ -279,7 +299,7 @@ def classifier_demo_page():
                 "negative": "#EF4444"
             }.get(final_sentiment, "#8A8F99")
             
-            # Display prediction result
+            # Display prediction result with Confidence Meter
             st.markdown(f"""
             <div style="background: linear-gradient(135deg, rgba(59,130,246,0.05) 0%, rgba(59,130,246,0.02) 100%); border: 1px solid #1A1D24; border-radius: 12px; padding: 1rem; margin-top: 1rem;">
                 <div style="display: flex; gap: 1rem; align-items: center;">
@@ -292,19 +312,86 @@ def classifier_demo_page():
                     </div>
                 </div>
                 <div style="margin-top: 0.75rem;">
-                    <div style="width: 100%; height: 6px; background: #1A1D24; border-radius: 3px; overflow: hidden;">
-                        <div style="width: {final_confidence*100}%; height: 100%; background: {sentiment_color}; border-radius: 3px;"></div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                        <span style="color: #8A8F99; font-size: 0.7rem;">Confidence Meter</span>
+                        <span style="color: {sentiment_color}; font-size: 0.7rem; font-weight: 500;">{final_confidence:.1%}</span>
+                    </div>
+                    <div style="width: 100%; height: 8px; background: #1A1D24; border-radius: 4px; overflow: hidden;">
+                        <div style="width: {final_confidence*100}%; height: 100%; background: {sentiment_color}; border-radius: 4px; transition: width 0.3s ease;"></div>
                     </div>
                 </div>
             </div>
             """, unsafe_allow_html=True)
+            
+            # ====================================================================
+            # HUMAN-IN-THE-LOOP FEEDBACK BUTTONS
+            # ====================================================================
+            st.markdown("""
+            <div style="margin-top: 1rem;">
+                <p style="color: #8A8F99; font-size: 0.7rem; margin-bottom: 0.5rem;">Was this prediction correct?</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            feedback_col1, feedback_col2 = st.columns(2)
+            
+            with feedback_col1:
+                if st.button("Correct", key="feedback_correct", use_container_width=True):
+                    # Store feedback
+                    feedback_entry = {
+                        'timestamp': datetime.now(),
+                        'text': user_text,
+                        'predicted_sentiment': final_sentiment,
+                        'confidence': final_confidence,
+                        'user_feedback': 'correct',
+                        'model': selected_model
+                    }
+                    st.session_state.feedback_history.append(feedback_entry)
+                    st.success("Thanks for the feedback! This helps improve the model.")
+            
+            with feedback_col2:
+                if st.button("Incorrect", key="feedback_incorrect", use_container_width=True):
+                    # Store feedback
+                    feedback_entry = {
+                        'timestamp': datetime.now(),
+                        'text': user_text,
+                        'predicted_sentiment': final_sentiment,
+                        'confidence': final_confidence,
+                        'user_feedback': 'incorrect',
+                        'model': selected_model
+                    }
+                    st.session_state.feedback_history.append(feedback_entry)
+                    
+                    # Optional: Ask for correct sentiment
+                    with st.expander("What was the correct sentiment?"):
+                        correct_sentiment = st.radio(
+                            "Select correct sentiment:",
+                            ['positive', 'neutral', 'negative'],
+                            key=f"correct_sentiment_{len(st.session_state.feedback_history)}"
+                        )
+                        if st.button("Submit correction"):
+                            st.session_state.feedback_history[-1]['correct_sentiment'] = correct_sentiment
+                            st.success("Correction recorded! This will help retrain the model.")
+            
+            # Display feedback stats if there's history
+            if st.session_state.feedback_history:
+                with st.expander("View Feedback History"):
+                    feedback_df = pd.DataFrame(st.session_state.feedback_history)
+                    st.dataframe(feedback_df[['timestamp', 'predicted_sentiment', 'confidence', 'user_feedback']], 
+                                use_container_width=True)
+                    
+                    # Calculate feedback metrics
+                    total_feedback = len(feedback_df)
+                    correct_count = len(feedback_df[feedback_df['user_feedback'] == 'correct'])
+                    accuracy_from_feedback = correct_count / total_feedback if total_feedback > 0 else 0
+                    
+                    st.metric("User Feedback Accuracy", f"{accuracy_from_feedback:.1%}", 
+                             help="Percentage of predictions users marked as correct")
         else:
             st.info("Enter some text above to see sentiment prediction")
         
         st.markdown('</div>', unsafe_allow_html=True)
 
     with col2:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
         
         # Header with educational popup
         header_col1, header_col2 = st.columns([4, 1])
@@ -384,7 +471,6 @@ def classifier_demo_page():
     # ========================================================================
     # MODEL COMPARISON SECTION
     # ========================================================================
-    st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown("""
     <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
         <h3 style="margin: 0;">Model Comparison</h3>

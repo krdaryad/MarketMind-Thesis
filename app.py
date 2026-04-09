@@ -12,7 +12,7 @@ st.set_page_config(
     page_title="MarketMind AI",
     page_icon="📊",
     layout="wide",
-    initial_sidebar_state="expanded"
+  
 )
 # Import all page functions
 from pages.dashboard import dashboard_page
