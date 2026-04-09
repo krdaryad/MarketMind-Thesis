@@ -238,7 +238,8 @@ def learning_hub_page():
     
     if "show_congrats" not in st.session_state:
         st.session_state.show_congrats = False
-    
+    if "survey_submitted" not in st.session_state:
+        st.session_state.survey_submitted = False
     # Load cached data
     modules = get_course_data()
     
@@ -266,9 +267,9 @@ def learning_hub_page():
         if not st.session_state.show_congrats:
             st.session_state.show_congrats = True
             st.balloons()
-            st.success("🎉 Congratulations! You've completed the entire course! 🎉")
+            st.success("Congratulations! You've completed the entire course! ")
         else:
-            st.success("🎉 Congratulations! You've completed the entire course! 🎉")
+            st.success("Congratulations! You've completed the entire course! ")
     else:
         st.session_state.show_congrats = False
     
@@ -390,50 +391,64 @@ def learning_hub_page():
             if completed_count < total_count:
                 st.info("📚 You've reached the end. Continue practicing to complete all lessons.")
     
+     # ========================================================================
+    # USER EXPERIENCE SURVEY - HIDE AFTER SUBMISSION
     # ========================================================================
-    # USER EXPERIENCE SURVEY
-    # ========================================================================
-    st.markdown("---")
-    st.markdown("### System Evaluation Survey")
-    st.markdown("*Please help evaluate the system for thesis purposes*")
+    
+    # Only show survey if not yet submitted
+    if not st.session_state.survey_submitted:
+        st.markdown("---")
+        st.markdown("### System Evaluation Survey")
+        st.markdown("*Please help evaluate the system for thesis purposes*")
 
-    with st.form("ux_survey"):
-        st.markdown("**1. Visual Clarity**")
-        visual_clarity = st.slider("How clear and understandable are the visualizations?", 1, 5, 3)
-        
-        st.markdown("**2. Interpretability**")
-        interpretability = st.slider("How easy is it to interpret the sentiment analysis results?", 1, 5, 3)
-        
-        st.markdown("**3. Exploratory Potential**")
-        exploratory = st.slider("How well does the system support exploring data on your own?", 1, 5, 3)
-        
-        st.markdown("**4. Overall Satisfaction**")
-        overall = st.slider("Overall satisfaction with the system", 1, 5, 3)
-        
-        feedback = st.text_area("Additional feedback (optional)")
-        
-        submitted = st.form_submit_button("Submit Evaluation")
-        
-        if submitted:
-            if 'survey_responses' not in st.session_state:
-                st.session_state.survey_responses = []
+        with st.form("ux_survey"):
+            st.markdown("**1. Visual Clarity**")
+            visual_clarity = st.slider("How clear and understandable are the visualizations?", 1, 5, 3, key="survey_clarity")
             
-            # FIXED: Use datetime.datetime.now() instead of datetime.now()
-            st.session_state.survey_responses.append({
-                'timestamp': datetime.datetime.now(),
-                'visual_clarity': visual_clarity,
-                'interpretability': interpretability,
-                'exploratory': exploratory,
-                'overall': overall,
-                'feedback': feedback
-            })
+            st.markdown("**2. Interpretability**")
+            interpretability = st.slider("How easy is it to interpret the sentiment analysis results?", 1, 5, 3, key="survey_interpret")
             
-            st.success("Thank you for your feedback! This helps with thesis evaluation.")
+            st.markdown("**3. Exploratory Potential**")
+            exploratory = st.slider("How well does the system support exploring data on your own?", 1, 5, 3, key="survey_explore")
             
-            if len(st.session_state.survey_responses) > 0:
-                st.markdown("### Survey Summary (for Thesis)")
+            st.markdown("**4. Overall Satisfaction**")
+            overall = st.slider("Overall satisfaction with the system", 1, 5, 3, key="survey_overall")
+            
+            feedback = st.text_area("Additional feedback (optional)", key="survey_feedback")
+            
+            submitted = st.form_submit_button("Submit Evaluation")
+            
+            if submitted:
+                if 'survey_responses' not in st.session_state:
+                    st.session_state.survey_responses = []
+                
+                st.session_state.survey_responses.append({
+                    'timestamp': datetime.datetime.now(),
+                    'visual_clarity': visual_clarity,
+                    'interpretability': interpretability,
+                    'exploratory': exploratory,
+                    'overall': overall,
+                    'feedback': feedback
+                })
+                
+                # Mark survey as submitted to hide it
+                st.session_state.survey_submitted = True
+                
+                st.success("Thank you for your feedback! This helps with thesis evaluation.")
+                st.rerun()
+    
+    else:
+        # Show only thank you message (no survey form)
+        st.markdown("---")
+        st.markdown("### System Evaluation Survey")
+        st.success("Thank you for your feedback! This helps with thesis evaluation.")
+        
+        # Optionally show survey summary if there are responses
+        if 'survey_responses' in st.session_state and len(st.session_state.survey_responses) > 0:
+            with st.expander("View Survey Summary (for Thesis)"):
                 df_survey = pd.DataFrame(st.session_state.survey_responses)
                 st.dataframe(df_survey.describe(), use_container_width=True)
+
 
 if __name__ == "__main__":
     learning_hub_page()

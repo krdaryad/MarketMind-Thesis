@@ -18,6 +18,7 @@ import nltk
 from nltk.corpus import stopwords
 import streamlit as st
 
+from loading_facts import get_ml_analysis_fact
 nltk.download('stopwords', quiet=True)
 stop_words = set(stopwords.words('english'))
 
@@ -197,20 +198,26 @@ def train_models(posts_df):
 
     return pd.DataFrame(results)
 
-# Cached versions for performance
-@st.cache_data(ttl=86400)
+# Cached versions for performance with fun facts
+@st.cache_data(ttl=86400, show_spinner=False)
 def get_real_topics(posts_df):
-    return extract_topics(posts_df)
+    fact = get_ml_analysis_fact()  # Changed from get_random_fact()
+    with st.spinner(f"Discovering hidden topics...\n\n {fact}"):
+        return extract_topics(posts_df)
 
-@st.cache_data(ttl=86400)
+@st.cache_data(ttl=86400, show_spinner=False)
 def get_real_patterns(posts_df):
-    return extract_patterns(posts_df)
+    fact = get_ml_analysis_fact()  # Changed from get_random_fact()
+    with st.spinner(f"Mining patterns...\n\n {fact}"):
+        return extract_patterns(posts_df)
 
-@st.cache_data(ttl=86400)
+@st.cache_data(ttl=86400, show_spinner=False)
 def get_real_model_results(posts_df):
-    return train_models(posts_df)
-# Add this function to text_analysis.py
+    fact = get_ml_analysis_fact()  # Changed from get_random_fact()
+    with st.spinner(f"Training models...\n\n {fact}"):
+        return train_models(posts_df)
 
+# Add this function to text_analysis.py
 def load_financial_phrasebank():
     """Load the Financial PhraseBank dataset for training."""
     try:

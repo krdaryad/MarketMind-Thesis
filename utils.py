@@ -5,6 +5,9 @@ import streamlit as st
 from datetime import datetime
 import numpy as np
 import pandas as pd
+import random
+import streamlit as st
+from loading_facts import get_random_fact
 from config import CATEGORIES, DEFAULT_START, DEFAULT_END, DEBUG_MODE, apply_theme
 from data_fetcher import get_companies_list, load_reddit_data, validate_data_quality, check_for_new_data
 import base64
@@ -47,44 +50,7 @@ def onboarding_step(step):
     }
 }
     return steps.get(step, steps[1])
-def play_success_sound():
-    """Play success sound using numpy-generated sine wave."""
-    sample_rate = 44100
-    duration = 0.25
-    num_samples = int(sample_rate * duration)
-    t = np.linspace(0, duration, num_samples, False)
-    
-    # Create wave array
-    wave = np.zeros(num_samples)
-    
-    # First half: 880Hz
-    half_point = num_samples // 2
-    wave[:half_point] = np.sin(880 * t[:half_point] * 2 * np.pi)
-    
-    # Second half: 1046Hz
-    wave[half_point:] = np.sin(1046 * t[half_point:] * 2 * np.pi) * 0.8
-    
-    # Fade out
-    fade = np.linspace(1, 0, num_samples)
-    wave = wave * fade
-    
-    st.audio(wave, sample_rate=sample_rate, autoplay=True)
 
-def play_error_sound():
-    """Play error sound using numpy-generated sawtooth wave."""
-    sample_rate = 44100
-    duration = 0.3
-    num_samples = int(sample_rate * duration)
-    t = np.linspace(0, duration, num_samples, False)
-    
-    # Generate sawtooth wave
-    frequency = 220
-    wave = 2 * (frequency * t - np.floor(0.5 + frequency * t))
-    wave = wave - 1  # Center around 0
-    
-    # Fade out
-    fade = np.exp(-5 * t)
-    wave = wave * fade
     
     st.audio(wave, sample_rate=sample_rate, autoplay=True)
 def show_onboarding():
@@ -175,8 +141,22 @@ def toggle_theme():
             <div style="width: 100%; height: 100%; background: {active_color}; opacity: 0.6;"></div>
         </div>
     """, unsafe_allow_html=True)
-
-
+def load_with_facts(func, loading_message=None, *args, **kwargs):
+    """
+    Execute a function while displaying a random behavioral finance fact.
+    
+    Parameters:
+    - func: The function to execute
+    - loading_message: Optional custom loading message (default: "Processing...")
+    - *args, **kwargs: Arguments to pass to the function
+    """
+    fact = get_random_fact()
+    message = loading_message or "Processing data"
+    
+    with st.spinner(f"{message}\n\n💡 **Behavioral Insight:** {fact}"):
+        result = func(*args, **kwargs)
+    
+    return result
 def render_data_quality():
     """Displays a high-tech data health indicator."""
     st.sidebar.markdown("---")
