@@ -148,14 +148,16 @@ def load_all_data():
         
         progress_bar.progress(80)
 
-        status_message.text("Training ML models...")
-        from text_analysis import get_real_topics, get_real_patterns, get_real_model_results
-        if len(posts_df) >= 10:
-            st.session_state.topics = get_real_topics(posts_df)
-            st.session_state.patterns = get_real_patterns(posts_df)
-            st.session_state.model_results = get_real_model_results(posts_df)
-        
-        steps["ml"].success("ML Models")
+        # Step 5: Load ML models (INSTANT - no training!)
+        status_message.text("Loading ML models...")
+
+        from text_analysis import get_preloaded_topics, get_preloaded_patterns, get_preloaded_model_results
+
+        st.session_state.topics = get_preloaded_topics()
+        st.session_state.patterns = get_preloaded_patterns()
+        st.session_state.model_results = get_preloaded_model_results()
+
+        steps["ml"].success("ML Models (pre-trained)")
         progress_bar.progress(100)
         status_message.info("System Ready")
         
