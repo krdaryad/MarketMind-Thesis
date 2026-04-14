@@ -122,12 +122,24 @@ def load_all_data():
         steps["market"].success("Market Data")
         progress_bar.progress(60)
 
+           # Step 4: Add sentiment (SIMPLIFIED - no chunking, no custom caching)
         status_message.text("Processing sentiment analysis...")
+        
         if not posts_df.empty:
-            posts_with_sentiment = add_sentiment(posts_df)
-            st.session_state.posts_data = posts_with_sentiment
-            st.session_state.sentiment_data = aggregate_sentiment(posts_with_sentiment)
-        steps["sent"].success("Sentiment")
+            # Check if sentiment already exists
+            if 'sentiment' in posts_df.columns and posts_df['sentiment'].notna().any():
+                st.session_state.posts_data = posts_df
+                st.session_state.sentiment_data = aggregate_sentiment(posts_df)
+                steps["sent"].success("Sentiment (cached)")
+            else:
+                # Simple direct call - let the original function handle it
+                posts_with_sentiment = add_sentiment(posts_df)
+                st.session_state.posts_data = posts_with_sentiment
+                st.session_state.sentiment_data = aggregate_sentiment(posts_with_sentiment)
+                steps["sent"].success("Sentiment")
+        else:
+            steps["sent"].warning("No data to process")
+        
         progress_bar.progress(80)
 
         status_message.text("Training ML models...")
