@@ -3,6 +3,12 @@ Main application entry point with loading screen.
 """
 import streamlit as st
 import pandas as pd
+import nltk
+try:
+    nltk.data.find('sentiment/vader_lexicon.zip')
+except LookupError:
+    nltk.download('vader_lexicon')
+
 import time
 from config import CATEGORIES, apply_theme
 from utils import (
