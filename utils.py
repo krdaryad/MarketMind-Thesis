@@ -255,7 +255,35 @@ def render_sidebar():
     """Render sidebar with a prominent corner logo."""
     
     track_user_session()
+    def render_sidebar():
     
+    
+    # Add a mobile menu toggle button (visible only on mobile)
+     st.markdown("""
+    <style>
+    @media (max-width: 768px) {
+        .mobile-menu-toggle {
+            display: block;
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 1001;
+            background: #1A1D24;
+            border: 1px solid #3B82F6;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+    }
+    @media (min-width: 769px) {
+        .mobile-menu-toggle {
+            display: none;
+        }
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    # Rest of your sidebar code...
     with st.sidebar:
         try:
             # 1. Determine which logo to use based on theme

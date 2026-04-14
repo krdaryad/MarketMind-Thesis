@@ -848,7 +848,132 @@ MOBILE_CSS = """
         padding: 1rem !important;
     }
 }
+/* ========================================================================
+   ADDITIONAL MOBILE FIXES (Add to existing MOBILE_CSS)
+   ======================================================================== */
+
+@media (max-width: 768px) {
+    /* Force sidebar to be collapsible and narrower */
+    [data-testid="stSidebar"] {
+        width: 280px !important;
+        min-width: 280px !important;
+        max-width: 280px !important;
+        position: fixed !important;
+        z-index: 1000 !important;
+        height: 100% !important;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease !important;
+    }
+    
+    /* Show sidebar when expanded */
+    [data-testid="stSidebar"][aria-expanded="true"] {
+        transform: translateX(0) !important;
+    }
+    
+    /* Main content takes full width */
+    [data-testid="stMain"] {
+        width: 100% !important;
+        margin-left: 0 !important;
+    }
+    
+    /* Chart containers - prevent overflow */
+    .stPlotlyChart {
+        overflow-x: auto !important;
+    }
+    
+    .js-plotly-plot {
+        min-width: 300px !important;
+    }
+    
+    /* Plotly legend - make horizontal on mobile */
+    .legend {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        gap: 0.5rem !important;
+    }
+    
+    .legend .traces {
+        display: inline-block !important;
+        width: auto !important;
+    }
+    
+    /* Data tables - horizontal scroll */
+    .stDataFrame {
+        overflow-x: auto !important;
+        display: block !important;
+        white-space: nowrap !important;
+    }
+    
+    /* Metric cards grid - apply to actual metrics */
+    div[data-testid="stMetric"] {
+        width: 48% !important;
+        display: inline-block !important;
+        margin: 1% !important;
+    }
+    
+    /* Stack columns on mobile */
+    div[data-testid="column"] {
+        width: 100% !important;
+        flex: 1 1 100% !important;
+        min-width: 100% !important;
+    }
+    
+    /* Reduce spacing between elements */
+    .element-container {
+        margin-bottom: 0.5rem !important;
+    }
+    
+    /* Hide less important elements on mobile (optional) */
+    .system-kernel-footer {
+        display: none !important;
+    }
+    
+    /* Make buttons full width on mobile */
+    .stButton button {
+        width: 100% !important;
+    }
+    
+    /* Adjust expander for touch */
+    .streamlit-expanderHeader {
+        padding: 0.75rem 0 !important;
+    }
+    
+    /* Better spacing for selectboxes */
+    .stSelectbox label {
+        font-size: 0.8rem !important;
+    }
+}
+
+/* Small phones (max-width: 480px) */
+@media (max-width: 480px) {
+    /* Even smaller fonts */
+    h1 {
+        font-size: 1.2rem !important;
+    }
+    
+    .tech-val {
+        font-size: 1rem !important;
+    }
+    
+    /* Single column for metrics */
+    div[data-testid="stMetric"] {
+        width: 100% !important;
+        margin: 0.25rem 0 !important;
+    }
+    
+    /* Hide secondary metrics row on very small screens */
+    .secondary-metrics {
+        display: none !important;
+    }
+    
+    /* Reduce chart height further */
+    .js-plotly-plot {
+        height: 250px !important;
+    }
+}
 </style>
+
 """
 
 # ============================================================================
