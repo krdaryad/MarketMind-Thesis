@@ -972,6 +972,53 @@ MOBILE_CSS = """
         height: 250px !important;
     }
 }
+/* ========================================================================
+   FIX FOR OVERFLOWING TABS ON MOBILE
+   ======================================================================== */
+
+@media (max-width: 768px) {
+    /* Make tabs scrollable horizontally */
+    .stTabs [data-baseweb="tab-list"] {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        white-space: nowrap !important;
+        gap: 0.25rem !important;
+        padding-bottom: 0.5rem !important;
+        scrollbar-width: thin !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+    
+    /* Individual tab buttons */
+    .stTabs [data-baseweb="tab"] {
+        flex: 0 0 auto !important;
+        white-space: nowrap !important;
+        padding: 0.5rem 0.75rem !important;
+        font-size: 0.75rem !important;
+        min-width: auto !important;
+    }
+    
+    /* Tab content area */
+    .stTabs [data-testid="stTabPanel"] {
+        padding-top: 0.75rem !important;
+    }
+    
+    /* Hide scrollbar on Webkit browsers (optional - cleaner look) */
+    .stTabs [data-baseweb="tab-list"]::-webkit-scrollbar {
+        height: 3px !important;
+    }
+    
+    .stTabs [data-baseweb="tab-list"]::-webkit-scrollbar-track {
+        background: #1A1D24 !important;
+        border-radius: 3px !important;
+    }
+    
+    .stTabs [data-baseweb="tab-list"]::-webkit-scrollbar-thumb {
+        background: #3B82F6 !important;
+        border-radius: 3px !important;
+    }
+}
 </style>
 
 """
