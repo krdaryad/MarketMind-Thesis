@@ -37,7 +37,7 @@ from pages.causality_analysis import causality_analysis_page
 from pages.market_history import market_history_page
 from pages.volatility_analysis import volatility_analysis_page
 from pages.event_impact import event_impact_page
-from pages.performance_dashboard import performance_dashboard_page
+
 try:
     from pages.company_comparison import company_comparison_page
 except ImportError:
@@ -198,7 +198,7 @@ def render_page_content():
     "Volatility Analysis": volatility_analysis_page,
     "Market History": market_history_page,
     "Event Impact": event_impact_page,
-    "Performance Dashboard": performance_dashboard_page,
+
     
 }
     
