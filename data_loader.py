@@ -8,22 +8,27 @@ from fredapi import Fred
 import streamlit as st
 from datetime import datetime
 import numpy as np
+from loading_facts import get_data_loading_fact  # ADD THIS IMPORT
 
 # Initialize FRED (Replace with your actual API key)
 # Get a free key at: https://fred.stlouisfed.org
 FRED_API_KEY = st.secrets["FRED_API_KEY"]
 fred = Fred(api_key=FRED_API_KEY)
 
-@st.cache_data(ttl=86400)  # Cache for 24 hours
+
+@st.cache_data(ttl=86400, show_spinner=False)  # ADD show_spinner=False
 def load_real_economic_data(ticker, start_date="2020-01-01", end_date=None):
     """Fetch real-world data from FRED and Yahoo Finance."""
+    
+    # ADD THIS: Get a random fact for the spinner
+    fact = get_data_loading_fact()
     
     if end_date is None:
         end_date = datetime.today().strftime("%Y-%m-%d")
     
     try:
         # 1. Fetch Stock Data from Yahoo Finance
-        with st.spinner(f"Fetching stock data for {ticker}..."):
+        with st.spinner(f"Fetching stock data for {ticker}...\n\n {fact}"):  # ADD fact here
             stock_df = yf.download(ticker, start=start_date, end=end_date, progress=False)
             if stock_df.empty:
                 st.warning(f"No stock data found for {ticker}")
@@ -65,9 +70,13 @@ def load_real_economic_data(ticker, start_date="2020-01-01", end_date=None):
         }
         
         macro_frames = []
+        
+        # Get a NEW fact for FRED data fetching
+        fact_fred = get_data_loading_fact()
+        
         for name, series_id in macro_series.items():
             try:
-                with st.spinner(f"Fetching {name} data from FRED..."):
+                with st.spinner(f"Fetching {name} data from FRED...\n\n {fact_fred}"):
                     s = fred.get_series(series_id, observation_start=start_date, observation_end=end_date)
                     if s is not None and not s.empty:
                         df_temp = pd.DataFrame(s, columns=[name]).reset_index()
@@ -88,11 +97,10 @@ def load_real_economic_data(ticker, start_date="2020-01-01", end_date=None):
         macro_cols = list(macro_series.keys())
         for col in macro_cols:
             if col in final_df.columns:
-                final_df[col] = final_df[col] = final_df[col].ffill()
-
+                final_df[col] = final_df[col].ffill()
         
         # Fill any remaining NaN values
-        final_df = final_df = final_df.bfill()
+        final_df = final_df.bfill()
         
         # 5. Calculate Derived Indicators
         final_df['Ticker'] = ticker
@@ -117,7 +125,6 @@ def load_real_economic_data(ticker, start_date="2020-01-01", end_date=None):
         # Create the dictionary structure your dashboard expects
         ticker_data = {ticker: final_df.set_index('date')}
         
-       # st.success(f" Loaded {len(final_df)} days of data for {ticker}")
         return ticker_data, final_df
 
     except Exception as e:
@@ -126,35 +133,40 @@ def load_real_economic_data(ticker, start_date="2020-01-01", end_date=None):
 
 
 # Keep the old function for compatibility with existing code
-@st.cache_data(ttl=3600)
+@st.cache_data(ttl=3600, show_spinner=False)  # ADD show_spinner=False
 def load_economic_data(file_path):
     """Load economic indicators from CSV file (legacy function)."""
+    
+    # ADD THIS: Get a random fact for the spinner
+    fact = get_data_loading_fact()
+    
     try:
-        df = pd.read_csv(file_path)
-        
-        # Convert Date to datetime
-        df['Date'] = pd.to_datetime(df['Date'])
-        
-        # Rename columns for consistency
-        df.rename(columns={
-            'Date': 'date',
-            'GDP (%)': 'gdp',
-            'Inflation (%)': 'inflation',
-            'Interest Rate (%)': 'interest_rate',
-            'Unemployment (%)': 'unemployment',
-            'Market Stress Level': 'market_stress',
-            'Event Flag': 'event_flag'
-        }, inplace=True)
-        
-        # Create separate dataframes for each ticker
-        tickers = df['Ticker'].unique()
-        ticker_data = {}
-        
-        for ticker in tickers:
-            ticker_data[ticker] = df[df['Ticker'] == ticker].copy()
-            ticker_data[ticker].set_index('date', inplace=True)
-        
-        return ticker_data, df
+        with st.spinner(f"Loading economic data from CSV...\n\n {fact}"):
+            df = pd.read_csv(file_path)
+            
+            # Convert Date to datetime
+            df['Date'] = pd.to_datetime(df['Date'])
+            
+            # Rename columns for consistency
+            df.rename(columns={
+                'Date': 'date',
+                'GDP (%)': 'gdp',
+                'Inflation (%)': 'inflation',
+                'Interest Rate (%)': 'interest_rate',
+                'Unemployment (%)': 'unemployment',
+                'Market Stress Level': 'market_stress',
+                'Event Flag': 'event_flag'
+            }, inplace=True)
+            
+            # Create separate dataframes for each ticker
+            tickers = df['Ticker'].unique()
+            ticker_data = {}
+            
+            for ticker in tickers:
+                ticker_data[ticker] = df[df['Ticker'] == ticker].copy()
+                ticker_data[ticker].set_index('date', inplace=True)
+            
+            return ticker_data, df
         
     except Exception as e:
         st.error(f"Error loading economic data: {e}")

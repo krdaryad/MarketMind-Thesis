@@ -2,7 +2,7 @@
 Global configuration, CSS, and constants.
 """
 import streamlit as st
-from datetime import datetime, timedelta
+from datetime import datetime
 import warnings
 import os
 
@@ -23,13 +23,16 @@ MODELS_DIR = "models/"
 os.makedirs(MODELS_DIR, exist_ok=True)
 
 # ============================================================================
-# PAGE CONFIGURATION
+# NOTE: st.set_page_config() has been REMOVED from here.
+# It must be the FIRST command in your main.py file.
+# Add this to main.py:
+#
+# st.set_page_config(
+#     page_title="MarketMind - AI Consumer Behavior Analysis",
+#     layout="wide",
+#     initial_sidebar_state="expanded"
+# )
 # ============================================================================
-st.set_page_config(
-    page_title="MarketMind - AI Consumer Behavior Analysis",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
 
 # ============================================================================
 # BASE CSS (Common to both themes)
@@ -218,6 +221,18 @@ BASE_CSS = """
     overflow: hidden;
 }
 
+/* ===== 14. TEXT MUTED ===== */
+.text-muted {
+    font-size: 0.85rem;
+}
+
+/* ===== 15. CARD DESCRIPTION ===== */
+.card-description {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin-top: 0.5rem;
+}
+
 /* Modern Button Styling */
 div.stButton > button {
     border-radius: 12px !important;
@@ -262,14 +277,14 @@ div.stButton > button:disabled {
     min-height: 26px !important;
 }
 
-
 /* Refresh button in sidebar */
 [data-testid="stSidebar"] .stButton button {
     font-size: 0.6rem !important;
     padding: 0.2rem 0.3rem !important;
     min-height: 24px !important;
 }
-/* ===== SIDEBAR TEXT-ONLY BUTTONS (No circles, just underline) ===== */
+
+/* ===== SIDEBAR TEXT-ONLY BUTTONS ===== */
 [data-testid="stSidebar"] .stButton > button {
     background: transparent !important;
     border: none !important;
@@ -325,7 +340,8 @@ div.stButton > button:disabled {
     text-decoration: underline !important;
     background: transparent !important;
 }
-/* ===== EXPANDER STYLING - Clean text, no circle/box ===== */
+
+/* ===== EXPANDER STYLING ===== */
 .streamlit-expanderHeader {
     background: transparent !important;
     border: none !important;
@@ -352,8 +368,6 @@ div.stButton > button:disabled {
     margin: 0 !important;
 }
 
-
-
 /* Content area styling */
 .streamlit-expanderContent {
     background: transparent !important;
@@ -363,7 +377,6 @@ div.stButton > button:disabled {
 }
 
 </style>
-
 """
 
 # ============================================================================
@@ -390,6 +403,15 @@ DARK_CSS = """
 .card:hover, .metric-card:hover {
     border-color: #3B82F6;
     box-shadow: 0 0 40px rgba(59, 130, 246, 0.15);
+}
+
+/* Text colors */
+.text-muted {
+    color: #8A8F99 !important;
+}
+
+.card-description {
+    color: #94A3B8;
 }
 
 .tech-val {
@@ -543,6 +565,85 @@ div[data-baseweb="popover"] li:hover {
     background: #111317;
     color: #E2E8F0;
 }
+
+/* ===== THEME-AWARE TEXT CLASSES ===== */
+.theme-text-primary {
+    color: #E2E8F0 !important;
+}
+.theme-text-secondary {
+    color: #8A8F99 !important;
+}
+.theme-text-accent {
+    color: #3B82F6 !important;
+}
+.theme-text-positive {
+    color: #10B981 !important;
+}
+.theme-text-negative {
+    color: #EF4444 !important;
+}
+.theme-text-warning {
+    color: #F59E0B !important;
+}
+
+/* ===== THEME-AWARE BACKGROUNDS ===== */
+.theme-bg-card {
+    background: rgba(10, 15, 25, 0.7) !important;
+    border: 1px solid rgba(59, 130, 246, 0.2) !important;
+}
+.theme-bg-positive-light {
+    background: rgba(16, 185, 129, 0.1) !important;
+}
+.theme-bg-negative-light {
+    background: rgba(239, 68, 68, 0.1) !important;
+}
+.theme-bg-warning-light {
+    background: rgba(245, 158, 11, 0.1) !important;
+}
+.theme-bg-info-light {
+    background: rgba(59, 130, 246, 0.05) !important;
+}
+
+/* ===== THEME-AWARE BORDERS ===== */
+.theme-border-positive {
+    border-left: 3px solid #10B981 !important;
+}
+.theme-border-negative {
+    border-left: 3px solid #EF4444 !important;
+}
+.theme-border-warning {
+    border-left: 3px solid #F59E0B !important;
+}
+.theme-border-info {
+    border-left: 3px solid #3B82F6 !important;
+}
+
+/* ===== METRIC CARD STYLES ===== */
+.metric-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0;
+}
+.metric-label {
+    font-size: 0.7rem;
+    color: #8A8F99;
+    margin: 0;
+}
+.duration-badge, .info-badge {
+    background: #1A1D24;
+    border-radius: 20px;
+    padding: 0.2rem 0.8rem;
+    font-size: 0.75rem;
+    display: inline-block;
+}
+.info-badge {
+    background: #1A1D24;
+    border-radius: 20px;
+    padding: 0.2rem 0.8rem;
+    font-size: 0.75rem;
+    display: inline-block;
+    color: #8A8F99;
+}
 </style>
 """
 
@@ -559,6 +660,15 @@ LIGHT_CSS = """
         linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
     background-size: 40px 40px;
     color: #0F172A;
+}
+
+/* Text colors */
+.text-muted {
+    color: #64748B !important;
+}
+
+.card-description {
+    color: #475569;
 }
 
 /* 2. Enhanced Card Visibility */
@@ -734,72 +844,93 @@ div[data-baseweb="select"] div[aria-hidden="true"] {
 .stAlert {
     background-color: #FFFFFF !important;
 }
+
+/* ===== THEME-AWARE TEXT CLASSES ===== */
+.theme-text-primary {
+    color: #0F172A !important;
+}
+.theme-text-secondary {
+    color: #64748B !important;
+}
+.theme-text-accent {
+    color: #2563EB !important;
+}
+.theme-text-positive {
+    color: #059669 !important;
+}
+.theme-text-negative {
+    color: #DC2626 !important;
+}
+.theme-text-warning {
+    color: #D97706 !important;
+}
+
+/* ===== THEME-AWARE BACKGROUNDS ===== */
+.theme-bg-card {
+    background: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+}
+.theme-bg-positive-light {
+    background: rgba(5, 150, 105, 0.08) !important;
+}
+.theme-bg-negative-light {
+    background: rgba(220, 38, 38, 0.08) !important;
+}
+.theme-bg-warning-light {
+    background: rgba(217, 119, 6, 0.08) !important;
+}
+.theme-bg-info-light {
+    background: rgba(37, 99, 235, 0.05) !important;
+}
+
+/* ===== THEME-AWARE BORDERS ===== */
+.theme-border-positive {
+    border-left: 3px solid #059669 !important;
+}
+.theme-border-negative {
+    border-left: 3px solid #DC2626 !important;
+}
+.theme-border-warning {
+    border-left: 3px solid #D97706 !important;
+}
+.theme-border-info {
+    border-left: 3px solid #2563EB !important;
+}
+
+/* ===== METRIC CARD STYLES ===== */
+.metric-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0;
+    color: #0F172A;
+}
+.metric-label {
+    font-size: 0.7rem;
+    color: #64748B;
+    margin: 0;
+}
+.duration-badge, .info-badge {
+    background: #F1F5F9;
+    border-radius: 20px;
+    padding: 0.2rem 0.8rem;
+    font-size: 0.75rem;
+    display: inline-block;
+    color: #475569;
+}
+.info-badge {
+    background: #F1F5F9;
+    border-radius: 20px;
+    padding: 0.2rem 0.8rem;
+    font-size: 0.75rem;
+    display: inline-block;
+    color: #475569;
+}
 </style>
 """
 
 # ============================================================================
-# CATEGORY MAPPING
+# MOBILE CSS
 # ============================================================================
-CATEGORIES = {
-    "GLOBAL MACRO": [
-        "Economic Dashboard",  # The broad context
-        "Causality Analysis"   # Testing macro indicators vs returns
-    ],
-    "2021 STOCK CASE STUDY": [
-        "Dashboard",           # The 2021 "Front Page"
-        "Sentiment Trends",    # Time-series flow
-        "Entity Analysis",     # Who was discussed?
-        "Company Comparison",  # Side-by-side deep dive
-        "Volatility Analysis", # Sentiment instability
-        "Event Impact"         # Specific shocks (e.g., GME squeeze)
-    ],
-    "AI ENGINE & PATTERN MINING": [
-        "AI Analysis",         # Model outputs/Topics
-        "Correlation Analysis",# Sentiment vs Market stats
-        "Pattern Mining",      # Frequent terms/Association rules
-        "Classifier Demo",     # Live interactive test
-        "Model Accuracy"       # Technical validation (ROC/Clusters)
-    ],
-    "KNOWLEDGE & THEORY": [
-        "Market History",
-        "Learning Hub",        # Interactive courses
-        "Methodology",         # Technical approach
-        "Glossary"             # Term definitions
-    ]
-}
-
-
-# ============================================================================
-# DEFAULTS
-# ============================================================================
-DEFAULT_START = datetime(2021, 2, 1)
-DEFAULT_END = datetime(2021, 2, 28)
-
-# ============================================================================
-# COMPANY MAPPINGS
-# ============================================================================
-COMPANY_TICKERS = {
-    'Apple': 'AAPL',
-    'Tesla': 'TSLA',
-    'Amazon': 'AMZN',
-    'Google': 'GOOGL',
-    'Microsoft': 'MSFT',
-    'GOOG': 'GOOGL',
-    'AMZN': 'AMZN',
-    'TSLA': 'TSLA',
-    'AAPL': 'AAPL',
-    'MSFT': 'MSFT'
-}
-
-# Color scheme
-COLORS = {
-    'positive': '#10B981',
-    'neutral': '#8A8F99',
-    'negative': '#EF4444',
-    'primary': '#3B82F6',
-    'secondary': '#F59E0B'
-}
-
 MOBILE_CSS = """
 <style>
 /* Mobile Responsive Styles */
@@ -841,18 +972,7 @@ MOBILE_CSS = """
     .element-container {
         margin-bottom: 0.5rem !important;
     }
-}
-
-@media (min-width: 769px) and (max-width: 1024px) {
-    .metric-card {
-        padding: 1rem !important;
-    }
-}
-/* ========================================================================
-   ADDITIONAL MOBILE FIXES (Add to existing MOBILE_CSS)
-   ======================================================================== */
-
-@media (max-width: 768px) {
+    
     /* Force sidebar to be collapsible and narrower */
     [data-testid="stSidebar"] {
         width: 280px !important;
@@ -943,40 +1063,7 @@ MOBILE_CSS = """
     .stSelectbox label {
         font-size: 0.8rem !important;
     }
-}
-
-/* Small phones (max-width: 480px) */
-@media (max-width: 480px) {
-    /* Even smaller fonts */
-    h1 {
-        font-size: 1.2rem !important;
-    }
     
-    .tech-val {
-        font-size: 1rem !important;
-    }
-    
-    /* Single column for metrics */
-    div[data-testid="stMetric"] {
-        width: 100% !important;
-        margin: 0.25rem 0 !important;
-    }
-    
-    /* Hide secondary metrics row on very small screens */
-    .secondary-metrics {
-        display: none !important;
-    }
-    
-    /* Reduce chart height further */
-    .js-plotly-plot {
-        height: 250px !important;
-    }
-}
-/* ========================================================================
-   FIX FOR OVERFLOWING TABS ON MOBILE
-   ======================================================================== */
-
-@media (max-width: 768px) {
     /* Make tabs scrollable horizontally */
     .stTabs [data-baseweb="tab-list"] {
         display: flex !important;
@@ -1019,8 +1106,41 @@ MOBILE_CSS = """
         border-radius: 3px !important;
     }
 }
-</style>
 
+/* Small phones (max-width: 480px) */
+@media (max-width: 480px) {
+    /* Even smaller fonts */
+    h1 {
+        font-size: 1.2rem !important;
+    }
+    
+    .tech-val {
+        font-size: 1rem !important;
+    }
+    
+    /* Single column for metrics */
+    div[data-testid="stMetric"] {
+        width: 100% !important;
+        margin: 0.25rem 0 !important;
+    }
+    
+    /* Hide secondary metrics row on very small screens */
+    .secondary-metrics {
+        display: none !important;
+    }
+    
+    /* Reduce chart height further */
+    .js-plotly-plot {
+        height: 250px !important;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .metric-card {
+        padding: 1rem !important;
+    }
+}
+</style>
 """
 
 # ============================================================================
@@ -1046,3 +1166,70 @@ def get_plotly_template():
         return "plotly_dark"
     else:
         return "plotly_white"
+
+# ============================================================================
+# CATEGORY MAPPING
+# ============================================================================
+CATEGORIES = {
+    "GLOBAL MACRO": [
+        "Economic Dashboard",
+        "Causality Analysis"
+    ],
+    "2021 STOCK CASE STUDY": [
+        "Dashboard",
+        "Sentiment Trends",
+        "Entity Analysis",
+        "Company Comparison",
+        "Volatility Analysis",
+        "Event Impact"
+    ],
+    "AI ENGINE & PATTERN MINING": [
+        "AI Analysis",
+        "Correlation Analysis",
+        "Pattern Mining",
+        "Classifier Demo",
+        "Model Accuracy"
+    ],
+    "KNOWLEDGE & THEORY": [
+        "Market History",
+        "Learning Hub",
+        "Methodology",
+        "Glossary"
+    ],
+    "SYSTEM & PERFORMANCE": [
+        "Performance Dashboard"
+    ],
+}
+
+# ============================================================================
+# DEFAULTS
+# ============================================================================
+DEFAULT_START = datetime(2021, 2, 1)
+DEFAULT_END = datetime(2021, 2, 28)
+
+# ============================================================================
+# COMPANY MAPPINGS
+# ============================================================================
+COMPANY_TICKERS = {
+    'Apple': 'AAPL',
+    'Tesla': 'TSLA',
+    'Amazon': 'AMZN',
+    'Google': 'GOOGL',
+    'Microsoft': 'MSFT',
+    'GOOG': 'GOOGL',
+    'AMZN': 'AMZN',
+    'TSLA': 'TSLA',
+    'AAPL': 'AAPL',
+    'MSFT': 'MSFT'
+}
+
+# ============================================================================
+# COLOR SCHEME
+# ============================================================================
+COLORS = {
+    'positive': '#10B981',
+    'neutral': '#8A8F99',
+    'negative': '#EF4444',
+    'primary': '#3B82F6',
+    'secondary': '#F59E0B'
+}

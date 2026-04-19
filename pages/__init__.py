@@ -18,3 +18,5 @@ from .shock_detection import shock_detection_page
 from .volatility_analysis import volatility_analysis_page
 from .market_history import market_history_page
 from .event_impact import event_impact_page
+
+from .performance_dashboard import performance_dashboard_page

@@ -1,0 +1,8 @@
+component,memory_mb
+Baseline (imports),87.7
+Reddit DataFrame,27.3
+Sentiment Analysis,98.1
+ML Models (4 classifiers),19.9
+TF-IDF Vectorizer,0.2
+TF-IDF Matrix (sparse),0.5
+TOTAL,279.0

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MarketMind Rendering Benchmark</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #111317; color: #E2E8F0; }
+        button { background: #3B82F6; color: white; border: none; padding: 10px 20px; margin: 5px; cursor: pointer; border-radius: 8px; }
+        button:hover { background: #2563EB; }
+        pre { background: #1A1D24; padding: 15px; border-radius: 8px; overflow-x: auto; }
+        .result { margin: 10px 0; padding: 10px; border-left: 3px solid #3B82F6; }
+    </style>
+</head>
+<body>
+    <h1>MarketMind Rendering Performance Test</h1>
+    <p>Follow the instructions below and record the results for your thesis.</p>
+    
+    <div style="margin: 20px 0;">
+        <button onclick="startTest()">Start Rendering Test</button>
+        <button onclick="clearResults()">Clear Results</button>
+        <button onclick="copyResults()">Copy Results to Clipboard</button>
+    </div>
+    
+    <div id="results"></div>
+    
+    <script>
+        const results = [];
+        
+        function log(message, type = 'info') {
+            const div = document.getElementById('results');
+            const entry = document.createElement('div');
+            entry.className = 'result';
+            entry.style.borderLeftColor = type === 'error' ? '#EF4444' : (type === 'success' ? '#10B981' : '#3B82F6');
+            entry.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong> - ${message}`;
+            div.appendChild(entry);
+            results.push({ timestamp: new Date().toISOString(), message: message, type: type });
+        }
+        
+        async function measureRenderTime(elementId, description) {
+            return new Promise((resolve) => {
+                const targetNode = document.getElementById(elementId);
+                if (!targetNode) {
+                    log(`Element "${elementId}" not found`, 'error');
+                    resolve(null);
+                    return;
+                }
+                
+                let startTime = null;
+                let endTime = null;
+                
+                const observer = new MutationObserver((mutations) => {
+                    for (const mutation of mutations) {
+                        if (mutation.type === 'childList' || mutation.type === 'subtree') {
+                            endTime = performance.now();
+                            observer.disconnect();
+                            const duration = endTime - startTime;
+                            log(`${description}: ${duration.toFixed(2)} ms`, 'success');
+                            resolve(duration);
+                            return;
+                        }
+                    }
+                });
+                
+                observer.observe(targetNode, { childList: true, subtree: true });
+                startTime = performance.now();
+                
+                // Timeout after 10 seconds
+                setTimeout(() => {
+                    observer.disconnect();
+                    log(`${description}: TIMEOUT (>10000ms)`, 'error');
+                    resolve(null);
+                }, 10000);
+            });
+        }
+        
+        async function startTest() {
+            log('Starting rendering benchmark...', 'info');
+            log('Navigate to each page in your MarketMind app and click the buttons below', 'info');
+            
+            // Test 1: Dashboard load
+            log('\n--- TEST 1: Dashboard Initial Load ---', 'info');
+            log('1. Navigate to Dashboard page in your MarketMind app', 'info');
+            log('2. Press Cmd+Option+I (Mac) or Ctrl+Shift+I (Windows) to open DevTools', 'info');
+            log('3. Go to Performance tab, click the record button (circle)', 'info');
+            log('4. Refresh the page, wait for full load, then stop recording', 'info');
+            log('5. Look for "Load" event - record the time in milliseconds', 'info');
+            log('6. Enter your measurement below:', 'info');
+            
+            const dashboardLoad = prompt('Enter Dashboard load time (ms):', '');
+            if (dashboardLoad) {
+                results.push({ test: 'Dashboard Initial Load', value: parseInt(dashboardLoad), unit: 'ms' });
+                log(`✓ Recorded: ${dashboardLoad} ms`, 'success');
+            }
+            
+            // Test 2: Chart interaction
+            log('\n--- TEST 2: Chart Interaction (Hover Response) ---', 'info');
+            log('1. On the Dashboard, hover over any data point on the Anomaly Timeline', 'info');
+            log('2. Measure the time until tooltip appears', 'info');
+            log('3. Repeat 5 times and calculate average', 'info');
+            
+            const hoverTime = prompt('Enter average hover response time (ms):', '');
+            if (hoverTime) {
+                results.push({ test: 'Hover Tooltip Response', value: parseInt(hoverTime), unit: 'ms' });
+                log(`✓ Recorded: ${hoverTime} ms`, 'success');
+            }
+            
+            // Test 3: Filter application
+            log('\n--- TEST 3: Filter Application ---', 'info');
+            log('1. On any page, change a filter (e.g., date range or company)', 'info');
+            log('2. Measure time until charts update', 'info');
+            log('3. Repeat 5 times and calculate average', 'info');
+            
+            const filterTime = prompt('Enter average filter response time (ms):', '');
+            if (filterTime) {
+                results.push({ test: 'Filter Application', value: parseInt(filterTime), unit: 'ms' });
+                log(`✓ Recorded: ${filterTime} ms`, 'success');
+            }
+            
+            // Test 4: Tab switching
+            log('\n--- TEST 4: Tab Switching Performance ---', 'info');
+            log('1. On Sentiment Trends page, switch between tabs', 'info');
+            log('2. Measure time until new content appears', 'info');
+            log('3. Average across 3 tab switches', 'info');
+            
+            const tabTime = prompt('Enter average tab switch time (ms):', '');
+            if (tabTime) {
+                results.push({ test: 'Tab Switching', value: parseInt(tabTime), unit: 'ms' });
+                log(`✓ Recorded: ${tabTime} ms`, 'success');
+            }
+            
+            // Summary
+            log('\n--- BENCHMARK SUMMARY ---', 'success');
+            log(JSON.stringify(results, null, 2), 'info');
+            log('Results saved. Click "Copy Results" to export for your thesis.', 'info');
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+            results.length = 0;
+            log('Results cleared', 'info');
+        }
+        
+        function copyResults() {
+            const text = JSON.stringify(results, null, 2);
+            navigator.clipboard.writeText(text);
+            log('Results copied to clipboard!', 'success');
+        }
+    </script>
+</body>
+</html>

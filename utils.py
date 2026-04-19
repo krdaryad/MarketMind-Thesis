@@ -98,7 +98,7 @@ def show_onboarding():
                     st.session_state.onboarding_step += 1
                     st.rerun()
             else:
-                if st.button("Finish Tour 🎉", type="primary", key="finish_tour", use_container_width=True):
+                if st.button("Finish Tour!", type="primary", key="finish_tour", use_container_width=True):
                     st.session_state.onboarding_active = False
                     st.rerun()
         
@@ -121,21 +121,38 @@ def toggle_theme():
     # 2. Section Label
     st.sidebar.markdown('<p style="font-size:0.65rem; color:#8A8F99; letter-spacing:1px; margin-bottom:10px;">APPEARANCE</p>', unsafe_allow_html=True)
     
-    # 3. Dynamic Styling based on State
-    # If Dark: Show Sun icon to switch to Light. If Light: Show Moon icon to switch to Dark.
-    label = "Light Mode" if is_dark else "Dark Mode"
-    help_text = "Switch to high-contrast light mode" if is_dark else "Switch to eye-friendly dark mode"
+    # 3. Dynamic Label (NOTE: Fixed the logic - was inverted!)
+    # When is_dark = True (dark mode active), button should say "Light Mode" to switch to light
+    # When is_dark = False (light mode active), button should say "Dark Mode" to switch to dark
+    label = " Light Mode" if is_dark else " Dark Mode"
+    help_text = "Switch to light mode" if is_dark else "Switch to dark mode"
     
     # 4. Functional Toggle Button
     if st.sidebar.button(label, use_container_width=True, help=help_text):
         st.session_state.dark_mode = not is_dark
-        # Import and apply theme instantly
+        
+        # Apply native Streamlit theme
+        if st.session_state.dark_mode:
+            st._config.set_option('theme.base', 'dark')
+            st._config.set_option('theme.backgroundColor', '#05070A')
+            st._config.set_option('theme.primaryColor', '#3B82F6')
+            st._config.set_option('theme.secondaryBackgroundColor', '#0F172A')
+            st._config.set_option('theme.textColor', '#E2E8F0')
+        else:
+            st._config.set_option('theme.base', 'light')
+            st._config.set_option('theme.backgroundColor', '#F1F5F9')
+            st._config.set_option('theme.primaryColor', '#3B82F6')
+            st._config.set_option('theme.secondaryBackgroundColor', '#FFFFFF')
+            st._config.set_option('theme.textColor', '#0F172A')
+        
+        # Apply your custom CSS theme
         from config import apply_theme
         apply_theme()
+        
         st.rerun()
 
     # 5. Visual "Active State" Indicator (Subtle underline)
-    active_color = "#3B82F6" if is_dark else "#F59E0B" # Blue for Dark, Amber for Light
+    active_color = "#3B82F6" if is_dark else "#F59E0B"
     st.sidebar.markdown(f"""
         <div style="width: 100%; height: 2px; background: rgba(255,255,255,0.05); margin-top: -10px;">
             <div style="width: 100%; height: 100%; background: {active_color}; opacity: 0.6;"></div>
@@ -189,7 +206,27 @@ def render_data_quality():
             </div>
         </div>
     """, unsafe_allow_html=True)
-
+def theme_card(content, card_type="info"):
+    """
+    Generate a theme-aware card.
+    
+    card_type: "positive", "negative", "warning", "info"
+    """
+    type_map = {
+        "positive": {"bg": "theme-bg-positive-light", "border": "theme-border-positive"},
+        "negative": {"bg": "theme-bg-negative-light", "border": "theme-border-negative"},
+        "warning": {"bg": "theme-bg-warning-light", "border": "theme-border-warning"},
+        "info": {"bg": "theme-bg-info-light", "border": "theme-border-info"}
+    }
+    
+    bg_class = type_map.get(card_type, type_map["info"])["bg"]
+    border_class = type_map.get(card_type, type_map["info"])["border"]
+    
+    return f"""
+    <div class="{bg_class} {border_class}" style="border-radius: 8px; padding: 0.75rem; margin: 0.5rem 0;">
+        {content}
+    </div>
+    """
 def render_system_controls(posts_df):
     
     
@@ -255,11 +292,10 @@ def render_sidebar():
     """Render sidebar with a prominent corner logo."""
     
     track_user_session()
-    def render_sidebar():
     
     
     # Add a mobile menu toggle button (visible only on mobile)
-     st.markdown("""
+    st.markdown("""
     <style>
     @media (max-width: 768px) {
         .mobile-menu-toggle {

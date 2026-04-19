@@ -733,23 +733,27 @@ def economic_dashboard_page():
         negative_spread = econ_df[econ_df['yield_spread'] < 0]
         if not negative_spread.empty:
             first_inversion = negative_spread.index[0]
+            
             st.markdown('''
             <div class="card" style="padding: 1rem;">
-                <h3 style="font-size: 1.1rem; margin-top: 0;">Recession Signal (Inverted Yield Curve)</h3>
+                <h3 style="font-size: 1.1rem; margin-top: 0;" class="theme-text-primary">Recession Signal (Inverted Yield Curve)</h3>
             ''', unsafe_allow_html=True)
-            st.markdown(f"""
-            <div style="background: rgba(239,68,68,0.1); border-left: 3px solid #EF4444; padding: 0.75rem; border-radius: 8px;">
-                <p style="margin: 0; font-size: 0.85rem;">
+            
+            # Use theme-aware classes instead of hardcoded colors
+            st.markdown(f'''
+            <div class="theme-bg-negative-light theme-border-negative" style="border-radius: 8px; padding: 0.75rem;">
+                <p style="margin: 0; font-size: 0.85rem;" class="theme-text-primary">
                     The yield curve inverted on <strong>{first_inversion.strftime('%Y-%m-%d') if hasattr(first_inversion, 'strftime') else first_inversion}</strong>, 
                     historically a leading indicator of recession.
                 </p>
-                <p style="margin: 0.5rem 0 0 0; font-size: 0.7rem; color: #8A8F99;">
+                <p style="margin: 0.5rem 0 0 0; font-size: 0.7rem;" class="theme-text-secondary">
                     <strong>Academic Context:</strong> An inverted yield curve occurs when short-term Treasury yields exceed long-term yields,
                     suggesting investor pessimism about future economic growth. According to research by Estrella and Mishkin (1998), 
                     the yield spread is one of the most reliable predictors of recessions with a 6-18 month lag.
                 </p>
             </div>
-            """, unsafe_allow_html=True)
+            ''', unsafe_allow_html=True)
+            
             st.markdown('</div>', unsafe_allow_html=True)
     
     # ========================================================================

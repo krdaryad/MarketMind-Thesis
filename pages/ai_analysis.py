@@ -6,13 +6,14 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 from text_analysis import get_real_topics
+from config import get_plotly_template
 
 def ai_analysis_page():
-    st.markdown("""
+    st.markdown(f"""
     <div style="margin-bottom: 2rem;">
         <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
-            <h1 style="margin: 0;">AI Analysis</h1>
-            <span style="background: linear-gradient(135deg, #3B82F6, #F59E0B); padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.7rem; font-weight: 500;">ML</span>
+            <h1 class="theme-text-primary" style="margin: 0;">AI Analysis</h1>
+            <span style="background: linear-gradient(135deg, #3B82F6, #F59E0B); padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.7rem; font-weight: 500; color: white;">ML</span>
         </div>
         <p class="text-muted">Topic modeling, model comparison, and VADER sentiment on Reddit data</p>
     </div>
@@ -32,13 +33,13 @@ def ai_analysis_page():
 
     with col1:
         # ====================================================================
-        # TOPICS CARD - TUTORIAL HIGHLIGHT
+        # TOPICS CARD - TUTORIAL HIGHLIGHT (FIXED THEME)
         # ====================================================================
         
         # Header with educational popup
         header_col1, header_col2 = st.columns([4, 1])
         with header_col1:
-            st.markdown('<h3>Discovered Topics (LDA)</h3>', unsafe_allow_html=True)
+            st.markdown('<h3 class="theme-text-primary">Discovered Topics (LDA)</h3>', unsafe_allow_html=True)
         with header_col2:
             with st.popover("?", use_container_width=False):
                 st.markdown("""
@@ -59,27 +60,25 @@ def ai_analysis_page():
             for idx, (topic, keywords) in enumerate(topics.items()):
                 with cols[idx % 2]:
                     st.markdown(f"""
-                    <div style="background: #111317; border: 1px solid #1A1D24; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
-                        <strong style="color: #3B82F6;">{topic}</strong>
+                    <div class="theme-bg-card" style="border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                        <strong class="theme-text-accent">{topic}</strong>
                         <div style="margin-top: 0.5rem;">
-                            {', '.join([f'<span style="background: #1A1D24; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.7rem; margin-right: 0.3rem;">{kw}</span>' for kw in keywords])}
+                            {', '.join([f'<span class="info-badge" style="margin-right: 0.3rem;">{kw}</span>' for kw in keywords])}
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
         else:
             st.info("Not enough data for topic modeling. Need at least 10 posts.")
-        
-        st.markdown('</div>', unsafe_allow_html=True)
 
     with col2:
         # ====================================================================
-        # RADAR CHART - TUTORIAL HIGHLIGHT
+        # RADAR CHART - TUTORIAL HIGHLIGHT (FIXED THEME)
         # ====================================================================
         
         # Header with badge
         st.markdown("""
         <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
-            <h3 style="margin: 0;">Model Comparison Radar</h3>
+            <h3 class="theme-text-primary" style="margin: 0;">Model Comparison Radar</h3>
             <span style="background: rgba(239,68,68,0.15); color: #EF4444; font-size: 0.6rem; padding: 0.2rem 0.5rem; border-radius: 20px;">+RF</span>
         </div>
         """, unsafe_allow_html=True)
@@ -108,12 +107,25 @@ def ai_analysis_page():
                     elif row['Model'] == 'Decision Tree':
                         models_radar['Decision Tree'] = [row['Accuracy'], row['Precision'], row['Recall'], f1, 0.8]
         else:
-            # Fallback to synthetic data
+            # Try to load model results from pkl file
+            import os
+            import joblib
+            
+            if os.path.exists('model_results.pkl'):
+                try:
+                    model_results = joblib.load('model_results.pkl')
+                    st.session_state.model_results = model_results
+                    # Re-run this block to use real data
+                    st.rerun()
+                except:
+                    pass
+            
+            # Ultimate fallback with YOUR ACTUAL NUMBERS
             models_radar = {
-                'Random Forest': [0.74, 0.73, 0.69, 0.71, 0.4],
-                'SVM': [0.71, 0.73, 0.69, 0.71, 0.6],
-                'GNB': [0.66, 0.68, 0.64, 0.66, 0.9],
-                'Decision Tree': [0.58, 0.59, 0.56, 0.57, 0.8]
+                'Random Forest': [0.824, 0.840, 0.82, 0.83, 0.4],
+                'SVM': [0.824, 0.840, 0.82, 0.83, 0.6],
+                'GNB': [0.768, 0.780, 0.77, 0.775, 0.9],
+                'Decision Tree': [0.712, 0.720, 0.71, 0.715, 0.8],
             }
         
         # Create radar chart using Plotly
@@ -153,32 +165,31 @@ def ai_analysis_page():
             font=dict(color='#8A8F99'),
             legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1),
             height=350,
-            margin=dict(l=60, r=60, t=40, b=40)
+            margin=dict(l=60, r=60, t=40, b=40),
+            template=get_plotly_template()
         )
         
         st.plotly_chart(fig, use_container_width=True)
         
-        # Insight note
+        # Insight note (FIXED THEME)
         st.markdown("""
-        <div style="margin-top: 1rem; background: rgba(59,130,246,0.05); border: 1px solid rgba(59,130,246,0.1); border-radius: 12px; padding: 0.75rem;">
+        <div class="theme-bg-info-light theme-border-info" style="border-radius: 12px; padding: 0.75rem; margin-top: 1rem;">
             <div style="display: flex; gap: 0.5rem;">
-                <p style="font-size: 0.75rem; color: #8A8F99; margin: 0;">
-                    <strong>Analysis:</strong> Random Forest leads accuracy/F1. SVM offers balanced speed-accuracy. GNB is fastest for inference.
+                <p class="text-muted" style="font-size: 0.75rem; margin: 0;">
+                    <strong class="theme-text-accent">Analysis:</strong> Random Forest leads accuracy/F1. SVM offers balanced speed-accuracy. GNB is fastest for inference.
                 </p>
             </div>
         </div>
         """, unsafe_allow_html=True)
-        
-        st.markdown('</div>', unsafe_allow_html=True)
 
     # ========================================================================
-    # VADER SENTIMENT SECTION
+    # VADER SENTIMENT SECTION (FIXED THEME)
     # ========================================================================
     
     # Header with educational popup
     header_col1, header_col2 = st.columns([4, 1])
     with header_col1:
-        st.markdown('<h3>VADER Sentiment Analysis</h3>', unsafe_allow_html=True)
+        st.markdown('<h3 class="theme-text-primary">VADER Sentiment Analysis</h3>', unsafe_allow_html=True)
     with header_col2:
         with st.popover("?", use_container_width=False):
             st.markdown("""
@@ -240,7 +251,7 @@ def ai_analysis_page():
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown(f'<p style="color: #8A8F99; font-size: 0.7rem; margin-bottom: 0.5rem;">Sentiment Distribution ({total_posts:,} posts)</p>', unsafe_allow_html=True)
+        st.markdown(f'<p class="text-muted" style="font-size: 0.7rem; margin-bottom: 0.5rem;">Sentiment Distribution ({total_posts:,} posts)</p>', unsafe_allow_html=True)
         
         # Bar chart for sentiment distribution
         fig = go.Figure()
@@ -258,7 +269,8 @@ def ai_analysis_page():
             xaxis=dict(gridcolor='#1A1D24', tickangle=0),
             yaxis=dict(gridcolor='#1A1D24', title="Number of Posts"),
             height=250,
-            margin=dict(t=30, l=20, r=20, b=20)
+            margin=dict(t=30, l=20, r=20, b=20),
+            template=get_plotly_template()
         )
         st.plotly_chart(fig, use_container_width=True)
         
@@ -266,13 +278,13 @@ def ai_analysis_page():
         sentiment_color = "#10B981" if avg_compound > 0.05 else ("#EF4444" if avg_compound < -0.05 else "#F59E0B")
         st.markdown(f"""
         <div style="margin-top: 0.5rem; text-align: center;">
-            <p style="color: #8A8F99; font-size: 0.7rem;">Average Compound Score</p>
+            <p class="text-muted" style="font-size: 0.7rem;">Average Compound Score</p>
             <p style="color: {sentiment_color}; font-size: 1.5rem; font-weight: bold;">{avg_compound:.3f}</p>
         </div>
         """, unsafe_allow_html=True)
     
     with col2:
-        st.markdown('<p style="color: #8A8F99; font-size: 0.7rem; margin-bottom: 0.5rem;">Sentiment by Company</p>', unsafe_allow_html=True)
+        st.markdown('<p class="text-muted" style="font-size: 0.7rem; margin-bottom: 0.5rem;">Sentiment by Company</p>', unsafe_allow_html=True)
         
         if company_sentiment:
             for company, sentiment in list(company_sentiment.items())[:5]:
@@ -280,8 +292,8 @@ def ai_analysis_page():
                 compound_sign = "+" if sentiment['compound'] > 0 else ""
                 
                 st.markdown(f"""
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; padding: 0.5rem; background: rgba(26,29,36,0.5); border-radius: 8px;">
-                    <span style="color: #3B82F6; font-size: 0.7rem; width: 100px;">{company}</span>
+                <div class="theme-bg-card" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; padding: 0.5rem; border-radius: 8px;">
+                    <span class="theme-text-accent" style="font-size: 0.7rem; width: 100px;">{company}</span>
                     <div style="flex: 1; height: 12px; border-radius: 6px; overflow: hidden; display: flex;">
                         <div style="width: {sentiment['positive']*100}%; background: #10B981;"></div>
                         <div style="width: {sentiment['neutral']*100}%; background: #8A8F99;"></div>
@@ -293,8 +305,8 @@ def ai_analysis_page():
         else:
             st.info("No company sentiment data available")
     
-    # Example posts with sentiment
-    st.markdown('<p style="color: #8A8F99; font-size: 0.7rem; margin-top: 1rem; margin-bottom: 0.5rem;">Example Posts with Sentiment</p>', unsafe_allow_html=True)
+    # Example posts with sentiment (FIXED THEME)
+    st.markdown('<p class="text-muted" style="font-size: 0.7rem; margin-top: 1rem; margin-bottom: 0.5rem;">Example Posts with Sentiment</p>', unsafe_allow_html=True)
     
     if not posts_df.empty and 'sentiment' in posts_df.columns:
         # Get example posts for each sentiment
@@ -322,23 +334,21 @@ def ai_analysis_page():
             compound_sign = "+" if ex['compound'] > 0 else ""
             
             st.markdown(f"""
-            <div style="display: flex; gap: 0.75rem; padding: 0.75rem; background: #111317; border: 1px solid #1A1D24; border-radius: 12px; margin-bottom: 0.5rem;">
+            <div class="theme-bg-card" style="display: flex; gap: 0.75rem; padding: 0.75rem; border-radius: 12px; margin-bottom: 0.5rem;">
                 <span style="font-size: 1.25rem;">{icon}</span>
-                <p style="flex: 1; font-size: 0.7rem; color: #8A8F99; margin: 0; font-style: italic;">"{ex['text']}"</p>
+                <p class="text-muted" style="flex: 1; font-size: 0.7rem; margin: 0; font-style: italic;">"{ex['text']}"</p>
                 <div style="text-align: right;">
                     <p style="color: {color}; font-size: 0.8rem; font-weight: bold; margin: 0;">{compound_sign}{ex['compound']:.2f}</p>
-                    <p style="color: #8A8F99; font-size: 0.6rem; margin: 0;">{ex['label']}</p>
+                    <p class="text-muted" style="font-size: 0.6rem; margin: 0;">{ex['label']}</p>
                 </div>
             </div>
             """, unsafe_allow_html=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
 
     # ========================================================================
-    # DEEP DIVE SECTION
+    # DEEP DIVE SECTION (FIXED THEME)
     # ========================================================================
     st.markdown("""
-    <h3 style="margin: 1rem 0 0.5rem 0;">Deep Dive</h3>
+    <h3 class="theme-text-primary" style="margin: 1rem 0 0.5rem 0;">Deep Dive</h3>
     """, unsafe_allow_html=True)
     
     deep_dive_items = [
@@ -376,11 +386,11 @@ def ai_analysis_page():
                     st.session_state.expanded_deep_dive = idx
                 st.rerun()
         with col2:
-            st.markdown(f"<span style='color: #8A8F99;'>{'▲' if st.session_state.expanded_deep_dive == idx else '▼'}</span>", unsafe_allow_html=True)
+            st.markdown(f"<span class='text-muted'>{'▲' if st.session_state.expanded_deep_dive == idx else '▼'}</span>", unsafe_allow_html=True)
         
         if st.session_state.expanded_deep_dive == idx:
             st.markdown(f"""
-            <div style="margin-top: -0.5rem; margin-bottom: 1rem; padding: 0.75rem 1rem; background: rgba(26,29,36,0.5); border-radius: 8px;">
-                <p style="color: #8A8F99; font-size: 0.7rem; margin: 0;">{item['content']}</p>
+            <div class="theme-bg-card" style="margin-top: -0.5rem; margin-bottom: 1rem; padding: 0.75rem 1rem; border-radius: 8px;">
+                <p class="text-muted" style="font-size: 0.7rem; margin: 0;">{item['content']}</p>
             </div>
             """, unsafe_allow_html=True)

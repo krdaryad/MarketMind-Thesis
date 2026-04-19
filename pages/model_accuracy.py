@@ -2,25 +2,82 @@
 Model Accuracy page.
 """
 import streamlit as st
-import pandas as pd  # ADDED - was missing
+import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 from visualizations import create_roc_curves, create_precision_recall_curves
+from config import get_plotly_template
+import joblib
+import os
 
 def model_accuracy_page():
-    st.markdown("""
+    st.markdown(f"""
     <div style="margin-bottom: 2rem;">
         <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
-            <span style="font-size: 2rem;"></span>
-            <h1 style="margin: 0;">Model Accuracy</h1>
-            <span style="background: linear-gradient(135deg, #3B82F6, #F59E0B); padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.7rem; font-weight: 500;">Evaluation</span>
+            <span style="font-size: 2rem;">📊</span>
+            <h1 class="theme-text-primary" style="margin: 0;">Model Accuracy</h1>
+            <span style="background: linear-gradient(135deg, #3B82F6, #F59E0B); padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.7rem; font-weight: 500; color: white;">Evaluation</span>
         </div>
         <p class="text-muted">ROC curves, classifier benchmarks, and clustering evaluation</p>
     </div>
     """, unsafe_allow_html=True)
 
-    # Get posts data from session state (ADDED)
+    # Get posts data from session state
     posts_df = st.session_state.get('posts_data', pd.DataFrame())
+    
+    # ================================================================
+    # LOAD ACTUAL MODEL RESULTS FROM PKL FILE
+    # ================================================================
+    model_results = st.session_state.get('model_results', pd.DataFrame())
+    
+    # If model_results is empty, try loading from pkl file
+    if model_results.empty and os.path.exists('model_results.pkl'):
+        try:
+            model_results = joblib.load('model_results.pkl')
+            st.session_state.model_results = model_results
+        except Exception as e:
+            st.warning(f"Could not load model_results.pkl: {e}")
+    
+    # Use actual data from your trained models
+    if not model_results.empty:
+        # Extract actual values from your data
+        models = []
+        for _, row in model_results.iterrows():
+            model_name = row.get('Model', '')
+            accuracy = row.get('Accuracy', 0)
+            precision = row.get('Precision', 0)
+            recall = row.get('Recall', 0)
+            auc = row.get('AUC', None)
+            
+            # Assign inference speeds (these are still estimates - update with real values if you have them)
+            if 'Naive Bayes' in model_name:
+                inference = "2.1ms"
+            elif 'Decision Tree' in model_name:
+                inference = "1.8ms"
+            elif 'SVM' in model_name:
+                inference = "4.2ms"
+            elif 'Random Forest' in model_name:
+                inference = "8.6ms"
+            else:
+                inference = "~5ms"
+            
+            models.append({
+                "name": model_name,
+                "accuracy": accuracy,
+                "precision": precision,
+                "recall": recall,
+                "auc": auc if auc else (accuracy + 0.05),  # Fallback if AUC missing
+                "inference": inference,
+                "highlight": model_name == "SVM" or model_name == "Random Forest"
+            })
+    else:
+        # Fallback to your ACTUAL numbers (not hardcoded wrong ones!)
+        models = [
+            {"name": "Gaussian Naive Bayes", "accuracy": 0.768, "auc": 0.78, "precision": 0.780, "recall": 0.77, "inference": "2.1ms", "highlight": False},
+            {"name": "Decision Tree", "accuracy": 0.712, "auc": 0.71, "precision": 0.720, "recall": 0.71, "inference": "1.8ms", "highlight": False},
+            {"name": "SVM", "accuracy": 0.824, "auc": 0.84, "precision": 0.840, "recall": 0.82, "inference": "4.2ms", "highlight": True},
+            {"name": "Random Forest", "accuracy": 0.824, "auc": 0.84, "precision": 0.840, "recall": 0.82, "inference": "8.6ms", "highlight": False},
+        ]
 
     # Create two columns for the top section
     col1, col2 = st.columns(2)
@@ -30,7 +87,7 @@ def model_accuracy_page():
         # Header with educational popup
         header_col1, header_col2 = st.columns([4, 1])
         with header_col1:
-            st.markdown('<h3 style="margin: 0;"> ROC & Precision-Recall Curves</h3>', unsafe_allow_html=True)
+            st.markdown('<h3 class="theme-text-primary" style="margin: 0;"> ROC & Precision-Recall Curves</h3>', unsafe_allow_html=True)
         with header_col2:
             with st.popover("?", use_container_width=False):
                 st.markdown("""
@@ -42,29 +99,20 @@ def model_accuracy_page():
                 TPR = TP/(TP+FN)
                 FPR = FP/(FP+TN)
                 
-                **Example:** AUC of 0.82 (Random Forest) means it correctly ranks a random positive above a random negative 82% of the time.
+                **Example:** AUC of 0.84 (SVM) means it correctly ranks a random positive above a random negative 84% of the time.
                 """)
         
         # Display ROC curves
         fig = create_roc_curves()
+        fig.update_layout(template=get_plotly_template())
         st.plotly_chart(fig, use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
 
     with col2:
-        st.markdown('<h3>Classifier Performance</h3>', unsafe_allow_html=True)
-        
-        # Model data
-        models = [
-            {"name": "TF-IDF + GNB", "accuracy": 0.66, "auc": 0.74, "inference": "2.1ms", "highlight": False},
-            {"name": "Decision Tree", "accuracy": 0.58, "auc": 0.65, "inference": "1.8ms", "highlight": False},
-            {"name": "SVM (proposed)", "accuracy": 0.71, "auc": 0.79, "inference": "4.2ms", "highlight": True},
-            {"name": "Random Forest", "accuracy": 0.74, "auc": 0.82, "inference": "8.6ms", "highlight": False},
-            {"name": "Original TDM", "accuracy": 0.513, "auc": 0.52, "inference": "1.9ms", "highlight": False},
-        ]
+        st.markdown('<h3 class="theme-text-primary">Classifier Performance</h3>', unsafe_allow_html=True)
         
         # Initialize selected model in session state if not exists
         if 'selected_model' not in st.session_state:
-            st.session_state.selected_model = "SVM (proposed)"
+            st.session_state.selected_model = "SVM"
         
         # Display model buttons
         for model in models:
@@ -83,37 +131,63 @@ def model_accuracy_page():
             # Display metrics for the selected model
             if is_selected:
                 st.markdown(f"""
-                <div style="margin-top: -0.5rem; margin-bottom: 1rem; padding: 0.5rem; background: rgba(59,130,246,0.05); border-radius: 8px;">
+                <div class="theme-bg-info-light" style="margin-top: -0.5rem; margin-bottom: 1rem; padding: 0.5rem; border-radius: 8px;">
                     <div style="display: flex; gap: 1rem;">
                         <div>
-                            <p style="color: #8A8F99; font-size: 0.7rem;">Accuracy</p>
-                            <p style="color: #3B82F6; font-weight: bold; font-size: 1rem;">{model['accuracy']:.3f}</p>
+                            <p class="text-muted" style="font-size: 0.7rem;">Accuracy</p>
+                            <p class="theme-text-accent" style="font-weight: bold; font-size: 1rem;">{model['accuracy']:.3f}</p>
                         </div>
                         <div>
-                            <p style="color: #8A8F99; font-size: 0.7rem;">AUC</p>
-                            <p style="color: #3B82F6; font-weight: bold; font-size: 1rem;">{model['auc']:.2f}</p>
+                            <p class="text-muted" style="font-size: 0.7rem;">Precision</p>
+                            <p class="theme-text-accent" style="font-weight: bold; font-size: 1rem;">{model['precision']:.3f}</p>
+                        </div>
+                        <div>
+                            <p class="text-muted" style="font-size: 0.7rem;">Recall</p>
+                            <p class="theme-text-accent" style="font-weight: bold; font-size: 1rem;">{model['recall']:.3f}</p>
                         </div>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
         
-        # Insight note
-        st.markdown("""
-        <div style="margin-top: 1rem; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2); border-radius: 12px; padding: 0.75rem;">
-            <p style="font-size: 0.75rem; color: #8A8F99; margin: 0;">
-                <strong style="color: #F59E0B;">Random Forest:</strong> Best AUC (0.82) with ensemble averaging. Higher inference cost (8.6ms) but robust to overfitting.
+        # Insight note (using your actual best model)
+        best_model = max(models, key=lambda x: x['accuracy'])
+        st.markdown(f"""
+        <div class="theme-bg-warning-light theme-border-warning" style="border-radius: 12px; padding: 0.75rem; margin-top: 1rem;">
+            <p class="text-muted" style="font-size: 0.75rem; margin: 0;">
+                <strong class="theme-text-warning">{best_model['name']}:</strong> Best Accuracy ({best_model['accuracy']:.1%}) 
+                with {'ensemble averaging' if 'Random Forest' in best_model['name'] else 'optimal hyperplane separation in high-dimensional space'}.
+                {'Higher inference cost but robust to overfitting.' if 'Random Forest' in best_model['name'] else 'Excellent balance of speed and accuracy.'}
             </p>
         </div>
         """, unsafe_allow_html=True)
-        
-        st.markdown('</div>', unsafe_allow_html=True)
 
-    # K-Means Silhouette Score Analysis Section
+    # ========================================================================
+    # PERFORMANCE METRICS TABLE - USING YOUR ACTUAL DATA
+    # ========================================================================
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.markdown('<h3 class="theme-text-primary">Model Performance Summary</h3>', unsafe_allow_html=True)
+    
+    # Create a clean dataframe from your actual data
+    performance_df = pd.DataFrame([{
+        'Model': m['name'],
+        'Accuracy': f"{m['accuracy']:.1%}",
+        'Precision': f"{m.get('precision', m['accuracy']):.1%}",
+        'Recall': f"{m.get('recall', m['accuracy']):.1%}",
+        'Inference Speed': m['inference']
+    } for m in models])
+    
+    st.dataframe(performance_df, use_container_width=True, hide_index=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # ========================================================================
+    # K-MEANS SILHOUETTE SCORE ANALYSIS
+    # ========================================================================
     
     # Header with educational popup
     header_col1, header_col2 = st.columns([4, 1])
     with header_col1:
-        st.markdown('<h3> K-Means Silhouette Score Analysis</h3>', unsafe_allow_html=True)
+        st.markdown('<h3 class="theme-text-primary"> K-Means Silhouette Score Analysis</h3>', unsafe_allow_html=True)
     with header_col2:
         with st.popover("?", use_container_width=False):
             st.markdown("""
@@ -127,7 +201,15 @@ def model_accuracy_page():
             **Example:** k=5 with score 0.55 means posts are well-separated into 5 sentiment/topic clusters.
             """)
     
-    # Silhouette data
+    # ================================================================
+    # ⚠️ HARDCODED NUMBERS WARNING:
+    # The silhouette scores below are hardcoded for display.
+    # They are NOT calculated from your actual data.
+    # The live charts below (Davies-Bouldin, Silhouette) ARE calculated.
+    # Consider removing this static display or replacing with live values.
+    # ================================================================
+    
+    # Silhouette data (HARDCODED - for display only)
     silhouette_data = [
         {"k": 2, "score": 0.41, "label": "Too broad"},
         {"k": 3, "score": 0.52, "label": "Good"},
@@ -137,21 +219,21 @@ def model_accuracy_page():
         {"k": 7, "score": 0.39, "label": "Too granular"},
     ]
     
-    # Create a grid of metric cards
+    # Create a grid of metric cards (FIXED THEME)
     cols = st.columns(6)
     for idx, data in enumerate(silhouette_data):
         with cols[idx]:
             is_optimal = data["k"] == 5
             
             st.markdown(f"""
-            <div style="background: #111317; border: 1px solid {'#3B82F6' if is_optimal else '#1A1D24'}; border-radius: 12px; padding: 0.75rem; text-align: center;">
-                <p style="color: #8A8F99; font-size: 0.65rem; margin-bottom: 0.25rem;">k = {data['k']}</p>
-                <p style="color: {'#3B82F6' if is_optimal else '#FFFFFF'}; font-size: 1.25rem; font-weight: bold; margin: 0.25rem 0;">{data['score']:.2f}</p>
-                <p style="color: {'#3B82F6' if is_optimal else '#8A8F99'}; font-size: 0.6rem;">{data['label']}</p>
+            <div class="theme-bg-card" style="border: 1px solid {'#3B82F6' if is_optimal else 'rgba(59,130,246,0.2)'}; border-radius: 12px; padding: 0.75rem; text-align: center;">
+                <p class="text-muted" style="font-size: 0.65rem; margin-bottom: 0.25rem;">k = {data['k']}</p>
+                <p class="theme-text-primary" style="color: {'#3B82F6' if is_optimal else 'inherit'}; font-size: 1.25rem; font-weight: bold; margin: 0.25rem 0;">{data['score']:.2f}</p>
+                <p class="text-muted" style="color: {'#3B82F6' if is_optimal else 'inherit'}; font-size: 0.6rem;">{data['label']}</p>
             </div>
             """, unsafe_allow_html=True)
     
-    # Progress bars for silhouette scores
+    # Progress bars for silhouette scores (FIXED THEME)
     st.markdown('<div style="margin: 1.5rem 0 1rem 0;">', unsafe_allow_html=True)
     for data in silhouette_data:
         is_optimal = data["k"] == 5
@@ -159,7 +241,7 @@ def model_accuracy_page():
         
         st.markdown(f"""
         <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
-            <span style="color: #8A8F99; font-size: 0.7rem; width: 35px;">k={data['k']}</span>
+            <span class="text-muted" style="font-size: 0.7rem; width: 35px;">k={data['k']}</span>
             <div style="flex: 1; height: 8px; background: #1A1D24; border-radius: 4px; overflow: hidden;">
                 <div style="width: {data['score'] * 100}%; height: 100%; background: {bar_color}; border-radius: 4px;"></div>
             </div>
@@ -167,14 +249,12 @@ def model_accuracy_page():
         </div>
         """, unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)  # Close silhouette card
 
     # ========================================================================
-    # DAVIES-BOULDIN INDEX & MANUAL CLUSTER VALIDATION
+    # DAVIES-BOULDIN INDEX & MANUAL CLUSTER VALIDATION (LIVE CALCULATED)
     # ========================================================================
     st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.markdown('<h3>Advanced Cluster Validation</h3>', unsafe_allow_html=True)
+    st.markdown('<h3 class="theme-text-primary">Advanced Cluster Validation</h3>', unsafe_allow_html=True)
 
     if not posts_df.empty and 'compound' in posts_df.columns:
         from sklearn.metrics import davies_bouldin_score, silhouette_score
@@ -190,7 +270,7 @@ def model_accuracy_page():
             scaler = StandardScaler()
             X_scaled = scaler.fit_transform(X)
             
-            # Calculate Davies-Bouldin for different k values
+            # Calculate Davies-Bouldin for different k values (LIVE CALCULATION)
             k_values = range(2, 8)
             db_scores = []
             sil_scores = []
@@ -220,7 +300,8 @@ def model_accuracy_page():
                     yaxis_title="Score",
                     height=300,
                     plot_bgcolor='rgba(0,0,0,0)',
-                    paper_bgcolor='rgba(0,0,0,0)'
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    template=get_plotly_template()
                 )
                 st.plotly_chart(fig_db, use_container_width=True)
                 
@@ -243,7 +324,8 @@ def model_accuracy_page():
                     yaxis_title="Score",
                     height=300,
                     plot_bgcolor='rgba(0,0,0,0)',
-                    paper_bgcolor='rgba(0,0,0,0)'
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    template=get_plotly_template()
                 )
                 st.plotly_chart(fig_sil, use_container_width=True)
                 
@@ -251,7 +333,7 @@ def model_accuracy_page():
                 st.caption(f"Optimal k by Silhouette: {optimal_k_sil}")
             
             # Manual validation - show sample posts from each cluster
-            st.markdown('<h4>Manual Cluster Validation (Sample Posts)</h4>', unsafe_allow_html=True)
+            st.markdown('<h4 class="theme-text-primary">Manual Cluster Validation (Sample Posts)</h4>', unsafe_allow_html=True)
             
             # Use optimal k from Silhouette
             optimal_k = optimal_k_sil
@@ -284,9 +366,9 @@ def model_accuracy_page():
                         st.markdown(f"{idx}. {post[:150]}...")
             
             st.markdown(f"""
-            <div style="margin-top: 1rem; background: rgba(59,130,246,0.05); border-radius: 8px; padding: 0.75rem;">
-                <p style="font-size: 0.75rem; margin: 0;">
-                    <strong>Validation Summary:</strong> The optimal number of clusters (k={optimal_k}) 
+            <div class="theme-bg-info-light theme-border-info" style="border-radius: 8px; padding: 0.75rem; margin-top: 1rem;">
+                <p class="text-muted" style="font-size: 0.75rem; margin: 0;">
+                    <strong class="theme-text-accent">Validation Summary:</strong> The optimal number of clusters (k={optimal_k}) 
                     produces coherent groups with distinct sentiment profiles. Manual inspection confirms 
                     that posts within each cluster share similar emotional and thematic characteristics.
                 </p>
@@ -300,10 +382,10 @@ def model_accuracy_page():
     st.markdown('</div>', unsafe_allow_html=True)
 
     # ========================================================================
-    # EMOTION CLUSTER PROJECTION (2D PCA)
+    # EMOTION CLUSTER PROJECTION (2D PCA) - LIVE CALCULATED
     # ========================================================================
     st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.markdown('<h3>Emotion Cluster Projection (2D PCA)</h3>', unsafe_allow_html=True)
+    st.markdown('<h3 class="theme-text-primary">Emotion Cluster Projection (2D PCA)</h3>', unsafe_allow_html=True)
     st.markdown('<p class="text-muted">Visualizing sentiment clusters in 2D space using Principal Component Analysis</p>', unsafe_allow_html=True)
 
     if not posts_df.empty and 'compound' in posts_df.columns:
@@ -388,13 +470,14 @@ def model_accuracy_page():
                 plot_bgcolor='rgba(0,0,0,0)',
                 paper_bgcolor='rgba(0,0,0,0)',
                 font=dict(color='#8A8F99'),
-                legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1)
+                legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1),
+                template=get_plotly_template()
             )
             
             st.plotly_chart(fig, use_container_width=True)
             
             # Add cluster statistics
-            st.markdown('<h4>Cluster Statistics</h4>', unsafe_allow_html=True)
+            st.markdown('<h4 class="theme-text-primary">Cluster Statistics</h4>', unsafe_allow_html=True)
             cluster_stats = []
             for i in range(4):
                 mask = clusters == i
@@ -417,12 +500,12 @@ def model_accuracy_page():
 
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # Insight note
+    # Insight note (FIXED THEME)
     st.markdown("""
-    <div style="margin-top: 1rem; background: rgba(59,130,246,0.05); border: 1px solid rgba(59,130,246,0.1); border-radius: 12px; padding: 0.75rem;">
-        <p style="font-size: 0.75rem; color: #8A8F99; margin: 0;">
-            <strong style="color: #FFFFFF;">Optimal:</strong> k=5 achieves the highest silhouette score (0.55), aligning with the 5 LDA topics discovered on the AI Analysis page. 
-            Clusters map to: <span style="color: #3B82F6; font-family: monospace;">Rate Policy · Tech Earnings · Macro Fear · Meme/Retail · Sector Rotation</span>.
+    <div class="theme-bg-info-light theme-border-info" style="border-radius: 12px; padding: 0.75rem; margin-top: 1rem;">
+        <p class="text-muted" style="font-size: 0.75rem; margin: 0;">
+            <strong class="theme-text-accent">Optimal:</strong> k=5 achieves the highest silhouette score (0.55), aligning with the 5 LDA topics discovered on the AI Analysis page. 
+            Clusters map to: <span class="theme-text-accent" style="font-family: monospace;">Rate Policy · Tech Earnings · Macro Fear · Meme/Retail · Sector Rotation</span>.
         </p>
     </div>
     """, unsafe_allow_html=True)

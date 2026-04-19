@@ -5,9 +5,10 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
+from config import get_plotly_template
 
 def pattern_mining_page():
-    st.markdown('<h1> Pattern Mining</h1>', unsafe_allow_html=True)
+    st.markdown('<h1 class="theme-text-primary"> Pattern Mining</h1>', unsafe_allow_html=True)
     st.markdown('<p class="text-muted">Frequent patterns and topic modeling using FP-Growth and LDA</p>', unsafe_allow_html=True)
     st.markdown('<br>', unsafe_allow_html=True)
     
@@ -20,8 +21,10 @@ def pattern_mining_page():
         st.warning("No data available. Please check your data source.")
         return
     
-    # Topics section
-    st.markdown('<h3> Discovered Topics (LDA)</h3>', unsafe_allow_html=True)
+    # ========================================================================
+    # TOPICS SECTION - FIXED THEME
+    # ========================================================================
+    st.markdown('<h3 class="theme-text-primary"> Discovered Topics (LDA)</h3>', unsafe_allow_html=True)
     st.markdown('<p class="text-muted">Coherence score: 0.62 (k=5)</p>', unsafe_allow_html=True)
     
     if topics and not topics.get("Not enough data"):
@@ -30,20 +33,20 @@ def pattern_mining_page():
         for idx, (topic, keywords) in enumerate(topics.items()):
             with cols[idx % 2]:
                 st.markdown(f"""
-                <div style="background: #111317; border: 1px solid #1A1D24; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
-                    <strong style="color: #3B82F6;">{topic}</strong>
+                <div class="theme-bg-card" style="border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                    <strong class="theme-text-accent">{topic}</strong>
                     <div style="margin-top: 0.5rem;">
-                        {', '.join([f'<span style="background: #1A1D24; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.7rem; margin-right: 0.3rem;">{kw}</span>' for kw in keywords])}
+                        {', '.join([f'<span class="info-badge" style="margin-right: 0.3rem;">{kw}</span>' for kw in keywords])}
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
     else:
         st.info("Not enough data for topic modeling. Need at least 10 posts with text content.")
     
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Pattern mining results
-    st.markdown('<h3> Frequent Patterns (FP-Growth)</h3>', unsafe_allow_html=True)
+    # ========================================================================
+    # PATTERN MINING RESULTS - FIXED THEME
+    # ========================================================================
+    st.markdown('<h3 class="theme-text-primary"> Frequent Patterns (FP-Growth)</h3>', unsafe_allow_html=True)
     
     if not patterns.empty and 'pattern' in patterns.columns:
         # Add sentiment column if not present (for demo)
@@ -88,22 +91,24 @@ def pattern_mining_page():
                 xaxis_title="Support",
                 yaxis_title="Pattern",
                 height=400,
-                legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1)
+                legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1),
+                template=get_plotly_template()
             )
             st.plotly_chart(fig, use_container_width=True)
         
         # Metrics table
-        st.markdown('<h4>Pattern Metrics</h4>', unsafe_allow_html=True)
-        st.dataframe(patterns[['pattern', 'support', 'confidence', 'lift']].head(10) 
-                     if 'support' in patterns.columns else patterns.head(10), 
-                     use_container_width=True)
+        st.markdown('<h4 class="theme-text-primary">Pattern Metrics</h4>', unsafe_allow_html=True)
+        
+        # Style the dataframe with theme-aware classes
+        df_display = patterns[['pattern', 'support', 'confidence', 'lift']].head(10) if 'support' in patterns.columns else patterns.head(10)
+        st.dataframe(df_display, use_container_width=True)
     else:
         st.info("Not enough data for pattern mining. Try with more posts.")
     
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Word frequency analysis
-    st.markdown('<h3> Word Frequency Analysis</h3>', unsafe_allow_html=True)
+    # ========================================================================
+    # WORD FREQUENCY ANALYSIS - FIXED THEME
+    # ========================================================================
+    st.markdown('<h3 class="theme-text-primary"> Word Frequency Analysis</h3>', unsafe_allow_html=True)
     
     # Extract word frequencies from posts
     from collections import Counter
@@ -113,7 +118,10 @@ def pattern_mining_page():
     words = re.findall(r'\b[a-zA-Z]{3,}\b', all_text.lower())
     
     # Filter out common words
-    stop_words = {'the', 'and', 'for', 'that', 'this', 'with', 'you', 'are', 'not', 'have', 'from', 'they', 'will', 'what', 'your', 'can', 'was', 'but', 'all', 'has', 'been', 'one', 'would', 'there', 'their', 'about', 'were', 'been', 'could', 'should', 'would'}
+    stop_words = {'the', 'and', 'for', 'that', 'this', 'with', 'you', 'are', 'not', 
+                  'have', 'from', 'they', 'will', 'what', 'your', 'can', 'was', 'but', 
+                  'all', 'has', 'been', 'one', 'would', 'there', 'their', 'about', 
+                  'were', 'been', 'could', 'should', 'would'}
     
     word_freq = Counter()
     for word in words:
@@ -138,26 +146,31 @@ def pattern_mining_page():
             font=dict(color='#8A8F99'),
             xaxis_title="Frequency",
             yaxis_title="Word",
-            height=500
+            height=500,
+            template=get_plotly_template()
         )
         st.plotly_chart(fig, use_container_width=True)
     else:
         st.info("No words to analyze.")
     
-    st.markdown('</div>', unsafe_allow_html=True)
+    # ========================================================================
+    # DEEP DIVE SECTION - FIXED THEME
+    # ========================================================================
+    st.markdown('<h3 class="theme-text-primary">Deep Dive: How LDA Works</h3>', unsafe_allow_html=True)
     
-    # Deep dive section
-
-    st.markdown('<h3>Deep Dive: How LDA Works</h3>', unsafe_allow_html=True)
+    # Use theme-aware card container
+    st.markdown('<div class="theme-bg-card" style="border-radius: 12px; padding: 1rem; margin-top: 1rem;">', unsafe_allow_html=True)
+    
     st.markdown("""
-    <p class="text-muted"><strong>Choosing k (Number of Topics)</strong><br>
+    <p class="text-muted"><strong class="theme-text-accent">Choosing k (Number of Topics)</strong><br>
     We tested k = 3, 5, 7, 10 and evaluated using coherence scores (C_v metric). 
     k=5 achieved the highest coherence of 0.62, balancing granularity with interpretability. 
     Too few topics merge distinct themes; too many create redundant or noisy clusters.</p>
     
-    <p class="text-muted" style="margin-top: 1rem;"><strong>Why SVM Outperforms</strong><br>
+    <p class="text-muted" style="margin-top: 1rem;"><strong class="theme-text-accent">Why SVM Outperforms</strong><br>
     Support Vector Machines excel at high-dimensional text classification due to their ability to find optimal 
     hyperplanes in feature space. Combined with TF-IDF features, SVM achieved higher accuracy compared to 
     Naive Bayes and Decision Trees.</p>
     """, unsafe_allow_html=True)
+    
     st.markdown('</div>', unsafe_allow_html=True)

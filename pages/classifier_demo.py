@@ -20,30 +20,47 @@ from datetime import datetime
 # In classifier_demo.py, update to use models trained on PhraseBank
 
 @st.cache_resource
+
 def get_trained_models():
     """Get or train sentiment models."""
     posts_df = st.session_state.get('posts_data', pd.DataFrame())
     
     # Try to load pre-trained models first
-    import joblib
-    import os
-    
     if os.path.exists('models/sentiment_models.pkl'):
         try:
             data = joblib.load('models/sentiment_models.pkl')
-            return data['models'], data['vectorizer']
-        except:
-            pass
+            
+            # Check different possible structures
+            if isinstance(data, dict):
+                if 'models' in data:
+                    models = data['models']
+                    vectorizer = data['vectorizer']
+                    
+                    # Get test data if available
+                    X_train = data.get('X_train', None)
+                    X_test = data.get('X_test', None)
+                    y_train = data.get('y_train', None)
+                    y_test = data.get('y_test', None)
+                    
+                    return models, vectorizer, X_train, X_test, y_train, y_test
+                elif 'model' in data:
+                    models = data['model']
+                    vectorizer = data['vectorizer']
+                    return models, vectorizer, None, None, None, None
+            else:
+                st.warning(f"Unexpected pkl format: {type(data)}")
+                
+        except Exception as e:
+            st.warning(f"Could not load saved models: {e}")
     
-    # Train new models with PhraseBank + Reddit data
-    from text_analysis import train_models_with_phrasebank
-    results_df, vectorizer, models = train_models_with_phrasebank(posts_df)
+    # Train new models
+    if posts_df.empty:
+        st.warning("No data available to train models.")
+        return None, None, None, None, None, None
     
-    # Save for next time
-    os.makedirs('models', exist_ok=True)
-    joblib.dump({'models': models, 'vectorizer': vectorizer}, 'models/sentiment_models.pkl')
-    
-    return models, vectorizer
+    result = train_and_cache_models(posts_df)
+    return result
+
 
 def train_and_cache_models(posts_df):
     """Train models on the data and cache them."""
@@ -53,6 +70,7 @@ def train_and_cache_models(posts_df):
     # Prepare data
     df = posts_df[posts_df['text'].notna() & (posts_df['text'].str.len() > 10)].copy()
     if len(df) < 10:
+        st.warning(f"Need at least 10 posts with text. Found {len(df)}.")
         return None, None, None, None, None, None
     
     X_text = df['text'].fillna('')
@@ -69,7 +87,7 @@ def train_and_cache_models(posts_df):
     models = {}
     
     with st.spinner("Training models... (this may take a moment)"):
-        # Gaussian Naive Bayes (needs dense array)
+        # Gaussian Naive Bayes
         gnb = GaussianNB()
         X_train_dense = X_train.toarray()
         gnb.fit(X_train_dense, y_train)
@@ -89,6 +107,19 @@ def train_and_cache_models(posts_df):
         rf = RandomForestClassifier(n_estimators=100, random_state=42)
         rf.fit(X_train, y_train)
         models['Random Forest'] = rf
+    
+    # Save models
+    os.makedirs('models', exist_ok=True)
+    save_data = {
+        'models': models,
+        'vectorizer': vectorizer,
+        'X_train': X_train,
+        'X_test': X_test,
+        'y_train': y_train,
+        'y_test': y_test
+    }
+    joblib.dump(save_data, 'models/sentiment_models.pkl')
+    st.success(f"Saved {len(models)} models to cache!")
     
     return models, vectorizer, X_train, X_test, y_train, y_test
 
@@ -168,10 +199,33 @@ def classifier_demo_page():
     
     # Train models (cached)
     @st.cache_resource
+    @st.cache_resource
     def get_models():
+        """Load pre-trained models instead of training from scratch."""
+        
+        # First, try to load your saved model results
+        if os.path.exists('models/sentiment_models.pkl'):
+            try:
+                data = joblib.load('models/sentiment_models.pkl')
+                models = data['models']
+                vectorizer = data['vectorizer']
+                
+                # Create dummy X_test, y_test for display (or load from saved)
+                X_train, X_test, y_train, y_test = None, None, None, None
+                
+                return models, vectorizer, X_train, X_test, y_train, y_test
+            except Exception as e:
+                st.warning(f"Could not load saved models: {e}")
+        
+        # Fallback to training on the fly
         return train_and_cache_models(posts_df)
     
-    models, vectorizer, X_train, X_test, y_train, y_test = get_models()
+    result = get_trained_models()
+    if result[0] is None:
+        st.warning("Could not load or train models. Please check your data.")
+        return
+
+    models, vectorizer, X_train, X_test, y_train, y_test = result
     
     if models is None:
         st.warning("Not enough data to train models. Need at least 10 posts with text content.")
@@ -194,7 +248,6 @@ def classifier_demo_page():
         # ====================================================================
         # CLASSIFIER INPUT - TUTORIAL HIGHLIGHT
         # ====================================================================
-        st.markdown('<div class="card" data-tutorial="classifier-input">', unsafe_allow_html=True)
         
         st.markdown("""
         <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
