@@ -1195,10 +1195,7 @@ CATEGORIES = {
         "Learning Hub",
         "Methodology",
         "Glossary"
-    ],
-    "SYSTEM & PERFORMANCE": [
-        "Performance Dashboard"
-    ],
+    ]
 }
 
 # ============================================================================
