@@ -70,8 +70,8 @@ def causality_analysis_page():
     # CORRECTED: Monthly alignment (NO forward-filling)
     # ------------------------------------------------------------
     df.set_index('date', inplace=True)
-    monthly_prices = df[price_col].resample('M').last()
-    monthly_sentiment = df['consumer_sentiment'].resample('M').last()
+    monthly_prices = df[price_col].resample('ME').last()
+    monthly_sentiment = df['consumer_sentiment'].resample('ME').last()
     
     monthly_df = pd.DataFrame({
         'price': monthly_prices,
