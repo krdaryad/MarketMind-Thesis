@@ -9,16 +9,12 @@ import plotly.graph_objects as go
 from datetime import datetime
 
 def market_history_page():
-    # ============================================================================
-    # PAGE HEADER
-    # ============================================================================
+   
     st.markdown('<h1>Economic History & Sentiment</h1>', unsafe_allow_html=True)
     st.markdown('<p class="text-muted">How crowd psychology drove the greatest market crashes and bubbles — from 1929 to 2020</p>', unsafe_allow_html=True)
     st.markdown('<br>', unsafe_allow_html=True)
 
-    # ============================================================================
-    # CUSTOM CSS - Only increased the two smallest fonts
-    # ============================================================================
+    
     st.markdown("""
     <style>
     .bento-card {
@@ -127,9 +123,7 @@ def market_history_page():
     </style>
     """, unsafe_allow_html=True)
 
-    # ============================================================================
-    # PHASE CONFIGURATION
-    # ============================================================================
+    
     phase_config = {
         "euphoria": {"label": "Euphoria", "color": "#10B981", "bg": "rgba(16,185,129,0.1)"},
         "denial": {"label": "Denial", "color": "#F59E0B", "bg": "rgba(245,158,11,0.1)"},
@@ -138,9 +132,6 @@ def market_history_page():
         "recovery": {"label": "Recovery", "color": "#3B82F6", "bg": "rgba(59,130,246,0.1)"},
     }
 
-    # ============================================================================
-    # CRISES DATA
-    # ============================================================================
     crises = [
         {
             "id": "crisis_1929",
@@ -381,9 +372,6 @@ def market_history_page():
         },
     ]
 
-    # ============================================================================
-    # HELPER FUNCTIONS
-    # ============================================================================
     def create_sentiment_arc_chart(price_data, crisis_title):
         df = pd.DataFrame(price_data)
         fig = go.Figure()
@@ -447,9 +435,7 @@ def market_history_page():
             """, unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # ============================================================================
-    # MAIN PAGE CONTENT
-    # ============================================================================
+   
 
     # Sentiment cycle overview
     st.markdown('''

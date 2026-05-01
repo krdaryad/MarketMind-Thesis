@@ -4,8 +4,21 @@ import pandas as pd
 def glossary_page():
     st.set_page_config(page_title="Interactive Glossary", layout="wide")
 
-    # --- 1. DATASET ---
+    # Custom CSS to make expander label match definition text colour
+    st.markdown("""
+    <style>
+        details.streamlit-expander summary {
+            color: currentColor !important;
+        }
+        details.streamlit-expander summary:hover {
+            color: currentColor !important;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # --- 1. DATASET (original + new multimedia/design terms) ---
     glossary = [
+        # Original entries
         {"term": "ARIMA", "category": "stats", "definition": "Auto-Regressive Integrated Moving Average. A time-series forecasting model.", "formula": r"Y_t = c + \sum \phi_i Y_{t-i} + \sum \theta_j \epsilon_{t-j} + \epsilon_t", "related": ["RMSE", "Stationarity"]},
         {"term": "AUC", "category": "ml", "definition": "Area Under the (ROC) Curve. Measures overall classifier performance.", "related": ["ROC Curve", "TPR", "FPR"]},
         {"term": "Bag of Words", "category": "nlp", "definition": "A text representation that counts word occurrences, ignoring grammar.", "related": ["TF-IDF", "TDM"]},
@@ -32,22 +45,44 @@ def glossary_page():
         {"term": "TF-IDF", "category": "nlp", "definition": "Weights words by frequency relative to the corpus.", "formula": r"TF \cdot \log(\frac{N}{df})", "related": ["Bag of Words"]},
         {"term": "TPR", "category": "ml", "definition": "Proportion of actual positives correctly identified.", "formula": r"TPR = \frac{TP}{TP + FN}", "related": ["FPR"]},
         {"term": "VIX", "category": "finance", "definition": "Volatility Index measuring market 'fear' gauge.", "formula": r"VIX \approx \sigma \sqrt{\frac{365}{30}} 100", "related": ["S&P 500"]},
-        {"term": "Word Cloud", "category": "stats", "definition": "Visual showing word size based on frequency.", "related": ["Bag of Words"]}
+        {"term": "Word Cloud", "category": "stats", "definition": "Visual showing word size based on frequency.", "related": ["Bag of Words"]},
+        
+        # NEW: Multimedia, Design, UX terms
+        {"term": "Gestalt Principles", "category": "design", "definition": "Laws of human perception (proximity, similarity, continuity) used to group related data metrics in the UI.", "related": ["Pre-attentive Attributes", "Visual Hierarchy"]},
+        {"term": "Pre-attentive Attributes", "category": "design", "definition": "Visual properties processed before conscious attention (<250ms), essential for instant 'Market Panic' red alerts.", "related": ["Color Theory", "Gestalt Principles"]},
+        {"term": "Glassmorphism", "category": "design", "definition": "UI style using frosted glass, background blur, and semi‑transparency to create depth and visual hierarchy without clutter.", "related": ["Visual Semiotics", "CSS"]},
+        {"term": "Visual Semiotics", "category": "design", "definition": "The study of signs and symbols (e.g., the bar‑chart logomark) and how they convey meaning to the user.", "related": ["Glassmorphism", "Brand Identity"]},
+        {"term": "Data Sonification", "category": "multimedia", "definition": "Transformation of data relations into perceived sound signals (e.g., mapping VIX volatility to audio frequency).", "related": ["WebAudio API", "Accessibility"]},
+        {"term": "Scrollytelling", "category": "ux", "definition": "A narrative technique where web content and visualizations change dynamically based on the user's scroll progress.", "related": ["Storytelling", "JavaScript"]},
+        {"term": "Cognitive Load", "category": "ux", "definition": "The amount of working memory used by the user; minimised through progressive disclosure.", "related": ["Progressive Disclosure", "Information Seeking Mantra"]},
+        {"term": "Progressive Disclosure", "category": "ux", "definition": "A design pattern that sequences information (e.g., 'Show Formula' expanders) to avoid overwhelming the user.", "related": ["Cognitive Load", "Affordance"]},
+        {"term": "Information Seeking Mantra", "category": "ux", "definition": "'Overview first, zoom and filter, then details‑on‑demand' (Shneiderman’s principle).", "related": ["Progressive Disclosure", "Dashboard Design"]},
+        {"term": "Affordance", "category": "ux", "definition": "A visual cue that implies how an object can be used (e.g., a glow on a button suggesting it is clickable).", "related": ["UX Design", "Interaction"]},
+        {"term": "Model Transparency", "category": "ml", "definition": "Degree to which a human can understand how an AI reached a conclusion (e.g., Sankey diagrams for pattern mining).", "related": ["Explainable AI", "Confidence Score"]},
+        {"term": "Confidence Score", "category": "ml", "definition": "Numerical value (0–1) from SVM/Naive Bayes indicating how certain the model is about a sentiment label.", "related": ["Model Transparency", "SVM"]},
+        {"term": "Black Box Problem", "category": "ml", "definition": "The challenge of AI models being too complex for humans to see 'inside' – which this design explicitly solves.", "related": ["Explainable AI", "Model Transparency"]}
     ]
 
     # --- 2. SIDEBAR (SEARCH & FILTER) ---
     with st.sidebar:
         st.header(" Controls")
         
-        # SEARCH INPUT
         search_query = st.text_input("Search terms...", placeholder="Type to filter...")
         
-        # CATEGORY FILTER
-        cat_options = {"All Categories": None, "Machine Learning": "ml", "NLP": "nlp", "Finance": "finance", "Statistics": "stats"}
+        # Category filter – put Design/UX/Multimedia on top (as requested)
+        cat_options = {
+            "All Categories": None,
+            "Design": "design",
+            "UX": "ux",
+            "Multimedia": "multimedia",
+            "Machine Learning": "ml",
+            "NLP": "nlp",
+            "Finance": "finance",
+            "Statistics": "stats"
+        }
         selected_label = st.selectbox("Filter by Category", list(cat_options.keys()))
         selected_cat = cat_options[selected_label]
 
-        # FILTER LOGIC
         filtered_glossary = [
             item for item in glossary 
             if (not selected_cat or item['category'] == selected_cat) and
@@ -56,7 +91,6 @@ def glossary_page():
 
         st.divider()
         
-        # EXPORT BUTTON
         if filtered_glossary:
             df = pd.DataFrame(filtered_glossary)
             csv = df.to_csv(index=False).encode('utf-8')
@@ -72,12 +106,15 @@ def glossary_page():
     st.title(" Knowledge Glossary")
     st.write(f"Showing **{len(filtered_glossary)}** matching terms")
 
-    # Layout colors
+    # Layout colours – updated with new categories (pink, cyan, orange)
     styles = {
         "ml": {"c": "#3B82F6", "bg": "rgba(59,130,246,0.1)"},
         "nlp": {"c": "#F59E0B", "bg": "rgba(245,158,11,0.1)"},
         "finance": {"c": "#10B981", "bg": "rgba(16,185,129,0.1)"},
-        "stats": {"c": "#8B5CF6", "bg": "rgba(139,92,246,0.1)"}
+        "stats": {"c": "#8B5CF6", "bg": "rgba(139,92,246,0.1)"},
+        "design": {"c": "#EC4899", "bg": "rgba(236,72,153,0.1)"},
+        "ux": {"c": "#06B6D4", "bg": "rgba(6,182,212,0.1)"},
+        "multimedia": {"c": "#F97316", "bg": "rgba(249,115,22,0.1)"}
     }
 
     # Grid Rendering (3 columns)
@@ -90,7 +127,7 @@ def glossary_page():
                     {item['category']}
                 </div>
                 <h3 style="margin:10px 0 5px 0;">{item['term']}</h3>
-                <p style="font-size:14px; color:#444;">{item['definition']}</p>
+                <p style="font-size:14px;">{item['definition']}</p>
             """, unsafe_allow_html=True)
             
             if "formula" in item:

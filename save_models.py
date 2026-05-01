@@ -109,7 +109,7 @@ def save_all_models():
         size = os.path.getsize(f'models/{f}') / 1024
         print(f"   - {f}: {size:.1f} KB")
     print("=" * 60)
-    print("\n✅ You can now run your app - models will load instantly!")
+    print("\n You can now run your app - models will load instantly!")
 
 if __name__ == "__main__":
     save_all_models()

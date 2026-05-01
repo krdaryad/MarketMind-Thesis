@@ -10,8 +10,7 @@ from datetime import datetime
 import numpy as np
 from loading_facts import get_data_loading_fact  # ADD THIS IMPORT
 
-# Initialize FRED (Replace with your actual API key)
-# Get a free key at: https://fred.stlouisfed.org
+
 FRED_API_KEY = st.secrets["FRED_API_KEY"]
 fred = Fred(api_key=FRED_API_KEY)
 
@@ -20,7 +19,7 @@ fred = Fred(api_key=FRED_API_KEY)
 def load_real_economic_data(ticker, start_date="2020-01-01", end_date=None):
     """Fetch real-world data from FRED and Yahoo Finance."""
     
-    # ADD THIS: Get a random fact for the spinner
+    
     fact = get_data_loading_fact()
     
     if end_date is None:
@@ -37,41 +36,40 @@ def load_real_economic_data(ticker, start_date="2020-01-01", end_date=None):
             stock_df = stock_df[['Close']].reset_index()
             stock_df.columns = ['date', 'close']
 
-        # 2. Fetch Macro Data from FRED - Comprehensive Indicators
         macro_series = {
-            # Existing indicators
+           
             'gdp': 'GDPC1',                    # Real GDP
             'inflation': 'CPIAUCSL',           # CPI All Urban Consumers
             'unemployment': 'UNRATE',          # Unemployment Rate
             'interest_rate': 'FEDFUNDS',       # Federal Funds Rate
             'consumer_sentiment': 'UMCSENT',   # University of Michigan Consumer Sentiment
             
-            # NEW - Market Sentiment & Stress
+            
             'financial_stress': 'STLFSI4',     # St. Louis Fed Financial Stress Index
             'initial_claims': 'ICSA',          # Weekly jobless claims
             'continuing_claims': 'CCSA',       # Continuing unemployment claims
             'vix': 'VIXCLS',                   # CBOE Volatility Index (VIX)
             'sp500': 'SP500',                  # S&P 500 Index Level
             
-            # NEW - Money Supply & Yield Curve
+            
             'm2_money_supply': 'M2SL',         # Broad money supply
             'm1_money_supply': 'M1SL',         # Narrow money supply
             'treasury_10yr': 'DGS10',          # 10-Year Treasury Rate
             'treasury_2yr': 'DGS2',            # 2-Year Treasury Rate
             
-            # NEW - Housing & Production
+           
             'building_permits': 'PERMIT',      # Housing permits
             'industrial_production': 'INDPRO', # Industrial output
             'new_orders': 'ANDENO',            # Manufacturing new orders
             
-            # NEW - Core Inflation
+            
             'core_inflation': 'CPILFESL',      # Core CPI (ex food & energy)
             'ppi': 'PPIACO',                   # Producer Price Index
         }
         
         macro_frames = []
         
-        # Get a NEW fact for FRED data fetching
+        
         fact_fred = get_data_loading_fact()
         
         for name, series_id in macro_series.items():

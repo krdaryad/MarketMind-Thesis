@@ -13,9 +13,6 @@ import os
 from config import CSV_FILE_PATH, COMPANY_TICKERS, DEBUG_MODE, COLORS, MODELS_DIR
 from loading_facts import get_data_loading_fact
 
-# ============================================================================
-# DATA LOADING WITH PROGRESS
-# ============================================================================
 @st.cache_data(ttl=3600, show_spinner=False)
 def load_reddit_data():
     """Load reddit posts from CSV file with progress tracking."""

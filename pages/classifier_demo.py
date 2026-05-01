@@ -245,9 +245,7 @@ def classifier_demo_page():
     col1, col2 = st.columns(2)
 
     with col1:
-        # ====================================================================
-        # CLASSIFIER INPUT - TUTORIAL HIGHLIGHT
-        # ====================================================================
+       
         
         st.markdown("""
         <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
@@ -376,9 +374,7 @@ def classifier_demo_page():
             </div>
             """, unsafe_allow_html=True)
             
-            # ====================================================================
-            # HUMAN-IN-THE-LOOP FEEDBACK BUTTONS
-            # ====================================================================
+            
             st.markdown("""
             <div style="margin-top: 1rem;">
                 <p style="color: #8A8F99; font-size: 0.7rem; margin-bottom: 0.5rem;">Was this prediction correct?</p>
@@ -521,9 +517,7 @@ def classifier_demo_page():
         
         st.markdown('</div>', unsafe_allow_html=True)
     
-    # ========================================================================
-    # MODEL COMPARISON SECTION
-    # ========================================================================
+    
     st.markdown("""
     <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
         <h3 style="margin: 0;">Model Comparison</h3>

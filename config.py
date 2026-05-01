@@ -8,35 +8,16 @@ import os
 
 warnings.filterwarnings('ignore')
 
-# ============================================================================
-# DEBUG SETTINGS
-# ============================================================================
-DEBUG_MODE = False  # Set to False in production
 
-# ============================================================================
-# FILE PATHS
-# ============================================================================
-CSV_FILE_PATH = "reddit_posts_clean.csv"
+DEBUG_MODE = False  
+
+
+CSV_FILE_PATH = "data/reddit_posts_clean.csv"
 MODELS_DIR = "models/"
 
-# Create models directory if it doesn't exist
+
 os.makedirs(MODELS_DIR, exist_ok=True)
 
-# ============================================================================
-# NOTE: st.set_page_config() has been REMOVED from here.
-# It must be the FIRST command in your main.py file.
-# Add this to main.py:
-#
-# st.set_page_config(
-#     page_title="MarketMind - AI Consumer Behavior Analysis",
-#     layout="wide",
-#     initial_sidebar_state="expanded"
-# )
-# ============================================================================
-
-# ============================================================================
-# BASE CSS (Common to both themes)
-# ============================================================================
 BASE_CSS = """
 <style>
 /* ===== 1. GLOBAL STYLES & GRID BACKGROUND ===== */
@@ -379,9 +360,6 @@ div.stButton > button:disabled {
 </style>
 """
 
-# ============================================================================
-# DARK MODE CSS (with Streamlit native element overrides)
-# ============================================================================
 DARK_CSS = """
 <style>
 /* Dark mode overrides */
@@ -647,9 +625,7 @@ div[data-baseweb="popover"] li:hover {
 </style>
 """
 
-# ============================================================================
-# LIGHT MODE CSS (with Streamlit native element overrides)
-# ============================================================================
+
 LIGHT_CSS = """
 <style>
 /* 1. Global Background & Text */
@@ -928,9 +904,7 @@ div[data-baseweb="select"] div[aria-hidden="true"] {
 </style>
 """
 
-# ============================================================================
-# MOBILE CSS
-# ============================================================================
+
 MOBILE_CSS = """
 <style>
 /* Mobile Responsive Styles */
@@ -1143,9 +1117,7 @@ MOBILE_CSS = """
 </style>
 """
 
-# ============================================================================
-# THEME MANAGEMENT
-# ============================================================================
+
 def get_theme_css(is_dark=True):
     """Return the appropriate CSS based on theme."""
     base = BASE_CSS
@@ -1167,9 +1139,7 @@ def get_plotly_template():
     else:
         return "plotly_white"
 
-# ============================================================================
-# CATEGORY MAPPING
-# ============================================================================
+
 CATEGORIES = {
     "GLOBAL MACRO": [
         "Economic Dashboard",
@@ -1198,15 +1168,11 @@ CATEGORIES = {
     ]
 }
 
-# ============================================================================
-# DEFAULTS
-# ============================================================================
+
 DEFAULT_START = datetime(2021, 2, 1)
 DEFAULT_END = datetime(2021, 2, 28)
 
-# ============================================================================
-# COMPANY MAPPINGS
-# ============================================================================
+
 COMPANY_TICKERS = {
     'Apple': 'AAPL',
     'Tesla': 'TSLA',
@@ -1220,9 +1186,7 @@ COMPANY_TICKERS = {
     'MSFT': 'MSFT'
 }
 
-# ============================================================================
-# COLOR SCHEME
-# ============================================================================
+
 COLORS = {
     'positive': '#10B981',
     'neutral': '#8A8F99',

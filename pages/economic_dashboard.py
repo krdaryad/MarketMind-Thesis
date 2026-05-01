@@ -1,27 +1,20 @@
-"""
-Real-time Economic Dashboard with comprehensive FRED indicators.
-Fixed: GDP and Inflation now correctly calculated as year-over-year percentages.
-Enhanced: Sentiment Gap Analysis, Backtesting Simulation, Market Stress Gauge, and Caching Architecture.
-"""
 import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from datetime import datetime, timedelta
-
-# Import at the top (not inside function)
 from data_loader import load_real_economic_data, merge_sentiment_with_economics
+from loading_facts import get_data_loading_fact
 
 def economic_dashboard_page():
     st.markdown('<h1>Real-Time Economic Dashboard</h1>', unsafe_allow_html=True)
     st.markdown('<p class="text-muted">Live economic indicators from FRED and Yahoo Finance</p>', unsafe_allow_html=True)
     st.markdown('<br>', unsafe_allow_html=True)
-    
-    # Get sentiment data from session state
+    #getting sentiment data from session stat
     sentiment_df = st.session_state.get('sentiment_data', pd.DataFrame())
     
-    # Date range selector
+    #date range selector
     col1, col2, col3 = st.columns([2, 1, 1])
     
     with col1:
@@ -44,9 +37,10 @@ def economic_dashboard_page():
             datetime.today(),
             max_value=datetime.today()
         )
-    
-    # Fetch live data (cached in data_loader.py with @st.cache_data)
-    with st.spinner(f"Fetching real-time data for {ticker}..."):
+    fact = get_data_loading_fact()
+
+    # fetching live data; cached 
+    with st.spinner(f"Fetching real-time data for {ticker}...\n\n{fact}"):
         economic_data, econ_df_raw = load_real_economic_data(
             ticker,
             start_date.strftime("%Y-%m-%d"),
@@ -57,31 +51,22 @@ def economic_dashboard_page():
         st.error(f"Could not fetch data for {ticker}. Please try another ticker or date range.")
         return
     
-    # ========================================================================
-    # FIX 1: Forward fill to handle reporting lag
-    # ========================================================================
     econ_df = econ_df_raw.ffill().fillna(0)
     
-    # ========================================================================
-    # FIX 2: CORRECT GDP CALCULATION - Year-over-Year Percentage Change
-    # ========================================================================
+    
     if 'gdp' in econ_df.columns:
         econ_df['gdp_growth'] = econ_df['gdp'].pct_change(periods=252) * 100
         if len(econ_df) > 0 and (econ_df['gdp_growth'].iloc[-1] > 100 or econ_df['gdp_growth'].iloc[-1] < -100):
             econ_df['gdp_growth'] = econ_df['gdp'].diff(periods=252) / econ_df['gdp'].shift(252) * 100
     
-    # ========================================================================
-    # FIX 3: CORRECT INFLATION CALCULATION - CPI to Year-over-Year %
-    # ========================================================================
+    
     if 'inflation' in econ_df.columns:
         econ_df['inflation_rate'] = econ_df['inflation'].pct_change(periods=252) * 100
     
     if 'core_inflation' in econ_df.columns:
         econ_df['core_inflation_rate'] = econ_df['core_inflation'].pct_change(periods=252) * 100
     
-    # ========================================================================
-    # DATA QUALITY NOTE WITH CACHING ARCHITECTURE
-    # ========================================================================
+    
     with st.expander("Methodology & Technical Architecture", expanded=False):
         st.markdown("""
         **Data Transformation & Caching Strategy:**
@@ -95,9 +80,7 @@ def economic_dashboard_page():
         *This architecture follows standard economic reporting methodology (Estrella & Mishkin, 1998) and demonstrates production-ready API integration patterns.*
         """)
     
-    # ========================================================================
-    # STOCK PRICE & SENTIMENT CHART
-    # ========================================================================
+    
     st.markdown('<br>', unsafe_allow_html=True)
     
     st.markdown('''
@@ -139,9 +122,6 @@ def economic_dashboard_page():
     st.plotly_chart(fig_price, use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # ========================================================================
-    # FEATURE 1: "SENTIMENT GAP" METRIC (The Bridge)
-    # ========================================================================
     if not sentiment_df.empty:
         st.markdown('''
         <div class="card" style="padding: 1rem;">
@@ -244,16 +224,14 @@ def economic_dashboard_page():
         
         st.markdown('</div>', unsafe_allow_html=True)
     
-    # ========================================================================
-    # FEATURE 2: "BACKTESTING" SIMULATION
-    # ========================================================================
-    st.markdown('''
-    <div class="card" style="padding: 1rem;">
-        <h3 style="font-size: 1.1rem; margin-top: 0;">Backtesting Simulator: What-If Investment Calculator</h3>
-        <p class="text-muted">Test the practical utility of sentiment signals as trading indicators</p>
-    ''', unsafe_allow_html=True)
     
-    if not sentiment_df.empty and not econ_df.empty:
+        st.markdown('''
+    <div class="card" style="padding: 1rem;">
+        <h3 style="font-size: 1.1rem; margin-top: 0;">Backtesting Simulator: Consumer Sentiment as Trading Signal</h3>
+        <p class="text-muted">Test the predictive power of the University of Michigan Consumer Sentiment Index</p>
+    ''', unsafe_allow_html=True)
+
+    if not econ_df.empty and 'consumer_sentiment' in econ_df.columns:
         col1, col2, col3 = st.columns([1, 1, 1])
         
         with col1:
@@ -263,114 +241,89 @@ def economic_dashboard_page():
                 max_value=100000,
                 value=1000,
                 step=100,
-                key="backtest_amount"
+                key="backtest_consumer_full"
             )
         
         with col2:
             sentiment_threshold = st.slider(
-                "Sentiment Signal Threshold",
-                min_value=0.0,
-                max_value=1.0,
-                value=0.8,
-                step=0.05,
-                help="Buy when Reddit sentiment exceeds this threshold"
+                "Consumer Sentiment Threshold (UMich Index)",
+                min_value=50.0,
+                max_value=100.0,
+                value=80.0,
+                step=1.0,
+                help="Buy when Consumer Sentiment Index >= this value"
             )
         
         with col3:
-            merged_backtest = merge_sentiment_with_economics(sentiment_df, economic_data, ticker)
-            if not merged_backtest.empty:
-                merged_backtest['date'] = pd.to_datetime(merged_backtest['date'])
-                available_dates = merged_backtest['date'].dt.date.tolist()
-                default_date = available_dates[len(available_dates)//2] if available_dates else datetime(2021, 1, 1).date()
-                backtest_date = st.date_input(
-                    "Investment Date",
-                    value=default_date,
-                    min_value=min(available_dates) if available_dates else datetime(2020, 1, 1).date(),
-                    max_value=max(available_dates) if available_dates else datetime.today().date()
-                )
-            else:
-                backtest_date = st.date_input("Investment Date", datetime(2021, 1, 1).date())
+            available_econ_dates = econ_df['date'].dt.date.tolist()
+            default_date = available_econ_dates[len(available_econ_dates)//2] if available_econ_dates else datetime(2020,1,1).date()
+            backtest_date = st.date_input(
+                "Investment Date",
+                value=default_date,
+                min_value=min(available_econ_dates) if available_econ_dates else datetime(2020,1,1).date(),
+                max_value=max(available_econ_dates) if available_econ_dates else datetime.today().date(),
+                key="backtest_date_consumer_full"
+            )
         
-        if not merged_backtest.empty:
-            merged_backtest['date'] = pd.to_datetime(merged_backtest['date'])
-            backtest_datetime = pd.to_datetime(backtest_date)
+        backtest_datetime = pd.to_datetime(backtest_date)
+        investment_row = econ_df[econ_df['date'] == backtest_datetime]
+        
+        if not investment_row.empty:
+            investment_sentiment = investment_row['consumer_sentiment'].iloc[0]
+            investment_price = investment_row['close'].iloc[0] if 'close' in investment_row.columns else None
             
-            investment_row = merged_backtest[merged_backtest['date'] == backtest_datetime]
-            
-            if not investment_row.empty:
-                investment_sentiment = investment_row['avg_compound'].iloc[0]
-                investment_price = investment_row['close'].iloc[0] if 'close' in investment_row.columns else None
+            if investment_price and not pd.isna(investment_price) and investment_price > 0:
+                future_data = econ_df[econ_df['date'] > backtest_datetime].copy()
                 
-                if investment_price and not pd.isna(investment_price):
-                    future_data = merged_backtest[merged_backtest['date'] > backtest_datetime].copy()
+                if not future_data.empty:
+                    future_data['days_diff'] = (future_data['date'] - backtest_datetime).dt.days
                     
-                    if not future_data.empty:
-                        future_data_dates = future_data.copy()
-                        future_data_dates['days_diff'] = (future_data_dates['date'] - backtest_datetime).dt.days
+                    max_price_30d = future_data[future_data['days_diff'] <= 30]['close'].max() if len(future_data[future_data['days_diff'] <= 30]) > 0 else investment_price
+                    max_price_60d = future_data[future_data['days_diff'] <= 60]['close'].max() if len(future_data[future_data['days_diff'] <= 60]) > 0 else investment_price
+                    max_price_90d = future_data[future_data['days_diff'] <= 90]['close'].max() if len(future_data[future_data['days_diff'] <= 90]) > 0 else investment_price
+                    
+                    shares = investment_amount / investment_price
+                    value_30d = shares * max_price_30d
+                    value_60d = shares * max_price_60d
+                    value_90d = shares * max_price_90d
+                    
+                    return_30d = (value_30d - investment_amount) / investment_amount * 100
+                    return_60d = (value_60d - investment_amount) / investment_amount * 100
+                    return_90d = (value_90d - investment_amount) / investment_amount * 100
+                    
+                    signal = investment_sentiment >= sentiment_threshold
+                    
+                    st.markdown(f"""
+                    <div style="background: {'rgba(16,185,129,0.1)' if signal else 'rgba(239,68,68,0.1)'}; border-radius: 8px; padding: 0.75rem;">
+                        <p><strong>Investment Date:</strong> {backtest_date}<br>
+                        <strong>{ticker} Price:</strong> ${investment_price:.2f}<br>
+                        <strong>Consumer Sentiment Index:</strong> {investment_sentiment:.1f}<br>
+                        <strong>Buy Signal (≥ {sentiment_threshold}):</strong> <span style="color: {'#10B981' if signal else '#EF4444'}">{'YES' if signal else 'NO'}</span></p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    if signal:
+                        col_a, col_b, col_c = st.columns(3)
+                        with col_a: st.metric("30-Day Peak Return", f"+{return_30d:.1f}%")
+                        with col_b: st.metric("60-Day Peak Return", f"+{return_60d:.1f}%")
+                        with col_c: st.metric("90-Day Peak Return", f"+{return_90d:.1f}%")
                         
-                        max_price_30d = future_data_dates[future_data_dates['days_diff'] <= 30]['close'].max() if len(future_data_dates[future_data_dates['days_diff'] <= 30]) > 0 else investment_price
-                        max_price_60d = future_data_dates[future_data_dates['days_diff'] <= 60]['close'].max() if len(future_data_dates[future_data_dates['days_diff'] <= 60]) > 0 else investment_price
-                        max_price_90d = future_data_dates[future_data_dates['days_diff'] <= 90]['close'].max() if len(future_data_dates[future_data_dates['days_diff'] <= 90]) > 0 else investment_price
-                        
-                        shares_bought = investment_amount / investment_price
-                        value_30d = shares_bought * max_price_30d
-                        value_60d = shares_bought * max_price_60d
-                        value_90d = shares_bought * max_price_90d
-                        
-                        return_30d = ((value_30d - investment_amount) / investment_amount) * 100
-                        return_60d = ((value_60d - investment_amount) / investment_amount) * 100
-                        return_90d = ((value_90d - investment_amount) / investment_amount) * 100
-                        
-                        signal_triggered = investment_sentiment >= sentiment_threshold
-                        
-                        st.markdown(f"""
-                        <div style="background: {'rgba(16,185,129,0.1)' if signal_triggered else 'rgba(239,68,68,0.1)'}; border-radius: 8px; padding: 0.75rem; margin-top: 0.75rem;">
-                            <p style="font-size: 0.8rem; margin: 0;">
-                                <strong>Backtest Results:</strong><br>
-                                Investment Date: <strong>{backtest_date}</strong><br>
-                                {ticker} Price: <strong>${investment_price:.2f}</strong><br>
-                                Reddit Sentiment Score: <strong>{investment_sentiment:.3f}</strong><br>
-                                Signal Trigger ({sentiment_threshold} threshold): <strong style="color: {'#10B981' if signal_triggered else '#EF4444'}">{'BUY SIGNAL' if signal_triggered else 'NO SIGNAL'}</strong>
-                            </p>
-                        </div>
-                        """, unsafe_allow_html=True)
-                        
-                        if signal_triggered:
-                            col_a, col_b, col_c = st.columns(3)
-                            with col_a:
-                                st.metric("30-Day Peak Return", f"+{return_30d:.1f}%")
-                            with col_b:
-                                st.metric("60-Day Peak Return", f"+{return_60d:.1f}%")
-                            with col_c:
-                                st.metric("90-Day Peak Return", f"+{return_90d:.1f}%")
-                            
-                            final_price = future_data.iloc[-1]['close']
-                            buy_hold_return = ((final_price - investment_price) / investment_price) * 100
-                            
-                            st.markdown(f"""
-                            <div style="margin-top: 0.75rem; padding: 0.75rem; background: rgba(59,130,246,0.05); border-radius: 8px;">
-                                <p style="font-size: 0.7rem; margin: 0;">
-                                    <strong>Practical Utility:</strong> The sentiment signal would have identified an optimal entry point, 
-                                    with peak returns exceeding buy-and-hold ({buy_hold_return:.1f}%).
-                                </p>
-                            </div>
-                            """, unsafe_allow_html=True)
-                        else:
-                            st.info(f"With sentiment score {investment_sentiment:.3f}, no buy signal at {sentiment_threshold} threshold.")
+                        final_price = future_data.iloc[-1]['close']
+                        buy_hold = (final_price - investment_price) / investment_price * 100
+                        st.caption(f"Buy‑and‑hold return: {buy_hold:.1f}%")
                     else:
-                        st.warning("Not enough future data for backtesting")
+                        st.info("No buy signal – the Consumer Sentiment Index was below the threshold on this date.")
                 else:
-                    st.warning(f"Price data not available for {backtest_date}")
+                    st.warning("No future data available after selected date.")
             else:
-                st.info(f"No sentiment data available for {backtest_date}")
+                st.warning("No valid price data for the selected date.")
         else:
-            st.info("Merge sentiment with economic data to enable backtesting")
-    
+            st.info("Selected date not found in the economic data. Please choose a date within the visible range.")
+    else:
+        st.info("Consumer sentiment data not available for backtesting.")
+
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # ========================================================================
-    # FEATURE 3: REAL-TIME "MARKET STRESS" GAUGE
-    # ========================================================================
     st.markdown('''
     <div class="card" style="padding: 1rem;">
         <h3 style="font-size: 1.1rem; margin-top: 0;">Real-Time Market Stress Gauge</h3>
@@ -442,9 +395,7 @@ def economic_dashboard_page():
     
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # ========================================================================
-    # CURRENT ECONOMIC CONDITIONS
-    # ========================================================================
+    
     st.markdown('''
     <div class="card" style="padding: 1rem;">
         <h3 style="font-size: 1.1rem; margin-top: 0;">Current Economic Conditions</h3>
@@ -497,7 +448,7 @@ def economic_dashboard_page():
     else:
         price_change = 0
     
-    # Row 1: Core Economic Indicators
+    #row1: core econ indicators
     col1, col2, col3, col4, col5, col6 = st.columns(6)
     
     with col1:
@@ -553,7 +504,7 @@ def economic_dashboard_page():
         </div>
         """, unsafe_allow_html=True)
     
-    # Row 2: Market & Financial Indicators
+    #row2 ma&f indicators
     st.markdown('<br>', unsafe_allow_html=True)
     col1, col2, col3, col4, col5, col6 = st.columns(6)
     
@@ -594,9 +545,9 @@ def economic_dashboard_page():
         """, unsafe_allow_html=True)
     
     with col4:
-        initial_claims = latest.get('initial_claims', 0)
+        initial_claims = latest.get('initial_claims', 214000)
         if pd.isna(initial_claims):
-            initial_claims = 0
+            initial_claims = 214000
         st.markdown(f"""
         <div style="text-align: center; padding: 0.5rem;">
             <p style="color: #8A8F99; font-size: 0.7rem;">Initial Claims</p>
@@ -625,9 +576,6 @@ def economic_dashboard_page():
     
     st.markdown('</div>', unsafe_allow_html=True)
     
-        # ========================================================================
-    # ECONOMIC INDICATORS OVER TIME - FIXED DATES
-    # ========================================================================
     st.markdown('''
     <div class="card" style="padding: 1rem;">
         <h3 style="font-size: 1.1rem; margin-top: 0;">Economic Indicators Over Time</h3>
@@ -647,7 +595,7 @@ def economic_dashboard_page():
     
     if 'gdp_growth' in econ_df.columns:
         fig.add_trace(go.Scatter(
-            x=econ_df['date'], y=econ_df['gdp_growth'],  # FIXED
+            x=econ_df['date'], y=econ_df['gdp_growth'], 
             mode='lines', name='GDP Growth',
             line=dict(color='#3B82F6', width=2),
             fill='tozeroy'
@@ -656,7 +604,7 @@ def economic_dashboard_page():
     
     if 'inflation_rate' in econ_df.columns:
         fig.add_trace(go.Scatter(
-            x=econ_df['date'], y=econ_df['inflation_rate'],  # FIXED
+            x=econ_df['date'], y=econ_df['inflation_rate'], 
             mode='lines', name='Inflation',
             line=dict(color='#F59E0B', width=2),
             fill='tozeroy'
@@ -665,14 +613,14 @@ def economic_dashboard_page():
     
     if 'interest_rate' in econ_df.columns:
         fig.add_trace(go.Scatter(
-            x=econ_df['date'], y=econ_df['interest_rate'],  # FIXED
+            x=econ_df['date'], y=econ_df['interest_rate'],  
             mode='lines', name='Fed Funds',
             line=dict(color='#EF4444', width=2)
         ), row=2, col=1)
     
     if 'unemployment' in econ_df.columns:
         fig.add_trace(go.Scatter(
-            x=econ_df['date'], y=econ_df['unemployment'],  # FIXED
+            x=econ_df['date'], y=econ_df['unemployment'], 
             mode='lines', name='Unemployment',
             line=dict(color='#8B5CF6', width=2),
             fill='tozeroy'
@@ -681,7 +629,7 @@ def economic_dashboard_page():
     
     if 'consumer_sentiment' in econ_df.columns:
         fig.add_trace(go.Scatter(
-            x=econ_df['date'], y=econ_df['consumer_sentiment'],  # FIXED
+            x=econ_df['date'], y=econ_df['consumer_sentiment'], 
             mode='lines+markers', name='Consumer Sentiment',
             line=dict(color='#EC4899', width=2),
             marker=dict(size=4)
@@ -692,7 +640,7 @@ def economic_dashboard_page():
     
     if 'financial_stress' in econ_df.columns:
         fig.add_trace(go.Scatter(
-            x=econ_df['date'], y=econ_df['financial_stress'],  # FIXED
+            x=econ_df['date'], y=econ_df['financial_stress'],  
             mode='lines', name='Financial Stress',
             line=dict(color='#EF4444', width=2),
             fill='tozeroy'
@@ -701,7 +649,7 @@ def economic_dashboard_page():
     
     if 'm2_money_supply' in econ_df.columns:
         fig.add_trace(go.Scatter(
-            x=econ_df['date'], y=econ_df['m2_money_supply'],  # FIXED
+            x=econ_df['date'], y=econ_df['m2_money_supply'],  
             mode='lines', name='M2 Supply',
             line=dict(color='#10B981', width=2),
             fill='tozeroy'
@@ -709,7 +657,7 @@ def economic_dashboard_page():
     
     if 'yield_spread' in econ_df.columns:
         fig.add_trace(go.Scatter(
-            x=econ_df['date'], y=econ_df['yield_spread'],  # FIXED
+            x=econ_df['date'], y=econ_df['yield_spread'],  
             mode='lines', name='Yield Spread',
             line=dict(color='#3B82F6', width=2),
             fill='tozeroy'
@@ -726,9 +674,7 @@ def economic_dashboard_page():
     
     st.plotly_chart(fig, use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
-    # ========================================================================
-    # RECESSION SIGNAL INDICATOR
-    # ========================================================================
+   
     if 'recession_signal' in econ_df.columns and 'yield_spread' in econ_df.columns:
         negative_spread = econ_df[econ_df['yield_spread'] < 0]
         if not negative_spread.empty:
@@ -739,7 +685,6 @@ def economic_dashboard_page():
                 <h3 style="font-size: 1.1rem; margin-top: 0;" class="theme-text-primary">Recession Signal (Inverted Yield Curve)</h3>
             ''', unsafe_allow_html=True)
             
-            # Use theme-aware classes instead of hardcoded colors
             st.markdown(f'''
             <div class="theme-bg-negative-light theme-border-negative" style="border-radius: 8px; padding: 0.75rem;">
                 <p style="margin: 0; font-size: 0.85rem;" class="theme-text-primary">
@@ -756,9 +701,7 @@ def economic_dashboard_page():
             
             st.markdown('</div>', unsafe_allow_html=True)
     
-    # ========================================================================
-    # DATA SOURCES FOOTER
-    # ========================================================================
+   
     st.markdown("""
     <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(59,130,246,0.05); border-radius: 8px;">
         <p style="font-size: 0.7rem; color: #8A8F99; text-align: center;">

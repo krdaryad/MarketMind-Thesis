@@ -15,9 +15,6 @@ def sentiment_trends_page():
     st.markdown('<p class="text-muted">Multi-dimensional analysis of sentiment patterns over time</p>', unsafe_allow_html=True)
     st.markdown('<br>', unsafe_allow_html=True)
 
-    # ========================================================================
-    # LOAD DATA FROM SESSION STATE
-    # ========================================================================
     sentiment_df = st.session_state.get('sentiment_data', pd.DataFrame())
     posts_df = st.session_state.get('posts_data', pd.DataFrame())
     market_df = st.session_state.get('market_data', pd.DataFrame())
@@ -29,9 +26,6 @@ def sentiment_trends_page():
     # Ensure date column is datetime
     sentiment_df['date'] = pd.to_datetime(sentiment_df['date'])
 
-    # ========================================================================
-    # COMPANY FILTER
-    # ========================================================================
     companies = get_companies_list(posts_df) if not posts_df.empty else []
     selected_company = st.sidebar.selectbox("Filter by Company", ["All"] + companies)
     
@@ -47,9 +41,6 @@ def sentiment_trends_page():
         ).reset_index()
         sentiment_df['date'] = pd.to_datetime(sentiment_df['date'])
 
-    # ========================================================================
-    # EVENT MARKERS SECTION (COMPLETELY REWRITTEN)
-    # ========================================================================
     st.markdown('''
             <div class="card" data-tutorial="company-stats" style="padding: 0.5rem;">
                 <h4> Sentiment with Real-World Events</h4>
@@ -126,9 +117,6 @@ def sentiment_trends_page():
     st.plotly_chart(fig_events, use_container_width=True, key="sentiment_with_events")
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # ========================================================================
-    # TABS
-    # ========================================================================
     tab1, tab2, tab3, tab4, tab6 = st.tabs(["All Trends", "VIX Scatter", "Heatmap", "Forecast", "Word Cloud"])
 
     with tab1:

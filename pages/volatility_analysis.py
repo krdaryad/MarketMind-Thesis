@@ -92,9 +92,7 @@ def volatility_analysis_page():
             hovertemplate='<b>%{x|%b %d, %Y}</b><br>Volume Volatility: %{y:.1f}<extra></extra>'
         ), row=3, col=1)
     
-    # ========================================================================
-    # ADD EVENT MARKERS TO ALL SUBPLOTS
-    # ========================================================================
+    
     for date_str, event in MARKET_EVENTS.items():
         event_date = pd.to_datetime(date_str)
         
@@ -189,9 +187,7 @@ def volatility_analysis_page():
     
     st.plotly_chart(fig, use_container_width=True)
     
-    # ========================================================================
-    # VOLATILITY STATISTICS WITH EVENT CONTEXT
-    # ========================================================================
+
     st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown('<h3>Volatility Statistics</h3>', unsafe_allow_html=True)
     

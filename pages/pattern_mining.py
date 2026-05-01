@@ -21,9 +21,6 @@ def pattern_mining_page():
         st.warning("No data available. Please check your data source.")
         return
     
-    # ========================================================================
-    # TOPICS SECTION - FIXED THEME
-    # ========================================================================
     st.markdown('<h3 class="theme-text-primary"> Discovered Topics (LDA)</h3>', unsafe_allow_html=True)
     st.markdown('<p class="text-muted">Coherence score: 0.62 (k=5)</p>', unsafe_allow_html=True)
     
@@ -43,9 +40,7 @@ def pattern_mining_page():
     else:
         st.info("Not enough data for topic modeling. Need at least 10 posts with text content.")
     
-    # ========================================================================
-    # PATTERN MINING RESULTS - FIXED THEME
-    # ========================================================================
+   
     st.markdown('<h3 class="theme-text-primary"> Frequent Patterns (FP-Growth)</h3>', unsafe_allow_html=True)
     
     if not patterns.empty and 'pattern' in patterns.columns:
@@ -105,9 +100,7 @@ def pattern_mining_page():
     else:
         st.info("Not enough data for pattern mining. Try with more posts.")
     
-    # ========================================================================
-    # WORD FREQUENCY ANALYSIS - FIXED THEME
-    # ========================================================================
+    
     st.markdown('<h3 class="theme-text-primary"> Word Frequency Analysis</h3>', unsafe_allow_html=True)
     
     # Extract word frequencies from posts
@@ -153,13 +146,8 @@ def pattern_mining_page():
     else:
         st.info("No words to analyze.")
     
-    # ========================================================================
-    # DEEP DIVE SECTION - FIXED THEME
-    # ========================================================================
     st.markdown('<h3 class="theme-text-primary">Deep Dive: How LDA Works</h3>', unsafe_allow_html=True)
     
-    # Use theme-aware card container
-    st.markdown('<div class="theme-bg-card" style="border-radius: 12px; padding: 1rem; margin-top: 1rem;">', unsafe_allow_html=True)
     
     st.markdown("""
     <p class="text-muted"><strong class="theme-text-accent">Choosing k (Number of Topics)</strong><br>

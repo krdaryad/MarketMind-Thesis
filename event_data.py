@@ -5,9 +5,7 @@ Includes February AND March 2021 events
 """
 
 MARKET_EVENTS = {
-    # ========================================================================
-    # FEBRUARY 2021 EVENTS
-    # ========================================================================
+   
     '2021-02-01': {
         'title': 'Google Cloud & Ford Partnership',
         'description': 'Google Cloud announced partnership with Ford for connected vehicle services.',
@@ -58,9 +56,7 @@ MARKET_EVENTS = {
         'category': 'positive'
     },
     
-    # ========================================================================
-    # MARCH 2021 EVENTS
-    # ========================================================================
+   
     '2021-03-02': {
         'title': 'Amazon AI & Fulfillment Investment',
         'description': 'Amazon announced major investment in AI-powered fulfillment centers ($200B).',

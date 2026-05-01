@@ -14,7 +14,7 @@ def model_accuracy_page():
     st.markdown(f"""
     <div style="margin-bottom: 2rem;">
         <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
-            <span style="font-size: 2rem;">📊</span>
+            <span style="font-size: 2rem;"></span>
             <h1 class="theme-text-primary" style="margin: 0;">Model Accuracy</h1>
             <span style="background: linear-gradient(135deg, #3B82F6, #F59E0B); padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.7rem; font-weight: 500; color: white;">Evaluation</span>
         </div>
@@ -25,9 +25,7 @@ def model_accuracy_page():
     # Get posts data from session state
     posts_df = st.session_state.get('posts_data', pd.DataFrame())
     
-    # ================================================================
-    # LOAD ACTUAL MODEL RESULTS FROM PKL FILE
-    # ================================================================
+    
     model_results = st.session_state.get('model_results', pd.DataFrame())
     
     # If model_results is empty, try loading from pkl file
@@ -161,9 +159,7 @@ def model_accuracy_page():
         </div>
         """, unsafe_allow_html=True)
 
-    # ========================================================================
-    # PERFORMANCE METRICS TABLE - USING YOUR ACTUAL DATA
-    # ========================================================================
+    
     st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown('<h3 class="theme-text-primary">Model Performance Summary</h3>', unsafe_allow_html=True)
     
@@ -180,9 +176,6 @@ def model_accuracy_page():
     
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # ========================================================================
-    # K-MEANS SILHOUETTE SCORE ANALYSIS
-    # ========================================================================
     
     # Header with educational popup
     header_col1, header_col2 = st.columns([4, 1])
@@ -201,13 +194,6 @@ def model_accuracy_page():
             **Example:** k=5 with score 0.55 means posts are well-separated into 5 sentiment/topic clusters.
             """)
     
-    # ================================================================
-    # ⚠️ HARDCODED NUMBERS WARNING:
-    # The silhouette scores below are hardcoded for display.
-    # They are NOT calculated from your actual data.
-    # The live charts below (Davies-Bouldin, Silhouette) ARE calculated.
-    # Consider removing this static display or replacing with live values.
-    # ================================================================
     
     # Silhouette data (HARDCODED - for display only)
     silhouette_data = [
@@ -250,9 +236,7 @@ def model_accuracy_page():
         """, unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # ========================================================================
-    # DAVIES-BOULDIN INDEX & MANUAL CLUSTER VALIDATION (LIVE CALCULATED)
-    # ========================================================================
+
     st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown('<h3 class="theme-text-primary">Advanced Cluster Validation</h3>', unsafe_allow_html=True)
 
@@ -381,9 +365,7 @@ def model_accuracy_page():
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # ========================================================================
-    # EMOTION CLUSTER PROJECTION (2D PCA) - LIVE CALCULATED
-    # ========================================================================
+    
     st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown('<h3 class="theme-text-primary">Emotion Cluster Projection (2D PCA)</h3>', unsafe_allow_html=True)
     st.markdown('<p class="text-muted">Visualizing sentiment clusters in 2D space using Principal Component Analysis</p>', unsafe_allow_html=True)

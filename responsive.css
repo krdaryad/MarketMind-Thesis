@@ -1,6 +1,4 @@
-/* responsive.css - Add to your CSS in config.py */
 
-/* Mobile responsive styles */
 @media (max-width: 768px) {
     /* Adjust main container padding */
     .main .block-container {

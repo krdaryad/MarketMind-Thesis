@@ -49,9 +49,6 @@ def company_comparison_page():
         st.warning("For better readability, please select up to 5 companies.")
         selected_companies = selected_companies[:5]
     
-    # ========================================================================
-    # METRICS OVERVIEW
-    # ========================================================================
     st.markdown('<h3> Key Metrics Comparison</h3>', unsafe_allow_html=True)
     
     # Calculate metrics for selected companies
@@ -91,9 +88,6 @@ def company_comparison_page():
     st.dataframe(df_metrics, use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # ========================================================================
-    # POST VOLUME CHART
-    # ========================================================================
     st.markdown('''
             <div class="card" data-tutorial="company-stats" style="padding: 0.5rem;">
                 <h4> Post Volume by Company</h4>
@@ -118,9 +112,6 @@ def company_comparison_page():
     st.plotly_chart(fig, use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # ========================================================================
-    # ENGAGEMENT METRICS (if multiple companies)
-    # ========================================================================
     if len(selected_companies) > 1:
         
         st.markdown('''
@@ -164,9 +155,6 @@ def company_comparison_page():
         st.plotly_chart(fig, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
     
-    # ========================================================================
-    # SENTIMENT DISTRIBUTION
-    # ========================================================================
     if 'Positive %' in df_metrics.columns:
         
         st.markdown('''
@@ -227,9 +215,7 @@ def company_comparison_page():
             st.plotly_chart(fig, use_container_width=True)
             st.markdown('</div>', unsafe_allow_html=True)
     
-         # ========================================================================
-    # TIME SERIES COMPARISON (with company-specific events)
-    # ========================================================================
+     
     if len(selected_companies) <= 5:
         st.markdown('''
             <div class="card" data-tutorial="company-stats" style="padding: 0.5rem;">
@@ -238,9 +224,7 @@ def company_comparison_page():
         ''', unsafe_allow_html=True)
         st.markdown('<p class="text-muted">Daily net sentiment (positive - negative) / total posts. Hover over markers for company events.</p>', unsafe_allow_html=True)
         
-        # ========================================================================
-        # COMPANY-SPECIFIC EVENTS (February-March 2021)
-        # ========================================================================
+       
         company_events = {
             'Tesla': [
                 {'date': '2021-02-08', 'title': 'Tesla Buys $1.5B Bitcoin', 'desc': 'Tesla announced $1.5 billion Bitcoin purchase', 'impact': 'Massive positive sentiment spike', 'color': '#10B981'},
@@ -377,9 +361,6 @@ def company_comparison_page():
         
         st.markdown('</div>', unsafe_allow_html=True)
     
-    # ========================================================================
-    # SUMMARY STATISTICS
-    # ========================================================================
 
     st.markdown('<h3>Summary Statistics</h3>', unsafe_allow_html=True)
     

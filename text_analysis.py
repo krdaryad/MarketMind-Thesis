@@ -8,9 +8,6 @@ import os
 import streamlit as st
 from loading_facts import get_random_fact
 
-# ============================================================================
-# PATHS FOR PRE-TRAINED MODELS
-# ============================================================================
 MODELS_DIR = "models/"
 TOPICS_PATH = os.path.join(MODELS_DIR, "topics.pkl")
 PATTERNS_PATH = os.path.join(MODELS_DIR, "patterns.pkl")
@@ -18,14 +15,7 @@ MODEL_RESULTS_PATH = os.path.join(MODELS_DIR, "model_results.pkl")
 SENTIMENT_MODELS_PATH = os.path.join(MODELS_DIR, "sentiment_models.pkl")
 VECTORIZER_PATH = os.path.join(MODELS_DIR, "vectorizer.pkl")
 
-# ============================================================================
-# ENSURE MODELS DIRECTORY EXISTS
-# ============================================================================
 os.makedirs(MODELS_DIR, exist_ok=True)
-
-# ============================================================================
-# PRE-TRAINED MODEL LOADERS (ALWAYS USE THESE)
-# ============================================================================
 
 @st.cache_resource(show_spinner=False)
 def get_preloaded_topics():
@@ -73,9 +63,6 @@ def get_preloaded_models():
         st.warning("Pre-trained ML models not found. Run save_models.py on desktop first.")
         return None, None
 
-# ============================================================================
-# BACKWARD COMPATIBILITY FUNCTIONS (for existing code that expects these names)
-# ============================================================================
 
 def get_real_topics(posts_df=None):
     """Get pre-trained LDA topics (posts_df ignored, kept for API compatibility)."""

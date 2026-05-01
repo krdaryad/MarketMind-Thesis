@@ -52,9 +52,6 @@ except ImportError:
 from data_fetcher import load_reddit_data, add_sentiment, aggregate_sentiment, fetch_market_data
 from data_loader import load_economic_data
 
-# ============================================================================
-# INITIALIZE SESSION STATE
-# ============================================================================
 def initialize_session_state():
     """Initialize all session state variables."""
     # Set default page to GLOBAL MACRO category
@@ -83,9 +80,7 @@ def initialize_session_state():
     if 'data_loaded' not in st.session_state:
         st.session_state.data_loaded = False
 
-# ============================================================================
-# DATA LOADING
-# ============================================================================
+
 def load_all_data():
     """Enhanced data loading with a centralized status card."""
     st.markdown("### System Initialization")
@@ -114,7 +109,7 @@ def load_all_data():
         progress_bar.progress(20)
 
         status_message.text("Loading economic indicators...")
-        economic_data, econ_df = load_economic_data('financial_forecasting_dataset.csv')
+        economic_data, econ_df = load_economic_data('data/financial_forecasting_dataset.csv')
         st.session_state.economic_data = economic_data
         st.session_state.econ_df = econ_df
         steps["econ"].success("Economics")
@@ -171,9 +166,6 @@ def load_all_data():
     
     return st.session_state.data_loaded
 
-# ============================================================================
-# PAGE RENDERING
-# ============================================================================
 def render_page_content():
     """Render the content based on selected category and page."""
     category = st.session_state.current_category
@@ -222,9 +214,7 @@ def render_page_content():
     else:
         st.error(f"Unknown category: {category}")
 
-# ============================================================================
-# MAIN APP
-# ============================================================================
+
 def main():
     """Main application entry point."""
     

@@ -20,9 +20,6 @@ def dashboard_page():
     st.markdown('<p class="text-muted">Overview · Market Correlation · Sentiment Trends</p>', unsafe_allow_html=True)
     st.markdown('<br>', unsafe_allow_html=True)
 
-    # ========================================================================
-    # DATA LOADING WITH CACHE (Improvement #1 - already in data_fetcher.py)
-    # ========================================================================
     posts_df = load_reddit_data()
     
     if posts_df.empty:
@@ -61,16 +58,10 @@ def dashboard_page():
     posts_df = add_sentiment(posts_df)
     sentiment_df = aggregate_sentiment(posts_df)
     
-    # ========================================================================
-    # SESSION STATE OPTIMIZATION (Improvement #3 - Store only derived data)
-    # ========================================================================
     # Only store what's needed for other pages
     st.session_state.posts_data = posts_df
     st.session_state.sentiment_data = sentiment_df
     
-    # ========================================================================
-    # DATA GHOSTING FIX (Improvement #5 - Clear state when data insufficient)
-    # ========================================================================
     if len(posts_df) >= 10:
         st.session_state.topics = get_real_topics(posts_df)
         st.session_state.patterns = get_real_patterns(posts_df)
@@ -88,9 +79,7 @@ def dashboard_page():
     # Company stats
     company_stats = get_company_stats(posts_df)
     
-    # ========================================================================
-    # METRIC CARDS - TUTORIAL HIGHLIGHT
-    # ========================================================================
+    
     st.markdown('<div data-tutorial="metric-cards">', unsafe_allow_html=True)
     col1, col2, col3, col4 = st.columns(4)
     
@@ -131,9 +120,6 @@ def dashboard_page():
         """, unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # ========================================================================
-    # MARKET METRICS ROW
-    # ========================================================================
     st.markdown('<br>', unsafe_allow_html=True)
     col1, col2, col3 = st.columns(3)
     
@@ -201,15 +187,11 @@ def dashboard_page():
             """, unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
-    # ========================================================================
-    # TABS
-    # ========================================================================
+    
     tab1, tab2, tab3, tab4 = st.tabs(["Company Stats", "Market Overview", "Sentiment Trends", "Post Analysis"])
     
     with tab1:
-        # ====================================================================
-        # COMPANY STATS - WITH EMPTY STATE HANDLING (Improvement #2)
-        # ====================================================================
+        
         if company_stats is not None and not company_stats.empty:
             st.markdown('''
             <div class="card" data-tutorial="company-stats" style="padding: 1rem;">
@@ -251,9 +233,7 @@ def dashboard_page():
             st.info("No company statistics available for the selected filters. Try selecting a different date range or company.")
     
     with tab2:
-        # ====================================================================
-        # MARKET OVERVIEW - WITH EMPTY STATE HANDLING (Improvement #2)
-        # ====================================================================
+        
         col1, col2 = st.columns(2)
         
         with col1:
@@ -322,9 +302,7 @@ def dashboard_page():
                 st.markdown('<div class="card" style="padding: 1rem;"><h3 style="font-size: 1.1rem;">VIX Volatility</h3><p>No VIX data available for the selected date range.</p></div>', unsafe_allow_html=True)
     
     with tab3:
-        # ====================================================================
-        # SENTIMENT TRENDS - WITH EMPTY STATE HANDLING (Improvement #2)
-        # ====================================================================
+        
         if sentiment_df is not None and not sentiment_df.empty:
             st.markdown('''
             <div class="card" data-tutorial="sentiment-chart" style="padding: 1rem;">
@@ -387,9 +365,7 @@ def dashboard_page():
                 """, unsafe_allow_html=True)
     
     with tab4:
-        # ====================================================================
-        # RECENT POSTS - WITH EMPTY STATE HANDLING (Improvement #2)
-        # ====================================================================
+        
         if posts_df is not None and not posts_df.empty:
             st.markdown('''
             <div class="card" style="padding: 1rem;">

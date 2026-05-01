@@ -96,9 +96,7 @@ def entity_analysis_page():
             st.info("Run sentiment analysis first to see entity sentiment over time")
         st.markdown('</div>', unsafe_allow_html=True)
     
-    # ========================================================================
-# ENTITY CO-OCCURRENCE NETWORK - FIXED VERSION
-# ========================================================================
+    
     st.markdown('''
     <div class="card" data-tutorial="company-stats" style="padding: 0.5rem;">
         <h4>Entity Co-occurrence Network</h4>
@@ -109,9 +107,7 @@ def entity_analysis_page():
     company_counts = posts_df['company_standard'].value_counts()
     top_entities = company_counts.head(8).index.tolist()
 
-    # ========================================================================
-    # FIX 1: PROPER CO-OCCURRENCE DETECTION
-    # ========================================================================
+    
     co_occurrence = {}
 
     for _, row in posts_df.iterrows():
@@ -136,9 +132,7 @@ def entity_analysis_page():
         st.info("ℹ No co-occurring company pairs found. Posts may only mention one company each.")
         st.markdown('</div>', unsafe_allow_html=True)
     else:
-        # ========================================================================
-        # FIX 2: BUILD EDGES FROM CO-OCCURRENCE
-        # ========================================================================
+       
         edges = []
         for (c1, c2), weight in co_occurrence.items():
             if c1 in top_entities and c2 in top_entities:
@@ -150,9 +144,6 @@ def entity_analysis_page():
         # Show top 15 edges, or all if fewer
         display_edges = edges[:15] if len(edges) > 15 else edges
         
-        # ========================================================================
-        # FIX 3: VISIBLE LINE COLOR (not dark on dark background)
-        # ========================================================================
         fig = go.Figure()
         
         # Position nodes in a circle
@@ -209,9 +200,6 @@ def entity_analysis_page():
         
         st.plotly_chart(fig, use_container_width=True)
         
-        # ========================================================================
-        # CO-OCCURRENCE TABLE
-        # ========================================================================
         if display_edges:
             st.markdown('<h4>Top Co-occurring Entity Pairs</h4>', unsafe_allow_html=True)
             cooc_df = pd.DataFrame(display_edges, columns=['Entity 1', 'Entity 2', 'Co-occurrences'])
@@ -230,9 +218,7 @@ def entity_analysis_page():
                 """, unsafe_allow_html=True)
         
         st.markdown('</div>', unsafe_allow_html=True)
-# ========================================================================
-# ENTITY ANALYSIS - SHARE OF CONVERSATION (Replaces Broken Network Graph)
-# ========================================================================
+
     st.markdown('''
     <div class="card" data-tutorial="company-stats" style="padding: 1rem;">
         <h4>Share of Conversation</h4>
@@ -243,9 +229,6 @@ def entity_analysis_page():
     company_counts = posts_df['company_standard'].value_counts()
     top_entities = company_counts.head(8).index.tolist()
 
-    # ========================================================================
-    # OPTION A: DONUT CHART (Best for showing conversation share)
-    # ========================================================================
     import plotly.express as px
 
     # Prepare data for donut chart
@@ -297,9 +280,6 @@ def entity_analysis_page():
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # ========================================================================
-    # OPTION B: TOP COMPANIES BAR CHART (Alternative view)
-    # ========================================================================
     st.markdown('''
     <div class="card" style="padding: 1rem;">
         <h4>Top Companies by Mention Volume</h4>
@@ -339,9 +319,6 @@ def entity_analysis_page():
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # ========================================================================
-    # COMPANY DETAILS SECTION (Keep as is)
-    # ========================================================================
     st.markdown('''
     <div class="card" style="padding: 1rem;">
         <h4>Company Details</h4>

@@ -32,9 +32,6 @@ def ai_analysis_page():
     col1, col2 = st.columns(2)
 
     with col1:
-        # ====================================================================
-        # TOPICS CARD - TUTORIAL HIGHLIGHT (FIXED THEME)
-        # ====================================================================
         
         # Header with educational popup
         header_col1, header_col2 = st.columns([4, 1])
@@ -71,10 +68,7 @@ def ai_analysis_page():
             st.info("Not enough data for topic modeling. Need at least 10 posts.")
 
     with col2:
-        # ====================================================================
-        # RADAR CHART - TUTORIAL HIGHLIGHT (FIXED THEME)
-        # ====================================================================
-        
+      
         # Header with badge
         st.markdown("""
         <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
@@ -182,10 +176,6 @@ def ai_analysis_page():
         </div>
         """, unsafe_allow_html=True)
 
-    # ========================================================================
-    # VADER SENTIMENT SECTION (FIXED THEME)
-    # ========================================================================
-    
     # Header with educational popup
     header_col1, header_col2 = st.columns([4, 1])
     with header_col1:
@@ -344,9 +334,6 @@ def ai_analysis_page():
             </div>
             """, unsafe_allow_html=True)
 
-    # ========================================================================
-    # DEEP DIVE SECTION (FIXED THEME)
-    # ========================================================================
     st.markdown("""
     <h3 class="theme-text-primary" style="margin: 1rem 0 0.5rem 0;">Deep Dive</h3>
     """, unsafe_allow_html=True)

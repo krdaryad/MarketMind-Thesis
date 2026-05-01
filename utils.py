@@ -341,16 +341,12 @@ def render_sidebar():
         except FileNotFoundError:
             # Fallback to text if no logo found
             st.sidebar.markdown("<h2 style='text-align: center;'>MarketMind</h2>", unsafe_allow_html=True)
-        # ====================================================================
-        # THEME TOGGLE - MODERN CAPSULE BUTTON
-        # ====================================================================
+       
         toggle_theme()
         
         
         
-        # ====================================================================
-        # ANALYSIS FILTERS
-        # ====================================================================
+        
         with st.expander("ANALYSIS FILTERS", expanded=False):
             # Load data for filters
             posts_df = load_reddit_data()
@@ -389,14 +385,10 @@ def render_sidebar():
             else:
                 st.warning("No data loaded")
         
-        # ====================================================================
-        # DATA QUALITY MONITOR
-        # ====================================================================
+       
         #render_data_quality()
         
-        # ====================================================================
-        # SYSTEM CONTROLS (Export + Debug)
-        # ====================================================================
+       
         posts_df = st.session_state.get('posts_data', None)
         render_system_controls(posts_df)
         
@@ -441,9 +433,7 @@ def render_footer():
     </div>
     """, unsafe_allow_html=True)
 
-    # ====================================================================
-        # SYSTEM KERNEL ID (Academic Power Move)
-        # ====================================================================
+   
     if 'session_id' in st.session_state:
             session_id_short = str(st.session_state.session_id)[-8:]
             st.markdown(f"""

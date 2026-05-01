@@ -5,7 +5,6 @@ Separate fact pools for different types of operations
 import random
 import streamlit as st
 
-# Facts for data loading operations (data_fetcher.py)
 DATA_LOADING_FACTS = [
     "Random Forest models use 100+ decision trees to reduce overfitting.",
     "VADER sentiment analysis achieves 96% accuracy on social media text.",
@@ -21,10 +20,9 @@ DATA_LOADING_FACTS = [
     "t-SNE visualization preserves local neighborhood structures in high-dim data.",
 ]
 
-# Facts for ML/Analysis operations (text_analysis.py)
 ML_ANALYSIS_FACTS = [
    
-    "Loss Aversion: The pain of losing $100 is twice as powerful as the joy of gaining $100.",
+    "Loss Aversion: The pain of losing €100 is twice as powerful as the joy of gaining €100.",
     "Herd Behavior: 39% of new money flows into last year's top performers.",
     "The Disposition Effect: Investors sell winning stocks too early but hold losing stocks too long.",
     "Recency Bias: The tendency to think the future will look exactly like the last 2 weeks.",
@@ -58,6 +56,5 @@ def reset_ml_analysis_fact():
     if 'ml_analysis_fact' in st.session_state:
         del st.session_state.ml_analysis_fact
 
-# Legacy function for backward compatibility
 def get_random_fact():
     return get_data_loading_fact()

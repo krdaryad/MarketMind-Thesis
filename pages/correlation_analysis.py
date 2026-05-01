@@ -36,9 +36,6 @@ def correlation_analysis_page():
         st.warning("No market data available for the selected date range.")
         return
     
-    # ========================================================================
-    # MERGE SENTIMENT WITH MARKET DATA
-    # ========================================================================
     # Prepare sentiment data
     sentiment_agg = sentiment_df.copy()
     sentiment_agg['date'] = pd.to_datetime(sentiment_agg['date'])
@@ -53,9 +50,7 @@ def correlation_analysis_page():
     
     st.success(f"Found {len(merged_data)} overlapping days for analysis")
     
-    # ========================================================================
-    # COMPANY SELECTION
-    # ========================================================================
+   
     companies = merged_data['company_standard'].unique() if 'company_standard' in merged_data.columns else []
     if len(companies) > 0:
         selected_company = st.selectbox("Select Company", ["All"] + list(companies))
@@ -63,9 +58,7 @@ def correlation_analysis_page():
             merged_data = merged_data[merged_data['company_standard'] == selected_company]
             st.info(f"Showing data for {selected_company}")
     
-    # ========================================================================
-    # CURRENT MARKET INDICATORS
-    # ========================================================================
+    
     st.markdown('<h3>Current Market Indicators</h3>', unsafe_allow_html=True)
     
     # Get latest values
@@ -147,9 +140,6 @@ def correlation_analysis_page():
     
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # ========================================================================
-    # CORRELATION MATRIX
-    # ========================================================================
     st.markdown('<h3>Correlation Matrix</h3>', unsafe_allow_html=True)
     
     # Select columns for correlation
@@ -196,9 +186,6 @@ def correlation_analysis_page():
     
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # ========================================================================
-    # SENTIMENT VS MARKET TIME SERIES
-    # ========================================================================
 
     st.markdown('<h3>Sentiment vs Market Indicators Over Time</h3>', unsafe_allow_html=True)
     
@@ -249,9 +236,7 @@ def correlation_analysis_page():
         
         st.plotly_chart(fig, use_container_width=True)
         
-        # ========================================================================
-        # TIME-LAGGED CORRELATION
-        # ========================================================================
+      
         st.markdown('<h3>Time-Lagged Correlation</h3>', unsafe_allow_html=True)
         st.markdown('<p class="text-muted">Does sentiment predict market movements?</p>', unsafe_allow_html=True)
         
@@ -307,9 +292,7 @@ def correlation_analysis_page():
     
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # ========================================================================
-    # SENTIMENT BREAKDOWN OVER TIME
-    # ========================================================================
+    
     st.markdown('<h3>Sentiment Breakdown Over Time</h3>', unsafe_allow_html=True)
     
     if 'positive' in merged_data.columns and 'negative' in merged_data.columns:
@@ -361,10 +344,6 @@ def correlation_analysis_page():
         st.info("Sentiment breakdown data not available")
     
     st.markdown('</div>', unsafe_allow_html=True)
-    
-    # ========================================================================
-    # SENTIMENT-RETURN ALIGNMENT
-    # ========================================================================
     st.markdown('<h3>Sentiment-Return Alignment</h3>', unsafe_allow_html=True)
     st.markdown('<p class="text-muted">Comparing sentiment direction with actual market returns</p>', unsafe_allow_html=True)
 
@@ -467,9 +446,6 @@ def correlation_analysis_page():
 
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # ========================================================================
-    # ECONOMIC INDICATOR MATRIX
-    # ========================================================================
     st.markdown('<h3>Economic Indicator Matrix</h3>', unsafe_allow_html=True)
     st.markdown('<p class="text-muted">Multi-indicator correlation matrix for economic analysis</p>', unsafe_allow_html=True)
 
@@ -541,9 +517,6 @@ def correlation_analysis_page():
 
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # ========================================================================
-    # SUMMARY STATISTICS
-    # ========================================================================
     st.markdown('<h3>Summary Statistics</h3>', unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)

@@ -34,9 +34,7 @@ def shock_detection_page():
         econ_df = econ_df.copy()
         econ_df['date'] = pd.to_datetime(econ_df['date'])
     
-    # ========================================================================
-    # DETECT SHOCKS IN REDDIT SENTIMENT
-    # ========================================================================
+    
     sentiment_df['rolling_mean'] = sentiment_df['avg_compound'].rolling(7, min_periods=1).mean()
     sentiment_df['rolling_std'] = sentiment_df['avg_compound'].rolling(7, min_periods=1).std()
     sentiment_df['z_score'] = (sentiment_df['avg_compound'] - sentiment_df['rolling_mean']) / sentiment_df['rolling_std'].replace(0, 0.1)
@@ -60,9 +58,6 @@ def shock_detection_page():
                 'min_sentiment': group['avg_compound'].min()
             })
     
-    # ========================================================================
-    # DETECT SHOCKS IN FRED DATA (if available)
-    # ========================================================================
     fred_indicators = []
     if not econ_df.empty:
         econ_df = econ_df.copy()
@@ -88,9 +83,7 @@ def shock_detection_page():
             econ_df['consumer_shock'] = econ_df['consumer_z_score'] < -2
             fred_indicators.append('Consumer Sentiment')
     
-    # ========================================================================
-    # CREATE MULTI-SOURCE VISUALIZATION
-    # ========================================================================
+    
     if fred_indicators:
         fig = make_subplots(
             rows=len(fred_indicators) + 1, cols=1,
@@ -266,9 +259,7 @@ def shock_detection_page():
         
         st.plotly_chart(fig, use_container_width=True)
     
-    # ========================================================================
-    # SHOCK STATISTICS SUMMARY
-    # ========================================================================
+    
     st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown('<h3>Shock Statistics Summary</h3>', unsafe_allow_html=True)
     
@@ -300,9 +291,7 @@ def shock_detection_page():
     
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # ========================================================================
-    # DETAILED SHOCK EVENTS TABLE
-    # ========================================================================
+    
     if shocks:
         st.markdown('<div class="card">', unsafe_allow_html=True)
         st.markdown('<h3>Detected Shock Events</h3>', unsafe_allow_html=True)
@@ -317,9 +306,6 @@ def shock_detection_page():
         st.dataframe(display_df, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
         
-        # ====================================================================
-        # THESIS INSIGHT
-        # ====================================================================
         st.markdown('<div class="card">', unsafe_allow_html=True)
         st.markdown('<h3>Thesis Insight: Multi-Source Validation</h3>', unsafe_allow_html=True)
         
