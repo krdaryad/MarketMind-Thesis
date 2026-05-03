@@ -1,6 +1,3 @@
-"""
-Utility functions: onboarding, sidebar, top menu, etc.
-"""
 import streamlit as st
 from datetime import datetime
 import numpy as np
@@ -63,10 +60,8 @@ def show_onboarding():
         step = st.session_state.onboarding_step
         step_data = onboarding_step(step)
         
-        # Calculate progress percentage
         progress_pct = (step / 7) * 100
         
-        # UI IMPROVEMENT: Use the 'card' class with progress bar
         st.markdown(f'''
             <div class="card" style="border: 2px solid #3B82F6; background: rgba(59, 130, 246, 0.1); padding: 1rem;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
@@ -85,7 +80,6 @@ def show_onboarding():
             </div>
         ''', unsafe_allow_html=True)
         
-        # UI IMPROVEMENT: More balanced button layout
         cols = st.columns([1, 1])
         with cols[0]:
             if step > 1:
@@ -102,7 +96,6 @@ def show_onboarding():
                     st.session_state.onboarding_active = False
                     st.rerun()
         
-                 # Single faint divider between branding and controls
         st.markdown('<hr style="opacity: 0.1; margin: 0.5rem 0;">', unsafe_allow_html=True)
     else:
         if st.button("Restart Tour", key="restart_tour", use_container_width=True):
@@ -112,26 +105,22 @@ def show_onboarding():
 
 def toggle_theme():
     """Single-button modern theme toggle with dynamic icon and label."""
-    # 1. Initialize State
+    
     if 'dark_mode' not in st.session_state:
         st.session_state.dark_mode = True
 
     is_dark = st.session_state.dark_mode
 
-    # 2. Section Label
     st.sidebar.markdown('<p style="font-size:0.65rem; color:#8A8F99; letter-spacing:1px; margin-bottom:10px;">APPEARANCE</p>', unsafe_allow_html=True)
     
-    # 3. Dynamic Label (NOTE: Fixed the logic - was inverted!)
-    # When is_dark = True (dark mode active), button should say "Light Mode" to switch to light
-    # When is_dark = False (light mode active), button should say "Dark Mode" to switch to dark
     label = " Light Mode" if is_dark else " Dark Mode"
     help_text = "Switch to light mode" if is_dark else "Switch to dark mode"
     
-    # 4. Functional Toggle Button
+    # toggle
     if st.sidebar.button(label, use_container_width=True, help=help_text):
         st.session_state.dark_mode = not is_dark
         
-        # Apply native Streamlit theme
+        # native streamlit
         if st.session_state.dark_mode:
             st._config.set_option('theme.base', 'dark')
             st._config.set_option('theme.backgroundColor', '#05070A')
@@ -145,13 +134,13 @@ def toggle_theme():
             st._config.set_option('theme.secondaryBackgroundColor', '#FFFFFF')
             st._config.set_option('theme.textColor', '#0F172A')
         
-        # Apply your custom CSS theme
+        # +custom css
         from config import apply_theme
         apply_theme()
         
         st.rerun()
 
-    # 5. Visual "Active State" Indicator (Subtle underline)
+    #active state indicator
     active_color = "#3B82F6" if is_dark else "#F59E0B"
     st.sidebar.markdown(f"""
         <div style="width: 100%; height: 2px; background: rgba(255,255,255,0.05); margin-top: -10px;">
@@ -178,8 +167,7 @@ def render_data_quality():
     """Displays a high-tech data health indicator."""
     st.sidebar.markdown("---")
     st.sidebar.markdown('<p class="tech-label" style="font-size:0.6rem; color:#8A8F99;">DATA INTEGRITY MONITOR</p>', unsafe_allow_html=True)
-    
-    # Get actual data quality metrics
+ 
     posts_df = st.session_state.get('posts_data', None)
     if posts_df is not None and not posts_df.empty:
         stats = validate_data_quality(posts_df)
@@ -252,10 +240,10 @@ def render_system_controls(posts_df):
                 st.session_state.show_debug = not st.session_state.get('show_debug', False)
                 st.rerun()
     
-    # If debug is active, show a floating code block
+    # if debug is active we show a floating code block
     if st.session_state.get('show_debug', False):
         with st.expander("System kernel logs", expanded=True):
-            # Get model accuracy if available
+            # model accuracy if available
             model_results = st.session_state.get('model_results', None)
             accuracy = "N/A"
             if model_results is not None and not model_results.empty:
@@ -293,8 +281,6 @@ def render_sidebar():
     
     track_user_session()
     
-    
-    # Add a mobile menu toggle button (visible only on mobile)
     st.markdown("""
     <style>
     @media (max-width: 768px) {
@@ -319,18 +305,16 @@ def render_sidebar():
     </style>
     """, unsafe_allow_html=True)
     
-    # Rest of your sidebar code...
     with st.sidebar:
         try:
-            # 1. Determine which logo to use based on theme
+            #logo choice
             is_dark = st.session_state.get('dark_mode', True)
-            logo_filename = "logo.png" if is_dark else "logo_light.png"
+            logo_filename = "images/logo.png" if is_dark else "images/logo_light.png"
             
-            # 2. Load and encode the logo
+            # load/encode
             with open(logo_filename, "rb") as f:
                 logo_data = base64.b64encode(f.read()).decode()
             
-            # 3. Render logo with slight transition effect
             st.markdown(f"""
                 <div style="display: flex; justify-content: center; padding: 0.5rem 0 2rem 0; transition: opacity 0.3s ease;">
                     <img src="data:image/png;base64,{logo_data}" 
@@ -339,20 +323,19 @@ def render_sidebar():
             """, unsafe_allow_html=True)
             
         except FileNotFoundError:
-            # Fallback to text if no logo found
+            #if that doesnt work out:)
             st.sidebar.markdown("<h2 style='text-align: center;'>MarketMind</h2>", unsafe_allow_html=True)
        
         toggle_theme()
         
         
         
-        
         with st.expander("ANALYSIS FILTERS", expanded=False):
-            # Load data for filters
+            
             posts_df = load_reddit_data()
             
             if not posts_df.empty:
-                # Date range picker with fallback
+                #datapicker
                 min_date = posts_df['created'].min().date() if not posts_df.empty else datetime(2021, 1, 1).date()
                 max_date = posts_df['created'].max().date() if not posts_df.empty else datetime(2021, 2, 28).date()
                 
@@ -365,16 +348,13 @@ def render_sidebar():
                 )
                 st.session_state.date_range = date_range
                 
-                # Company filter
                 companies = get_companies_list(posts_df)
                 selected_company = st.selectbox("Company", ["All"] + companies)
                 st.session_state.selected_company = selected_company
                 
-                # Sentiment filter
                 sentiment_filter = st.selectbox("Sentiment", ["All", "Positive", "Neutral", "Negative"])
                 st.session_state.sentiment_filter = sentiment_filter
                 
-                # Score filter
                 max_score = int(posts_df['score'].max()) if not posts_df.empty else 100
                 min_score = st.slider("Minimum Score", 0, max_score, 0, 10)
                 st.session_state.min_score = min_score
@@ -385,7 +365,7 @@ def render_sidebar():
             else:
                 st.warning("No data loaded")
         
-       
+        #will remove this, possibly add this later 
         #render_data_quality()
         
        
@@ -433,7 +413,6 @@ def render_footer():
     </div>
     """, unsafe_allow_html=True)
 
-   
     if 'session_id' in st.session_state:
             session_id_short = str(st.session_state.session_id)[-8:]
             st.markdown(f"""

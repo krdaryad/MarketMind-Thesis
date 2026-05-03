@@ -1,6 +1,3 @@
-"""
-AI Analysis page - using CSV data for topic modeling and sentiment with tutorial highlights.
-"""
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -13,13 +10,11 @@ def ai_analysis_page():
     <div style="margin-bottom: 2rem;">
         <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
             <h1 class="theme-text-primary" style="margin: 0;">AI Analysis</h1>
-            <span style="background: linear-gradient(135deg, #3B82F6, #F59E0B); padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.7rem; font-weight: 500; color: white;">ML</span>
         </div>
         <p class="text-muted">Topic modeling, model comparison, and VADER sentiment on Reddit data</p>
     </div>
     """, unsafe_allow_html=True)
 
-    # Get data from session state
     posts_df = st.session_state.get('posts_data', pd.DataFrame())
     sentiment_df = st.session_state.get('sentiment_data', pd.DataFrame())
     topics = st.session_state.get('topics', {})
@@ -28,12 +23,12 @@ def ai_analysis_page():
         st.warning("No data available. Please check your data source.")
         return
 
-    # Create two columns for the top section
+    
     col1, col2 = st.columns(2)
 
     with col1:
         
-        # Header with educational popup
+        # header + educational popup
         header_col1, header_col2 = st.columns([4, 1])
         with header_col1:
             st.markdown('<h3 class="theme-text-primary">Discovered Topics (LDA)</h3>', unsafe_allow_html=True)
@@ -50,7 +45,7 @@ def ai_analysis_page():
                 **Example:** k=5 means we asked the model to find 5 topics.
                 """)
         
-        # Topic modeling visualization
+        # topic modeling visualization
         if topics and not topics.get("Not enough data"):
             cols = st.columns(2)
             
@@ -69,7 +64,7 @@ def ai_analysis_page():
 
     with col2:
       
-        # Header with badge
+        
         st.markdown("""
         <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
             <h3 class="theme-text-primary" style="margin: 0;">Model Comparison Radar</h3>
@@ -77,17 +72,17 @@ def ai_analysis_page():
         </div>
         """, unsafe_allow_html=True)
         
-        # Use model results from session state if available
+        # model results from session state if there are there
         model_results = st.session_state.get('model_results', pd.DataFrame())
         
         if not model_results.empty and len(model_results) > 0:
-            # Use real model results
+            # using real model results
             categories = ['Accuracy', 'Precision', 'Recall', 'F1 Score', 'Inference Speed']
             
             models_radar = {}
             for _, row in model_results.iterrows():
                 if row['Model'] in ['Random Forest', 'SVM', 'Gaussian Naive Bayes', 'Decision Tree']:
-                    # Calculate F1 score
+                    # F1 score
                     precision = row['Precision']
                     recall = row['Recall']
                     f1 = (2 * precision * recall / (precision + recall)) if (precision + recall) > 0 else 0
@@ -101,7 +96,7 @@ def ai_analysis_page():
                     elif row['Model'] == 'Decision Tree':
                         models_radar['Decision Tree'] = [row['Accuracy'], row['Precision'], row['Recall'], f1, 0.8]
         else:
-            # Try to load model results from pkl file
+            # nodels from my pkl
             import os
             import joblib
             
@@ -114,7 +109,7 @@ def ai_analysis_page():
                 except:
                     pass
             
-            # Ultimate fallback with YOUR ACTUAL NUMBERS
+            # hardcoding just in case
             models_radar = {
                 'Random Forest': [0.824, 0.840, 0.82, 0.83, 0.4],
                 'SVM': [0.824, 0.840, 0.82, 0.83, 0.6],
@@ -122,12 +117,12 @@ def ai_analysis_page():
                 'Decision Tree': [0.712, 0.720, 0.71, 0.715, 0.8],
             }
         
-        # Create radar chart using Plotly
+        #  radar chart using Plotly
         fig = go.Figure()
         categories = ['Accuracy', 'Precision', 'Recall', 'F1 Score', 'Inference Speed']
         
         for model_name, values in models_radar.items():
-            # Close the loop by appending the first value
+            # !!close the loop by appending the first value
             values_closed = values + [values[0]]
             categories_closed = categories + [categories[0]]
             
@@ -165,7 +160,7 @@ def ai_analysis_page():
         
         st.plotly_chart(fig, use_container_width=True)
         
-        # Insight note (FIXED THEME)
+        
         st.markdown("""
         <div class="theme-bg-info-light theme-border-info" style="border-radius: 12px; padding: 0.75rem; margin-top: 1rem;">
             <div style="display: flex; gap: 0.5rem;">
@@ -176,7 +171,7 @@ def ai_analysis_page():
         </div>
         """, unsafe_allow_html=True)
 
-    # Header with educational popup
+    #might need to fix this later
     header_col1, header_col2 = st.columns([4, 1])
     with header_col1:
         st.markdown('<h3 class="theme-text-primary">VADER Sentiment Analysis</h3>', unsafe_allow_html=True)
@@ -193,7 +188,7 @@ def ai_analysis_page():
             **Example:** 'This is GREAT!!!' scores higher than 'This is great' due to caps and punctuation boosters.
             """)
     
-    # Get sentiment distribution from data
+    # sentiment distribution 
     if not sentiment_df.empty:
         pos_total = sentiment_df['positive'].sum()
         neu_total = sentiment_df['neutral'].sum()
@@ -208,13 +203,13 @@ def ai_analysis_page():
             {"range": "Strongly Negative (< -0.5)", "count": int(neg_total * 0.3) if neg_total > 0 else 0, "color": "#EF4444"},
         ]
         
-        # Calculate average compound score
+       
         if 'avg_compound' in sentiment_df.columns:
             avg_compound = sentiment_df['avg_compound'].mean()
         else:
             avg_compound = 0.0
     else:
-        # Fallback data
+        #if that doesnt work
         compound_distribution = [
             {"range": "Strongly Positive (>0.5)", "count": 91, "color": "#059669"},
             {"range": "Positive (0.05 to 0.5)", "count": 189, "color": "#10B981"},
@@ -225,7 +220,7 @@ def ai_analysis_page():
         avg_compound = 0.08
         total_posts = sum(d['count'] for d in compound_distribution)
     
-    # Get company sentiment distribution
+    
     company_sentiment = {}
     if not posts_df.empty and 'sentiment' in posts_df.columns and 'company_standard' in posts_df.columns:
         for company in posts_df['company_standard'].unique():
@@ -243,7 +238,7 @@ def ai_analysis_page():
     with col1:
         st.markdown(f'<p class="text-muted" style="font-size: 0.7rem; margin-bottom: 0.5rem;">Sentiment Distribution ({total_posts:,} posts)</p>', unsafe_allow_html=True)
         
-        # Bar chart for sentiment distribution
+        #bar chart 
         fig = go.Figure()
         fig.add_trace(go.Bar(
             x=[d["range"] for d in compound_distribution],
@@ -264,7 +259,7 @@ def ai_analysis_page():
         )
         st.plotly_chart(fig, use_container_width=True)
         
-        # Average sentiment score
+        #dont like this part, but why not
         sentiment_color = "#10B981" if avg_compound > 0.05 else ("#EF4444" if avg_compound < -0.05 else "#F59E0B")
         st.markdown(f"""
         <div style="margin-top: 0.5rem; text-align: center;">
@@ -295,11 +290,11 @@ def ai_analysis_page():
         else:
             st.info("No company sentiment data available")
     
-    # Example posts with sentiment (FIXED THEME)
+    
     st.markdown('<p class="text-muted" style="font-size: 0.7rem; margin-top: 1rem; margin-bottom: 0.5rem;">Example Posts with Sentiment</p>', unsafe_allow_html=True)
     
     if not posts_df.empty and 'sentiment' in posts_df.columns:
-        # Get example posts for each sentiment
+        # example posts for each sentiment
         examples = []
         for sentiment_type in ['positive', 'neutral', 'negative']:
             sample = posts_df[posts_df['sentiment'] == sentiment_type].head(2)
@@ -357,7 +352,7 @@ def ai_analysis_page():
         }
     ]
     
-    # Initialize expanded state in session state
+    # expended state in session state
     if 'expanded_deep_dive' not in st.session_state:
         st.session_state.expanded_deep_dive = None
     

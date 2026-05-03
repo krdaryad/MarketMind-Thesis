@@ -1,12 +1,9 @@
-"""
-Mobile-responsive utilities and touch-friendly components.
-"""
+#extra if normall config is not good enough
 import streamlit as st
 from streamlit.components.v1 import html
 
 def detect_mobile():
-    """Detect if user is on mobile device."""
-    # Check user agent via JavaScript
+
     mobile_detection = """
     <script>
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -18,7 +15,7 @@ def detect_mobile():
     </script>
     """
     
-    # Default to False, will be updated by JS
+    # default to False will be updated by JS
     if 'is_mobile' not in st.session_state:
         st.session_state.is_mobile = False
     
@@ -40,7 +37,6 @@ def responsive_columns(items, mobile_cols=1, desktop_cols=None):
     
     cols_per_row = mobile_cols if is_mobile else desktop_cols
     
-    # Create rows of columns
     rows = []
     for i in range(0, len(items), cols_per_row):
         row_items = items[i:i + cols_per_row]

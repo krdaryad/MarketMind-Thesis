@@ -1,6 +1,3 @@
-"""
-Text preprocessing, topic extraction, pattern mining, and model training.
-"""
 import pandas as pd
 import numpy as np
 import joblib
@@ -22,7 +19,7 @@ def get_preloaded_topics():
     """Load pre-trained LDA topics from disk."""
     if os.path.exists(TOPICS_PATH):
         fact = get_random_fact()
-        with st.spinner(f"📚 Loading LDA topics...\n\n💡 {fact}"):
+        with st.spinner(f" Loading LDA topics...\n\n {fact}"):
             return joblib.load(TOPICS_PATH)
     else:
         st.warning("Pre-trained topics not found. Run save_models.py first.")
@@ -33,7 +30,7 @@ def get_preloaded_patterns():
     """Load pre-trained FP-Growth patterns from disk."""
     if os.path.exists(PATTERNS_PATH):
         fact = get_random_fact()
-        with st.spinner(f"🔍 Loading pattern mining results...\n\n💡 {fact}"):
+        with st.spinner(f" Loading pattern mining results...\n\n {fact}"):
             return joblib.load(PATTERNS_PATH)
     else:
         st.warning("Pre-trained patterns not found. Run save_models.py first.")
@@ -44,7 +41,7 @@ def get_preloaded_model_results():
     """Load pre-trained model performance metrics from disk."""
     if os.path.exists(MODEL_RESULTS_PATH):
         fact = get_random_fact()
-        with st.spinner(f"🤖 Loading model performance data...\n\n💡 {fact}"):
+        with st.spinner(f" Loading model performance data...\n\n {fact}"):
             return joblib.load(MODEL_RESULTS_PATH)
     else:
         st.warning("Pre-trained model results not found. Run save_models.py first.")
@@ -55,7 +52,7 @@ def get_preloaded_models():
     """Load pre-trained ML models (SVM, Random Forest, etc.) from disk."""
     if os.path.exists(SENTIMENT_MODELS_PATH) and os.path.exists(VECTORIZER_PATH):
         fact = get_random_fact()
-        with st.spinner(f"🧠 Loading ML models (Random Forest, SVM, GNB, Decision Tree)...\n\n💡 {fact}"):
+        with st.spinner(f" Loading ML models (Random Forest, SVM, GNB, Decision Tree)...\n\n {fact}"):
             models = joblib.load(SENTIMENT_MODELS_PATH)
             vectorizer = joblib.load(VECTORIZER_PATH)
             return models, vectorizer

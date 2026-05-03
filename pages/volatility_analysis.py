@@ -187,8 +187,6 @@ def volatility_analysis_page():
     
     st.plotly_chart(fig, use_container_width=True)
     
-
-    st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown('<h3>Volatility Statistics</h3>', unsafe_allow_html=True)
     
     col1, col2, col3, col4 = st.columns(4)

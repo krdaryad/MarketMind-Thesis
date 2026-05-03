@@ -1,13 +1,8 @@
-"""
-Loading screen component with progress indicators.
-"""
 import streamlit as st
 import time
 
 def show_loading_screen():
-    """Display a loading animation using Streamlit native elements."""
     
-    # Create a placeholder for the entire loading screen
     loading_placeholder = st.empty()
     
     with loading_placeholder.container():

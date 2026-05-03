@@ -16,7 +16,7 @@ def model_accuracy_page():
         <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
             <span style="font-size: 2rem;"></span>
             <h1 class="theme-text-primary" style="margin: 0;">Model Accuracy</h1>
-            <span style="background: linear-gradient(135deg, #3B82F6, #F59E0B); padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.7rem; font-weight: 500; color: white;">Evaluation</span>
+           
         </div>
         <p class="text-muted">ROC curves, classifier benchmarks, and clustering evaluation</p>
     </div>
