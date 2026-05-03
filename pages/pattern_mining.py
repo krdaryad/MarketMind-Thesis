@@ -1,6 +1,3 @@
-"""
-Pattern Mining page - using CSV data.
-"""
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -9,10 +6,10 @@ from config import get_plotly_template
 
 def pattern_mining_page():
     st.markdown('<h1 class="theme-text-primary"> Pattern Mining</h1>', unsafe_allow_html=True)
+    
     st.markdown('<p class="text-muted">Frequent patterns and topic modeling using FP-Growth and LDA</p>', unsafe_allow_html=True)
     st.markdown('<br>', unsafe_allow_html=True)
     
-    # Get data from session state
     posts_df = st.session_state.get('posts_data', pd.DataFrame())
     patterns = st.session_state.get('patterns', pd.DataFrame())
     topics = st.session_state.get('topics', {})
@@ -44,7 +41,7 @@ def pattern_mining_page():
     st.markdown('<h3 class="theme-text-primary"> Frequent Patterns (FP-Growth)</h3>', unsafe_allow_html=True)
     
     if not patterns.empty and 'pattern' in patterns.columns:
-        # Add sentiment column if not present (for demo)
+       
         if 'sentiment' not in patterns.columns:
             patterns['sentiment'] = patterns['pattern'].apply(
                 lambda x: 'positive' if any(word in x.lower() for word in ['bull', 'moon', 'rocket', 'gain']) 
@@ -52,7 +49,6 @@ def pattern_mining_page():
                 else 'neutral')
             )
         
-        # Create sentiment-based patterns
         pos_patterns = patterns[patterns['sentiment'] == 'positive'].head(5)
         neg_patterns = patterns[patterns['sentiment'] == 'negative'].head(5)
         
@@ -91,10 +87,10 @@ def pattern_mining_page():
             )
             st.plotly_chart(fig, use_container_width=True)
         
-        # Metrics table
+        #metrics table
         st.markdown('<h4 class="theme-text-primary">Pattern Metrics</h4>', unsafe_allow_html=True)
         
-        # Style the dataframe with theme-aware classes
+        #styling+themeaware
         df_display = patterns[['pattern', 'support', 'confidence', 'lift']].head(10) if 'support' in patterns.columns else patterns.head(10)
         st.dataframe(df_display, use_container_width=True)
     else:
@@ -103,14 +99,14 @@ def pattern_mining_page():
     
     st.markdown('<h3 class="theme-text-primary"> Word Frequency Analysis</h3>', unsafe_allow_html=True)
     
-    # Extract word frequencies from posts
+    #extracting word frequencies from posts
     from collections import Counter
     import re
     
     all_text = ' '.join(posts_df['title'].fillna('') + ' ' + posts_df['selftext'].fillna(''))
     words = re.findall(r'\b[a-zA-Z]{3,}\b', all_text.lower())
     
-    # Filter out common words
+    #filtering out common word
     stop_words = {'the', 'and', 'for', 'that', 'this', 'with', 'you', 'are', 'not', 
                   'have', 'from', 'they', 'will', 'what', 'your', 'can', 'was', 'but', 
                   'all', 'has', 'been', 'one', 'would', 'there', 'their', 'about', 

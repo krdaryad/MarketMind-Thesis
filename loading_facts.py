@@ -1,7 +1,3 @@
-"""
-Behavioral Finance Facts - Displayed during data loading operations
-Separate fact pools for different types of operations
-"""
 import random
 import streamlit as st
 
@@ -35,24 +31,24 @@ ML_ANALYSIS_FACTS = [
 ]
 
 def get_data_loading_fact():
-    """Get a fact for data loading operations (CSV, market data, sentiment)."""
+    
     if 'data_loading_fact' not in st.session_state:
         st.session_state.data_loading_fact = random.choice(DATA_LOADING_FACTS)
     return st.session_state.data_loading_fact
 
 def get_ml_analysis_fact():
-    """Get a fact for ML/Analysis operations (topic modeling, patterns, training)."""
+   
     if 'ml_analysis_fact' not in st.session_state:
         st.session_state.ml_analysis_fact = random.choice(ML_ANALYSIS_FACTS)
     return st.session_state.ml_analysis_fact
 
 def reset_data_loading_fact():
-    """Reset the data loading fact for a new page load."""
+   
     if 'data_loading_fact' in st.session_state:
         del st.session_state.data_loading_fact
 
 def reset_ml_analysis_fact():
-    """Reset the ML analysis fact for a new page load."""
+    
     if 'ml_analysis_fact' in st.session_state:
         del st.session_state.ml_analysis_fact
 

@@ -1,6 +1,3 @@
-"""
-Company Comparison page - Compare multiple companies side by side.
-"""
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -12,25 +9,20 @@ def company_comparison_page():
     st.markdown('<p class="text-muted">Compare sentiment, engagement, and discussion across companies</p>', unsafe_allow_html=True)
     st.markdown('<br>', unsafe_allow_html=True)
     
-    # Get data from session state
     posts_df = st.session_state.get('posts_data', pd.DataFrame())
     
     if posts_df.empty:
         st.warning("No data available. Please check your data source.")
         return
     
-    # Get list of companies
     companies = sorted(posts_df['company_standard'].unique())
     
-    # Check if we have any companies
     if not companies:
         st.warning("No companies found in the data.")
         return
     
-    # Multi-select for companies to compare - define default_companies BEFORE using it
     default_companies = companies[:min(3, len(companies))]
     
-    # Tutorial highlight for company selector
     st.markdown('<div data-tutorial="company-selector">', unsafe_allow_html=True)
     selected_companies = st.multiselect(
         "Select companies to compare",
@@ -44,14 +36,12 @@ def company_comparison_page():
         st.info("Select at least one company to compare")
         return
     
-    # Limit to 5 companies for readability
     if len(selected_companies) > 5:
         st.warning("For better readability, please select up to 5 companies.")
         selected_companies = selected_companies[:5]
     
     st.markdown('<h3> Key Metrics Comparison</h3>', unsafe_allow_html=True)
-    
-    # Calculate metrics for selected companies
+
     metrics_data = []
     for company in selected_companies:
         company_posts = posts_df[posts_df['company_standard'] == company]
@@ -65,13 +55,11 @@ def company_comparison_page():
                 'Avg Comments': round(company_posts['num_comments'].mean(), 1),
             }
             
-            # Add sentiment percentages if available
             if 'sentiment' in company_posts.columns:
                 metrics_item['Positive %'] = round((company_posts['sentiment'] == 'positive').mean() * 100, 1)
                 metrics_item['Neutral %'] = round((company_posts['sentiment'] == 'neutral').mean() * 100, 1)
                 metrics_item['Negative %'] = round((company_posts['sentiment'] == 'negative').mean() * 100, 1)
             
-            # Add average compound score if available
             if 'compound' in company_posts.columns:
                 metrics_item['Avg Sentiment'] = round(company_posts['compound'].mean(), 3)
             
@@ -83,8 +71,7 @@ def company_comparison_page():
         st.warning("No metrics data available for selected companies")
         st.markdown('</div>', unsafe_allow_html=True)
         return
-    
-    # Display metrics table
+  
     st.dataframe(df_metrics, use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
     
@@ -120,7 +107,6 @@ def company_comparison_page():
             ''', unsafe_allow_html=True)
         fig = make_subplots(specs=[[{"secondary_y": True}]])
         
-        # Avg Score bars
         fig.add_trace(go.Bar(
             x=df_metrics['Company'],
             y=df_metrics['Avg Score'],
@@ -130,7 +116,6 @@ def company_comparison_page():
             textposition='outside'
         ), secondary_y=False)
         
-        # Avg Comments line
         fig.add_trace(go.Scatter(
             x=df_metrics['Company'],
             y=df_metrics['Avg Comments'],
@@ -184,7 +169,6 @@ def company_comparison_page():
         st.plotly_chart(fig, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
         
-        # Average sentiment score if available
         if 'Avg Sentiment' in df_metrics.columns:
             
             st.markdown('''
@@ -258,13 +242,11 @@ def company_comparison_page():
         for company in selected_companies:
             company_posts = posts_df[posts_df['company_standard'] == company].copy()
             if not company_posts.empty and 'sentiment' in company_posts.columns:
-                # Convert date to datetime if needed
                 if 'date' in company_posts.columns:
                     company_posts['date'] = pd.to_datetime(company_posts['date'])
                 elif 'created' in company_posts.columns:
                     company_posts['date'] = pd.to_datetime(company_posts['created']).dt.date
                 
-                # Group by date and calculate net sentiment
                 daily = company_posts.groupby('date').agg(
                     positive=('sentiment', lambda x: (x == 'positive').sum()),
                     neutral=('sentiment', lambda x: (x == 'neutral').sum()),
@@ -275,7 +257,6 @@ def company_comparison_page():
                 daily['date'] = pd.to_datetime(daily['date'])
                 daily = daily.sort_values('date')
                 
-                # Add main sentiment line for the company
                 fig.add_trace(go.Scatter(
                     x=daily['date'],
                     y=daily['net_sentiment'],
@@ -285,21 +266,19 @@ def company_comparison_page():
                     hovertemplate=f'{company}<br>Date: %{{x|%Y-%m-%d}}<br>Net Sentiment: %{{y:.2f}}<extra></extra>'
                 ))
                 
-                # Add company-specific event markers
                 if company in company_events:
                     for event in company_events[company]:
                         event_date = pd.to_datetime(event['date'])
                         
-                        # Find sentiment value at event date
                         event_row = daily[daily['date'].dt.strftime('%Y-%m-%d') == event['date']]
                         if not event_row.empty:
                             y_pos = event_row['net_sentiment'].iloc[0]
                         else:
-                            # Find nearest date
+                            
                             nearest_idx = (daily['date'] - event_date).abs().idxmin()
                             y_pos = daily.loc[nearest_idx, 'net_sentiment']
                         
-                        # Add marker
+                      
                         fig.add_trace(go.Scatter(
                             x=[event_date],
                             y=[y_pos],
@@ -322,7 +301,6 @@ def company_comparison_page():
                             """
                         ))
                         
-                        # Add vertical line for major events (NO annotation_text!)
                         if event['impact'] in ['Massive positive sentiment spike', 'Strong positive sentiment']:
                             fig.add_vline(
                                 x=event_date,
@@ -331,8 +309,6 @@ def company_comparison_page():
                                 line_width=1,
                                 opacity=0.3
                             )
-        
-        
         
         
         
@@ -349,7 +325,6 @@ def company_comparison_page():
         
         st.plotly_chart(fig, use_container_width=True)
         
-        # Add summary of company events
         with st.expander(" Company-Specific Events (Feb-Mar 2021)"):
             for company in selected_companies:
                 if company in company_events:
@@ -376,7 +351,6 @@ def company_comparison_page():
     with col3:
         st.metric("Avg Score (All)", f"{avg_score_all:.1f}")
     
-    # Find top company by posts
     top_company = df_metrics.loc[df_metrics['Total Posts'].idxmax(), 'Company']
     top_posts = df_metrics['Total Posts'].max()
     st.markdown(f"""

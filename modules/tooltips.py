@@ -1,12 +1,8 @@
-"""
-Educational Tooltip Helper Module
-"""
 
 import streamlit as st
 from modules.glossary_data import get_glossary
 
 def tooltip(term):
-    """Return a clickable educational popup for a term"""
     glossary = get_glossary()
     term_data = next((t for t in glossary if t["term"].lower() == term.lower()), None)
     

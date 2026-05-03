@@ -1,6 +1,3 @@
-"""
-Interactive classifier demo page - Uses real ML models trained on your data with tutorial highlights.
-"""
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -17,26 +14,22 @@ import os
 import hashlib
 from datetime import datetime
 
-# In classifier_demo.py, update to use models trained on PhraseBank
-
 @st.cache_resource
 
 def get_trained_models():
-    """Get or train sentiment models."""
+    
     posts_df = st.session_state.get('posts_data', pd.DataFrame())
     
-    # Try to load pre-trained models first
     if os.path.exists('models/sentiment_models.pkl'):
         try:
             data = joblib.load('models/sentiment_models.pkl')
             
-            # Check different possible structures
+            
             if isinstance(data, dict):
                 if 'models' in data:
                     models = data['models']
                     vectorizer = data['vectorizer']
                     
-                    # Get test data if available
                     X_train = data.get('X_train', None)
                     X_test = data.get('X_test', None)
                     y_train = data.get('y_train', None)
@@ -53,7 +46,6 @@ def get_trained_models():
         except Exception as e:
             st.warning(f"Could not load saved models: {e}")
     
-    # Train new models
     if posts_df.empty:
         st.warning("No data available to train models.")
         return None, None, None, None, None, None
@@ -63,11 +55,10 @@ def get_trained_models():
 
 
 def train_and_cache_models(posts_df):
-    """Train models on the data and cache them."""
+    
     if posts_df.empty:
         return None, None, None, None, None, None
     
-    # Prepare data
     df = posts_df[posts_df['text'].notna() & (posts_df['text'].str.len() > 10)].copy()
     if len(df) < 10:
         st.warning(f"Need at least 10 posts with text. Found {len(df)}.")
@@ -76,39 +67,32 @@ def train_and_cache_models(posts_df):
     X_text = df['text'].fillna('')
     y = df['sentiment']
     
-    # Vectorize
     vectorizer = TfidfVectorizer(max_features=5000, stop_words='english')
     X = vectorizer.fit_transform(X_text)
     
-    # Split data
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
     
-    # Train models
     models = {}
     
     with st.spinner("Training models... (this may take a moment)"):
-        # Gaussian Naive Bayes
         gnb = GaussianNB()
         X_train_dense = X_train.toarray()
         gnb.fit(X_train_dense, y_train)
         models['Gaussian Naive Bayes'] = gnb
         
-        # SVM
         svm = SVC(kernel='linear', probability=True, random_state=42)
         svm.fit(X_train, y_train)
         models['SVM'] = svm
         
-        # Decision Tree
         dt = DecisionTreeClassifier(random_state=42)
         dt.fit(X_train, y_train)
         models['Decision Tree'] = dt
         
-        # Random Forest
         rf = RandomForestClassifier(n_estimators=100, random_state=42)
         rf.fit(X_train, y_train)
         models['Random Forest'] = rf
     
-    # Save models
+    #saving
     os.makedirs('models', exist_ok=True)
     save_data = {
         'models': models,
@@ -128,33 +112,27 @@ def predict_sentiment(text, model, vectorizer):
     if not text or not model or not vectorizer:
         return "neutral", 0.5
     
-    # Vectorize the text
     X = vectorizer.transform([text])
     
-    # Get prediction
-    if hasattr(model, 'predict_proba'):
-        # Get probabilities
-        if isinstance(model, GaussianNB):
-            # GNB needs dense array
+    if hasattr(model, 'predict_proba'): # getting prediction
+        if isinstance(model, GaussianNB): #probabilities
+
             X_dense = X.toarray()
             proba = model.predict_proba(X_dense)[0]
         else:
             proba = model.predict_proba(X)[0]
         
-        # Get class indices
-        classes = model.classes_
+        classes = model.classes_ #class indices
         
-        # Find index for each sentiment
         pos_idx = list(classes).index('positive') if 'positive' in classes else -1
         neu_idx = list(classes).index('neutral') if 'neutral' in classes else -1
         neg_idx = list(classes).index('negative') if 'negative' in classes else -1
         
-        # Get probabilities
         pos_prob = proba[pos_idx] if pos_idx >= 0 else 0
         neu_prob = proba[neu_idx] if neu_idx >= 0 else 0
         neg_prob = proba[neg_idx] if neg_idx >= 0 else 0
         
-        # Determine sentiment
+        # determining sentiment
         if pos_prob > 0.5:
             return "positive", pos_prob
         elif neg_prob > 0.5:
@@ -162,7 +140,6 @@ def predict_sentiment(text, model, vectorizer):
         else:
             return "neutral", neu_prob
     else:
-        # Simple prediction without probabilities
         pred = model.predict(X)[0]
         return pred, 0.7
 
@@ -171,13 +148,11 @@ def classifier_demo_page():
     <div style="margin-bottom: 2rem;">
         <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
             <h1 style="margin: 0;">Interactive Classifier</h1>
-            <span style="background: linear-gradient(135deg, #3B82F6, #F59E0B); padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.7rem; font-weight: 500;">ML Models</span>
         </div>
         <p class="text-muted">Test the sentiment classifier with your own text using models trained on Reddit data</p>
     </div>
     """, unsafe_allow_html=True)
 
-    # Initialize feedback storage in session state
     if 'feedback_history' not in st.session_state:
         st.session_state.feedback_history = []
     
@@ -190,34 +165,25 @@ def classifier_demo_page():
     if 'current_text' not in st.session_state:
         st.session_state.current_text = ""
 
-    # Get data from session state
     posts_df = st.session_state.get('posts_data', pd.DataFrame())
     
     if posts_df.empty:
         st.warning("No data available. Please load data first (go to Dashboard).")
         return
     
-    # Train models (cached)
     @st.cache_resource
-    @st.cache_resource
-    def get_models():
-        """Load pre-trained models instead of training from scratch."""
-        
-        # First, try to load your saved model results
+    def get_models(): # needs deleting
         if os.path.exists('models/sentiment_models.pkl'):
             try:
                 data = joblib.load('models/sentiment_models.pkl')
                 models = data['models']
                 vectorizer = data['vectorizer']
-                
-                # Create dummy X_test, y_test for display (or load from saved)
+  
                 X_train, X_test, y_train, y_test = None, None, None, None
                 
                 return models, vectorizer, X_train, X_test, y_train, y_test
             except Exception as e:
                 st.warning(f"Could not load saved models: {e}")
-        
-        # Fallback to training on the fly
         return train_and_cache_models(posts_df)
     
     result = get_trained_models()
@@ -231,7 +197,7 @@ def classifier_demo_page():
         st.warning("Not enough data to train models. Need at least 10 posts with text content.")
         return
     
-    # Model selection
+    # model selection
     model_names = list(models.keys())
     selected_model = st.selectbox(
         "Select Model",
@@ -241,7 +207,6 @@ def classifier_demo_page():
     
     model = models[selected_model]
     
-    # Create two columns for the main content
     col1, col2 = st.columns(2)
 
     with col1:
@@ -253,7 +218,6 @@ def classifier_demo_page():
         </div>
         """, unsafe_allow_html=True)
 
-        # Text input with example
         example_texts = [
             "Fed signals higher‑for‑longer rates, markets tumble.",
             "Tesla earnings absolutely crushed it! To the moon!",
@@ -276,15 +240,12 @@ def classifier_demo_page():
             )
         
         if user_text:
-            # Get prediction
             sentiment, confidence = predict_sentiment(user_text, model, vectorizer)
             
-            # Store current prediction for feedback
             st.session_state.current_prediction = sentiment
             st.session_state.current_confidence = confidence
             st.session_state.current_text = user_text
             
-            # Word highlighting (simple lexicon-based for explainability)
             sentiment_lexicon = {
                 "fed": -0.3, "signals": -0.1, "higher": -0.8, "rates": -0.5,
                 "markets": 0.1, "tumble": -0.9, "crash": -0.9, "surge": 0.8,
@@ -303,7 +264,7 @@ def classifier_demo_page():
                 if weight != 0:
                     word_weights.append((word, weight))
             
-            # Display highlighted words
+            # displaying highlighted words
             if word_weights:
                 st.markdown('<p style="color: #8A8F99; font-size: 0.7rem;">Word-level sentiment:</p>', unsafe_allow_html=True)
                 st.markdown('<div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.5rem 0;">', unsafe_allow_html=True)
@@ -323,7 +284,7 @@ def classifier_demo_page():
                     st.markdown(f'<span style="background: {bg}; border: 1px solid {border}; border-radius: 999px; padding: 0.25rem 0.75rem; font-size: 0.875rem; color: {text_color};">{word}</span>', unsafe_allow_html=True)
                 st.markdown('</div>', unsafe_allow_html=True)
             
-            # Confidence slider (user can adjust)
+            # confidence slider 
             st.markdown('<p style="color: #8A8F99; font-size: 0.7rem; margin-top: 1rem;">Adjust confidence threshold</p>', unsafe_allow_html=True)
             threshold = st.slider(
                 "",
@@ -336,7 +297,7 @@ def classifier_demo_page():
                 key="threshold_slider"
             )
             
-            # Adjust sentiment based on threshold
+            # adjusting sentiment based on threshold
             if confidence < threshold and sentiment != "neutral":
                 final_sentiment = "neutral"
                 final_confidence = threshold
@@ -350,7 +311,6 @@ def classifier_demo_page():
                 "negative": "#EF4444"
             }.get(final_sentiment, "#8A8F99")
             
-            # Display prediction result with Confidence Meter
             st.markdown(f"""
             <div style="background: linear-gradient(135deg, rgba(59,130,246,0.05) 0%, rgba(59,130,246,0.02) 100%); border: 1px solid #1A1D24; border-radius: 12px; padding: 1rem; margin-top: 1rem;">
                 <div style="display: flex; gap: 1rem; align-items: center;">
@@ -385,7 +345,7 @@ def classifier_demo_page():
             
             with feedback_col1:
                 if st.button("Correct", key="feedback_correct", use_container_width=True):
-                    # Store feedback
+                    # store feedback
                     feedback_entry = {
                         'timestamp': datetime.now(),
                         'text': user_text,
@@ -399,7 +359,7 @@ def classifier_demo_page():
             
             with feedback_col2:
                 if st.button("Incorrect", key="feedback_incorrect", use_container_width=True):
-                    # Store feedback
+                    
                     feedback_entry = {
                         'timestamp': datetime.now(),
                         'text': user_text,
@@ -410,7 +370,6 @@ def classifier_demo_page():
                     }
                     st.session_state.feedback_history.append(feedback_entry)
                     
-                    # Optional: Ask for correct sentiment
                     with st.expander("What was the correct sentiment?"):
                         correct_sentiment = st.radio(
                             "Select correct sentiment:",
@@ -421,14 +380,13 @@ def classifier_demo_page():
                             st.session_state.feedback_history[-1]['correct_sentiment'] = correct_sentiment
                             st.success("Correction recorded! This will help retrain the model.")
             
-            # Display feedback stats if there's history
+            
             if st.session_state.feedback_history:
                 with st.expander("View Feedback History"):
                     feedback_df = pd.DataFrame(st.session_state.feedback_history)
                     st.dataframe(feedback_df[['timestamp', 'predicted_sentiment', 'confidence', 'user_feedback']], 
                                 use_container_width=True)
                     
-                    # Calculate feedback metrics
                     total_feedback = len(feedback_df)
                     correct_count = len(feedback_df[feedback_df['user_feedback'] == 'correct'])
                     accuracy_from_feedback = correct_count / total_feedback if total_feedback > 0 else 0
@@ -442,7 +400,6 @@ def classifier_demo_page():
 
     with col2:
         
-        # Header with educational popup
         header_col1, header_col2 = st.columns([4, 1])
         with header_col1:
             st.markdown("""
@@ -461,22 +418,19 @@ def classifier_demo_page():
                 Accuracy = (TP + TN) / (TP + TN + FP + FN)
                 """)
         
-        # Get model performance metrics
+        # model performance metrics
         if X_test is not None and y_test is not None:
-            # Get predictions for the selected model
             if isinstance(model, GaussianNB):
                 X_test_dense = X_test.toarray()
                 y_pred = model.predict(X_test_dense)
             else:
                 y_pred = model.predict(X_test)
             
-            # Calculate metrics
             accuracy = accuracy_score(y_test, y_pred)
             precision = precision_score(y_test, y_pred, average='weighted', zero_division=0)
             recall = recall_score(y_test, y_pred, average='weighted', zero_division=0)
             f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
             
-            # Display metrics
             col_a, col_b, col_c, col_d = st.columns(4)
             with col_a:
                 st.metric("Accuracy", f"{accuracy:.1%}")
@@ -487,11 +441,9 @@ def classifier_demo_page():
             with col_d:
                 st.metric("F1 Score", f"{f1:.1%}")
             
-            # Confusion matrix
             cm = confusion_matrix(y_test, y_pred, labels=['positive', 'neutral', 'negative'])
             cm_percent = cm / cm.sum(axis=1, keepdims=True) * 100
             
-            # Display confusion matrix
             st.markdown('<p style="color: #8A8F99; font-size: 0.7rem; margin-top: 1rem;">Confusion Matrix (% of actual class)</p>', unsafe_allow_html=True)
             
             cm_df = pd.DataFrame(
@@ -502,7 +454,6 @@ def classifier_demo_page():
             
             st.dataframe(cm_df.round(1), use_container_width=True)
             
-            # Insight note
             st.markdown("""
             <div style="margin-top: 1rem; background: rgba(59,130,246,0.05); border: 1px solid rgba(59,130,246,0.1); border-radius: 12px; padding: 0.75rem;">
                 <p style="font-size: 0.7rem; color: #8A8F99; margin: 0;">
@@ -525,7 +476,7 @@ def classifier_demo_page():
     <p class="text-muted">How different models perform on the test set</p>
     """, unsafe_allow_html=True)
     
-    # Calculate metrics for all models
+    # calculate metrics for all models
     if X_test is not None and y_test is not None:
         comparison_data = []
         
@@ -552,8 +503,8 @@ def classifier_demo_page():
         comparison_df = pd.DataFrame(comparison_data)
         st.dataframe(comparison_df, use_container_width=True)
         
-        # Highlight best model
-        best_accuracy = max([float(d['Accuracy'].rstrip('%')) for d in comparison_data])
+      
+        best_accuracy = max([float(d['Accuracy'].rstrip('%')) for d in comparison_data]) #best mdoel
         st.markdown(f"""
         <div style="margin-top: 1rem; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); border-radius: 12px; padding: 0.75rem;">
             <p style="font-size: 0.7rem; color: #10B981; margin: 0;">

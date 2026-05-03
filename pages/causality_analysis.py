@@ -88,7 +88,7 @@ def causality_analysis_page():
         'consumer_sentiment': monthly_sentiment
     }).dropna()
     
-    # log returns for price (stationary)
+    # log returns for price stationary
     monthly_df['market_return'] = np.log(monthly_df['price'] / monthly_df['price'].shift(1))
     monthly_df = monthly_df.dropna()
     

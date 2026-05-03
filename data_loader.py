@@ -1,21 +1,17 @@
-"""
-Data loader for real-time economic indicators from FRED and Yahoo Finance.
-Includes comprehensive economic indicators for thesis analysis.
-"""
 import pandas as pd
 import yfinance as yf
 from fredapi import Fred
 import streamlit as st
 from datetime import datetime
 import numpy as np
-from loading_facts import get_data_loading_fact  # ADD THIS IMPORT
+from loading_facts import get_data_loading_fact  
 
 
 FRED_API_KEY = st.secrets["FRED_API_KEY"]
 fred = Fred(api_key=FRED_API_KEY)
 
 
-@st.cache_data(ttl=86400, show_spinner=False)  # ADD show_spinner=False
+@st.cache_data(ttl=86400, show_spinner=False)  
 def load_real_economic_data(ticker, start_date="2020-01-01", end_date=None):
     """Fetch real-world data from FRED and Yahoo Finance."""
     
@@ -26,8 +22,8 @@ def load_real_economic_data(ticker, start_date="2020-01-01", end_date=None):
         end_date = datetime.today().strftime("%Y-%m-%d")
     
     try:
-        # 1. Fetch Stock Data from Yahoo Finance
-        with st.spinner(f"Fetching stock data for {ticker}...\n\n {fact}"):  # ADD fact here
+        # data from Yahoo Finance
+        with st.spinner(f"Fetching stock data for {ticker}...\n\n {fact}"):  # witha fun fact
             stock_df = yf.download(ticker, start=start_date, end=end_date, progress=False)
             if stock_df.empty:
                 st.warning(f"No stock data found for {ticker}")
@@ -35,7 +31,7 @@ def load_real_economic_data(ticker, start_date="2020-01-01", end_date=None):
             
             stock_df = stock_df[['Close']].reset_index()
             stock_df.columns = ['date', 'close']
-
+        #official api source attributes and descriptions, which I chose 
         macro_series = {
            
             'gdp': 'GDPC1',                    # Real GDP
@@ -83,45 +79,41 @@ def load_real_economic_data(ticker, start_date="2020-01-01", end_date=None):
             except Exception as e:
                 st.warning(f"Could not fetch {name} data: {e}")
 
-        # 3. Merge All Data
+        #  merging everything
         final_df = stock_df
         for m_df in macro_frames:
             final_df = pd.merge(final_df, m_df, on='date', how='left')
 
-        # 4. Clean Data - Forward fill macro data (monthly/quarterly to daily)
+        # clean data with a forward fill macro data (monthly/quarterly to daily)
         final_df = final_df.sort_values('date')
         
-        # Forward fill macro columns
         macro_cols = list(macro_series.keys())
         for col in macro_cols:
             if col in final_df.columns:
                 final_df[col] = final_df[col].ffill()
         
-        # Fill any remaining NaN values
+        # fixing any remaining NaN values
         final_df = final_df.bfill()
         
-        # 5. Calculate Derived Indicators
-        final_df['Ticker'] = ticker
+        final_df['Ticker'] = ticker # Calculate Derived Indicators
         
         # Calculate market stress (volatility-based)
         final_df['returns'] = final_df['close'].pct_change()
         final_df['market_stress'] = final_df['returns'].rolling(20).std() * (252 ** 0.5)
         final_df['market_stress'] = final_df['market_stress'].fillna(0)
         
-        # Calculate yield spread (10Y - 2Y) - recession signal
+        # calculate yield spread (10 - 2)
         if 'treasury_10yr' in final_df.columns and 'treasury_2yr' in final_df.columns:
             final_df['yield_spread'] = final_df['treasury_10yr'] - final_df['treasury_2yr']
-            final_df['recession_signal'] = (final_df['yield_spread'] < 0).astype(int)
+            final_df['recession_signal'] = (final_df['yield_spread'] < 0).astype(int) #recession signal
         
-        # Calculate real interest rate (nominal - inflation)
+        # real interest rate
         if 'interest_rate' in final_df.columns and 'inflation' in final_df.columns:
-            final_df['real_rate'] = final_df['interest_rate'] - final_df['inflation']
+            final_df['real_rate'] = final_df['interest_rate'] - final_df['inflation'] #nominal-inflation
         
-        # Simple event flag (days with >2% moves)
-        final_df['event_flag'] = (abs(final_df['returns']) > 0.02).astype(int)
-        
-        # Create the dictionary structure your dashboard expects
-        ticker_data = {ticker: final_df.set_index('date')}
+        final_df['event_flag'] = (abs(final_df['returns']) > 0.02).astype(int) #flgs for days with >2% moves
+    
+        ticker_data = {ticker: final_df.set_index('date')} #dictionary structure
         
         return ticker_data, final_df
 
@@ -129,23 +121,18 @@ def load_real_economic_data(ticker, start_date="2020-01-01", end_date=None):
         st.error(f"Error fetching live data: {e}")
         return {}, pd.DataFrame()
 
-
-# Keep the old function for compatibility with existing code
-@st.cache_data(ttl=3600, show_spinner=False)  # ADD show_spinner=False
+@st.cache_data(ttl=3600, show_spinner=False)  
 def load_economic_data(file_path):
     """Load economic indicators from CSV file (legacy function)."""
     
-    # ADD THIS: Get a random fact for the spinner
     fact = get_data_loading_fact()
     
     try:
         with st.spinner(f"Loading economic data from CSV...\n\n {fact}"):
             df = pd.read_csv(file_path)
             
-            # Convert Date to datetime
             df['Date'] = pd.to_datetime(df['Date'])
             
-            # Rename columns for consistency
             df.rename(columns={
                 'Date': 'date',
                 'GDP (%)': 'gdp',
@@ -156,7 +143,6 @@ def load_economic_data(file_path):
                 'Event Flag': 'event_flag'
             }, inplace=True)
             
-            # Create separate dataframes for each ticker
             tickers = df['Ticker'].unique()
             ticker_data = {}
             

@@ -1,9 +1,7 @@
-"""
-Correlation Analysis page - Analyze sentiment-market correlations with economic indicators.
-"""
+
 import streamlit as st
 import pandas as pd
-import numpy as np  # ADDED - was missing
+import numpy as np  
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from data_loader import merge_sentiment_with_economics
@@ -14,7 +12,6 @@ def correlation_analysis_page():
     st.markdown('<p class="text-muted">Analyze relationships between Reddit sentiment, market movements, and economic indicators</p>', unsafe_allow_html=True)
     st.markdown('<br>', unsafe_allow_html=True)
     
-    # Get data from session state
     sentiment_df = st.session_state.get('sentiment_data', pd.DataFrame())
     posts_df = st.session_state.get('posts_data', pd.DataFrame())
     
@@ -22,13 +19,11 @@ def correlation_analysis_page():
         st.warning("No sentiment data available. Please check your data source.")
         return
     
-    # Get date range from session state
     if 'date_range' in st.session_state:
         start_date, end_date = st.session_state.date_range
     else:
         start_date, end_date = pd.Timestamp('2021-02-01'), pd.Timestamp('2021-02-28')
     
-    # Fetch market data for the date range
     with st.spinner("Loading market data..."):
         market_df = fetch_market_data(start_date, end_date)
     
@@ -36,11 +31,10 @@ def correlation_analysis_page():
         st.warning("No market data available for the selected date range.")
         return
     
-    # Prepare sentiment data
     sentiment_agg = sentiment_df.copy()
     sentiment_agg['date'] = pd.to_datetime(sentiment_agg['date'])
     
-    # Merge with market data
+    # merginh with market data
     market_df['date'] = pd.to_datetime(market_df['date'])
     merged_data = pd.merge(sentiment_agg, market_df, on='date', how='inner')
     
@@ -61,14 +55,13 @@ def correlation_analysis_page():
     
     st.markdown('<h3>Current Market Indicators</h3>', unsafe_allow_html=True)
     
-    # Get latest values
+    #latest values
     latest = merged_data.iloc[-1]
     
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
         if 'spy' in latest and not pd.isna(latest['spy']):
-            # Calculate SPY change
             spy_first = merged_data['spy'].iloc[0] if len(merged_data) > 0 else latest['spy']
             spy_change = ((latest['spy'] - spy_first) / spy_first) * 100 if spy_first != 0 else 0
             spy_color = "#10B981" if spy_change >= 0 else "#EF4444"
@@ -142,7 +135,7 @@ def correlation_analysis_page():
     
     st.markdown('<h3>Correlation Matrix</h3>', unsafe_allow_html=True)
     
-    # Select columns for correlation
+    #columns for correlation
     corr_cols = ['positive', 'neutral', 'negative', 'avg_compound', 'compound', 
                  'spy', 'vix', 'treasury']
     available_cols = [c for c in corr_cols if c in merged_data.columns and not merged_data[c].isna().all()]
@@ -170,7 +163,6 @@ def correlation_analysis_page():
         )
         st.plotly_chart(fig, use_container_width=True)
         
-        # Interpretation
         st.markdown("""
         <div style="margin-top: 1rem; background: rgba(59,130,246,0.05); border: 1px solid rgba(59,130,246,0.1); border-radius: 12px; padding: 0.75rem;">
             <p style="font-size: 0.75rem; color: #8A8F99; margin: 0;">
@@ -189,7 +181,6 @@ def correlation_analysis_page():
 
     st.markdown('<h3>Sentiment vs Market Indicators Over Time</h3>', unsafe_allow_html=True)
     
-    # Select market indicator to display
     market_indicators = ['spy', 'vix', 'treasury']
     available_indicators = [m for m in market_indicators if m in merged_data.columns]
     
@@ -202,10 +193,8 @@ def correlation_analysis_page():
             'treasury': '10Y Treasury Yield (%)'
         }
         
-        # Create dual-axis chart
         fig = make_subplots(specs=[[{"secondary_y": True}]])
         
-        # Sentiment (avg compound)
         fig.add_trace(go.Scatter(
             x=merged_data['date'],
             y=merged_data['avg_compound'],
@@ -214,7 +203,7 @@ def correlation_analysis_page():
             line=dict(color='#F59E0B', width=2)
         ), secondary_y=False)
         
-        # Market indicator
+        # market indicator
         fig.add_trace(go.Scatter(
             x=merged_data['date'],
             y=merged_data[selected_indicator],
@@ -348,7 +337,7 @@ def correlation_analysis_page():
     st.markdown('<p class="text-muted">Comparing sentiment direction with actual market returns</p>', unsafe_allow_html=True)
 
     if not sentiment_df.empty and not market_df.empty:
-        # Prepare alignment data
+        #preparing alignment data
         sentiment_aligned = sentiment_df.copy()
         sentiment_aligned['date'] = pd.to_datetime(sentiment_aligned['date'])
         market_aligned = market_df.copy()
@@ -357,27 +346,23 @@ def correlation_analysis_page():
         aligned = pd.merge(sentiment_aligned, market_aligned[['date', 'spy']], on='date', how='inner')
         
         if len(aligned) > 0:
-            # Calculate daily returns
-            aligned['returns'] = aligned['spy'].pct_change().fillna(0)
             
-            # Determine sentiment direction (positive vs negative)
+            aligned['returns'] = aligned['spy'].pct_change().fillna(0) #daily
+            
             aligned['sentiment_direction'] = aligned['avg_compound'].apply(
                 lambda x: 'Bullish' if x > 0.05 else ('Bearish' if x < -0.05 else 'Neutral')
             )
-            
-            # Determine market direction
+           
             aligned['market_direction'] = aligned['returns'].apply(
                 lambda x: 'Up' if x > 0 else ('Down' if x < 0 else 'Flat')
             )
             
-            # Calculate alignment
             aligned['aligned'] = ((aligned['sentiment_direction'] == 'Bullish') & (aligned['market_direction'] == 'Up')) | \
                                  ((aligned['sentiment_direction'] == 'Bearish') & (aligned['market_direction'] == 'Down')) | \
                                  ((aligned['sentiment_direction'] == 'Neutral') & (aligned['market_direction'] == 'Flat'))
             
             alignment_rate = aligned['aligned'].mean() * 100
             
-            # Create confusion matrix style visualization
             confusion = pd.crosstab(aligned['sentiment_direction'], aligned['market_direction'])
             
             fig = go.Figure(data=go.Heatmap(
@@ -402,7 +387,7 @@ def correlation_analysis_page():
             
             st.plotly_chart(fig, use_container_width=True)
             
-            # Monthly alignment trend
+            #monthly alignment trend
             aligned['month'] = aligned['date'].dt.to_period('M')
             monthly_alignment = aligned.groupby('month')['aligned'].mean() * 100
             
@@ -428,7 +413,6 @@ def correlation_analysis_page():
             
             st.plotly_chart(fig2, use_container_width=True)
             
-            # Summary
             st.markdown(f"""
             <div style="margin-top: 1rem; background: rgba(59,130,246,0.05); border-radius: 8px; padding: 0.75rem;">
                 <p style="font-size: 0.75rem; margin: 0;">
@@ -449,11 +433,10 @@ def correlation_analysis_page():
     st.markdown('<h3>Economic Indicator Matrix</h3>', unsafe_allow_html=True)
     st.markdown('<p class="text-muted">Multi-indicator correlation matrix for economic analysis</p>', unsafe_allow_html=True)
 
-    # Get economic data
     econ_df = st.session_state.get('econ_df', pd.DataFrame())
 
     if not econ_df.empty:
-        # Select numeric columns for correlation
+        
         econ_cols = ['gdp', 'inflation', 'interest_rate', 'unemployment', 'consumer_sentiment', 
                      'financial_stress', 'vix', 'close']
         available_econ_cols = [c for c in econ_cols if c in econ_df.columns]
@@ -461,7 +444,6 @@ def correlation_analysis_page():
         if len(available_econ_cols) >= 2:
             corr_matrix = econ_df[available_econ_cols].corr()
             
-            # Rename for better display
             display_names = {
                 'gdp': 'GDP Growth',
                 'inflation': 'Inflation',
@@ -473,7 +455,6 @@ def correlation_analysis_page():
                 'close': 'Stock Price'
             }
             
-            # Only rename columns that exist
             rename_dict = {k: v for k, v in display_names.items() if k in corr_matrix.columns}
             corr_matrix = corr_matrix.rename(index=rename_dict, columns=rename_dict)
             
@@ -499,7 +480,6 @@ def correlation_analysis_page():
             
             st.plotly_chart(fig, use_container_width=True)
             
-            # Key findings
             st.markdown("""
             <div style="margin-top: 1rem; background: rgba(59,130,246,0.05); border-radius: 8px; padding: 0.75rem;">
                 <p style="font-size: 0.75rem; margin: 0;">

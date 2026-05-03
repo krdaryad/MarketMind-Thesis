@@ -1,6 +1,3 @@
-"""
-Dashboard page - using CSV data with tutorial highlights.
-"""
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -26,39 +23,33 @@ def dashboard_page():
         st.error("No data loaded. Please check your CSV file path.")
         return
     
-    # Get date range from sidebar
-    if 'date_range' not in st.session_state:
+   
+    if 'date_range' not in st.session_state: #from sidebar
         st.session_state.date_range = [datetime(2021, 2, 1), datetime(2021, 2, 28)]
     
     start_date, end_date = st.session_state.date_range
     
-    # Filter by date
     posts_df = filter_by_date(posts_df, start_date, end_date)
     
     if posts_df.empty:
         st.warning(f"No posts found for date range {start_date} to {end_date}")
         return
     
-    # Company filter from sidebar
     companies = get_companies_list(posts_df)
     selected_company = st.session_state.get('selected_company', 'All')
     
     if selected_company != 'All':
         posts_df = filter_by_company(posts_df, selected_company)
     
-    # Sentiment filter
     sentiment_filter = st.session_state.get('sentiment_filter', 'All')
     posts_df = filter_by_sentiment(posts_df, sentiment_filter)
     
-    # Score filter
-    min_score = st.session_state.get('min_score', 0)
+    min_score = st.session_state.get('min_score', 0)#score filter
     posts_df = filter_by_score(posts_df, min_score)
     
-    # Add sentiment
     posts_df = add_sentiment(posts_df)
     sentiment_df = aggregate_sentiment(posts_df)
     
-    # Only store what's needed for other pages
     st.session_state.posts_data = posts_df
     st.session_state.sentiment_data = sentiment_df
     
@@ -67,16 +58,14 @@ def dashboard_page():
         st.session_state.patterns = get_real_patterns(posts_df)
         st.session_state.model_results = get_real_model_results(posts_df)
     else:
-        # Clear ghost data when insufficient posts
+        
         st.session_state.topics = {"Not enough data": ["Need at least 10 posts"]}
         st.session_state.patterns = pd.DataFrame(columns=['pattern', 'support', 'confidence', 'lift'])
         st.session_state.model_results = pd.DataFrame(columns=['Model', 'Accuracy', 'AUC', 'Precision', 'Recall'])
     
-    # Fetch market data
     market_df = fetch_market_data(start_date, end_date)
     st.session_state.market_data = market_df
     
-    # Company stats
     company_stats = get_company_stats(posts_df)
     
     
@@ -161,16 +150,16 @@ def dashboard_page():
             """, unsafe_allow_html=True)
         else:
             st.markdown("""<div class="metric-card" style="padding: 0.75rem;"><p class="tech-label" style="font-size: 0.7rem;">10Y Treasury</p><p class="tech-val" style="font-size: 1.5rem;">N/A</p></div>""", unsafe_allow_html=True)
-        # In dashboard.py - Add an event timeline card
+        
 
     st.markdown('<h3 style="font-size: 1.1rem;">February 2021: Key Market Events</h3>', unsafe_allow_html=True)
     st.markdown('<p class="text-muted">Hover over any sentiment spike in the charts above to see how these events drove market psychology.</p>', unsafe_allow_html=True)
 
-    # Create a timeline of events
+    #timeline of events
     event_cols = st.columns(4)
     for i, (date_str, event) in enumerate(list(MARKET_EVENTS.items())[:8]):
         with event_cols[i % 4]:
-            # Determine color
+          
             if 'positive' in event['impact'].lower():
                 color = '#10B981'
             elif 'negative' in event['impact'].lower():
@@ -198,7 +187,7 @@ def dashboard_page():
                 <h3 style="font-size: 1.1rem; margin-top: 0;">Company Statistics</h3>
             ''', unsafe_allow_html=True)
             
-            # Display top companies chart
+            #top c chart
             top_companies = company_stats.head(10)
             if not top_companies.empty:
                 fig = go.Figure()
@@ -221,7 +210,7 @@ def dashboard_page():
                 )
                 st.plotly_chart(fig, use_container_width=True)
             
-            # Display stats table
+            #stats table
             st.markdown('<h4 style="font-size: 0.9rem;">Detailed Stats</h4>', unsafe_allow_html=True)
             display_stats = company_stats.copy()
             if 'avg_compound' in display_stats.columns:
@@ -352,7 +341,7 @@ def dashboard_page():
                 </div>
                 """, unsafe_allow_html=True)
             
-            # Add average sentiment score
+            #ad average sentiment score
             if 'avg_compound' in sentiment_df.columns:
                 avg_sentiment = sentiment_df['avg_compound'].mean()
                 sentiment_color = "#10B981" if avg_sentiment > 0.05 else ("#EF4444" if avg_sentiment < -0.05 else "#F59E0B")
@@ -372,14 +361,12 @@ def dashboard_page():
                 <h3 style="font-size: 1.1rem; margin-top: 0;">Recent Posts</h3>
             ''', unsafe_allow_html=True)
             
-            # Display recent posts
             display_cols = ['created', 'title', 'company_standard', 'score', 'num_comments']
             if 'sentiment' in posts_df.columns:
                 display_cols.append('sentiment')
             
             recent_posts = posts_df.sort_values('created', ascending=False).head(20)
             
-            # Format the dataframe for display
             display_df = recent_posts[display_cols].copy()
             if 'created' in display_df.columns:
                 display_df['created'] = pd.to_datetime(display_df['created']).dt.strftime('%Y-%m-%d %H:%M')

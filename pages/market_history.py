@@ -1,7 +1,3 @@
-"""
-Economic History & Sentiment – Premium FinTech Design
-Interactive timeline with sentiment arc visualization, bento metrics, and media snippets
-"""
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -161,11 +157,11 @@ def market_history_page():
                     {"t": 1927, "v": 200, "phase": "euphoria"},
                     {"t": 1928, "v": 300, "phase": "euphoria"},
                     {"t": 1929.75, "v": 381, "phase": "euphoria"},  # Sep 1929 = 1929.75
-                    {"t": 1929.83, "v": 230, "phase": "panic"},     # Oct 29 = 1929.83
-                    {"t": 1930.33, "v": 294, "phase": "denial"},    # Apr 1930 = 1930.33
-                    {"t": 1930.92, "v": 164, "phase": "capitulation"}, # Dec 1930 = 1930.92
-                    {"t": 1931.42, "v": 156, "phase": "capitulation"}, # Jun 1931 = 1931.42
-                    {"t": 1932.5, "v": 41, "phase": "capitulation"},   # Jul 1932 = 1932.5
+                    {"t": 1929.83, "v": 230, "phase": "panic"},    
+                    {"t": 1930.33, "v": 294, "phase": "denial"},    
+                    {"t": 1930.92, "v": 164, "phase": "capitulation"}, 
+                    {"t": 1931.42, "v": 156, "phase": "capitulation"}, 
+                    {"t": 1932.5, "v": 41, "phase": "capitulation"},   
                     {"t": 1933, "v": 99, "phase": "recovery"},
                     {"t": 1937, "v": 194, "phase": "recovery"},
                 ],
@@ -255,9 +251,9 @@ def market_history_page():
                     {"t": 1998, "v": 2000, "phase": "euphoria"},
                     {"t": 1999, "v": 4000, "phase": "euphoria"},
                     {"t": 2000.2, "v": 5048, "phase": "euphoria"},   # Mar 2000 = 2000.2
-                    {"t": 2000.75, "v": 3800, "phase": "denial"},    # Sep 2000 = 2000.75
-                    {"t": 2001.2, "v": 2000, "phase": "panic"},      # Mar 2001 = 2001.2
-                    {"t": 2001.75, "v": 1500, "phase": "panic"},     # Sep 2001 = 2001.75
+                    {"t": 2000.75, "v": 3800, "phase": "denial"},    
+                    {"t": 2001.2, "v": 2000, "phase": "panic"},     
+                    {"t": 2001.75, "v": 1500, "phase": "panic"},    
                     {"t": 2002.83, "v": 1114, "phase": "capitulation"}, # Oct 2002 = 2002.83
                     {"t": 2004, "v": 2000, "phase": "recovery"},
                     {"t": 2007, "v": 2800, "phase": "recovery"},
@@ -301,12 +297,12 @@ def market_history_page():
             ],
             "priceData": [
                     {"t": 2006, "v": 1400, "phase": "euphoria"},
-                    {"t": 2007.83, "v": 1565, "phase": "euphoria"},  # Oct 2007 = 2007.83
-                    {"t": 2008.2, "v": 1300, "phase": "denial"},    # Mar 2008 = 2008.2
-                    {"t": 2008.75, "v": 1200, "phase": "panic"},    # Sep 2008 = 2008.75
-                    {"t": 2008.92, "v": 850, "phase": "panic"},     # Nov 2008 = 2008.92
-                    {"t": 2009.2, "v": 666, "phase": "capitulation"}, # Mar 2009 = 2009.2
-                    {"t": 2009.92, "v": 1115, "phase": "recovery"}, # Dec 2009 = 2009.92
+                    {"t": 2007.83, "v": 1565, "phase": "euphoria"},  
+                    {"t": 2008.2, "v": 1300, "phase": "denial"},    
+                    {"t": 2008.75, "v": 1200, "phase": "panic"},    
+                    {"t": 2008.92, "v": 850, "phase": "panic"},     
+                    {"t": 2009.2, "v": 666, "phase": "capitulation"}, 
+                    {"t": 2009.92, "v": 1115, "phase": "recovery"}, 
                     {"t": 2011, "v": 1260, "phase": "recovery"},
                     {"t": 2013, "v": 1565, "phase": "recovery"},
                 ],
@@ -437,7 +433,7 @@ def market_history_page():
 
    
 
-    # Sentiment cycle overview
+    #sentiment cycle overview
     st.markdown('''
     <div class="card" style="padding: 1rem;">
         <h3 style="font-size: 1.1rem; margin-top: 0;">The Universal Market Sentiment Cycle</h3>
@@ -448,10 +444,9 @@ def market_history_page():
     sentiment_cycle_diagram()
     st.markdown('<br>', unsafe_allow_html=True)
 
-    # Phase legend
     phase_legend()
 
-    # Crisis timeline - Each crisis in its own card
+    #crisis timeline
     for crisis in crises:
         expand_key = f"expanded_{crisis['id']}"
         if expand_key not in st.session_state:
@@ -470,7 +465,6 @@ def market_history_page():
             </div>
         ''', unsafe_allow_html=True)
         
-        # Tabs
         tab1, tab2 = st.tabs(["Market Movement", "Crisis Details"])
         
         with tab1:
@@ -479,7 +473,7 @@ def market_history_page():
             st.markdown(f'<p class="card-description">{crisis["description"]}</p>', unsafe_allow_html=True)
         
         with tab2:
-            # Key Indicators - 3x2 grid
+            
             st.markdown('<h4 style="font-size: 0.9rem;">Key Indicators</h4>', unsafe_allow_html=True)
             bento_cols = st.columns(3)
             for i, indicator in enumerate(crisis["keyIndicators"]):
@@ -491,7 +485,7 @@ def market_history_page():
                     </div>
                     """, unsafe_allow_html=True)
             
-            # Sentiment Phases
+            #sentiment Phases
             st.markdown('<h4 style="font-size: 0.9rem; margin-top: 1rem;">Sentiment Phase Breakdown</h4>', unsafe_allow_html=True)
             for sp in crisis["sentimentPhases"]:
                 cfg = phase_config[sp["phase"]]
@@ -506,7 +500,7 @@ def market_history_page():
                 </div>
                 """, unsafe_allow_html=True)
             
-            # Media Headlines
+            #media Headlines
             st.markdown('<h4 style="font-size: 0.9rem; margin-top: 1rem;">Media Sentiment Snapshots</h4>', unsafe_allow_html=True)
             for h in crisis["mediaHeadlines"]:
                 sentiment_class = "media-positive" if h["sentiment"] == "positive" else ("media-negative" if h["sentiment"] == "negative" else "media-neutral")
@@ -515,7 +509,7 @@ def market_history_page():
         st.markdown('</div>', unsafe_allow_html=True)
         st.markdown('<br>', unsafe_allow_html=True)
 
-    # Cross-crisis comparison table
+    #cross-crisis comparison table
     st.markdown('''
     <div class="card" style="padding: 1rem;">
         <h3 style="font-size: 1.1rem; margin-top: 0;">Cross-Crisis Comparison</h3>
@@ -535,7 +529,6 @@ def market_history_page():
     df_comp = pd.DataFrame(comp_data)
     st.dataframe(df_comp, use_container_width=True, hide_index=True)
 
-    # Final insight
     st.markdown('''
     <div class="card" style="padding: 1rem; text-align: center;">
         <p style="font-size: 0.9rem; font-style: italic;">"The four most dangerous words in investing: <span style="color: #3B82F6; font-weight: bold;">This time is different.</span>"</p>

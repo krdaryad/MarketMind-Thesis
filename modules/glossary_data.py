@@ -1,10 +1,5 @@
-"""
-Glossary Data Module
-Contains all glossary terms with categories, formulas, and related terms
-"""
 
 def get_glossary():
-    """Return the complete glossary"""
     return [
         {"term": "Anomaly Score", "category": "Statistics", 
          "definition": "Value 0-1 indicating deviation from normal patterns. >0.5 triggers alert.", 

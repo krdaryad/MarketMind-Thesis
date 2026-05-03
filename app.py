@@ -1,6 +1,3 @@
-"""
-Main application entry point with loading screen.
-"""
 import streamlit as st
 import pandas as pd
 import nltk
@@ -20,7 +17,7 @@ st.set_page_config(
     layout="wide",
   
 )
-# Import all page functions
+
 from pages.dashboard import dashboard_page
 from pages.sentiment_trends import sentiment_trends_page
 from pages.ai_analysis import ai_analysis_page
@@ -48,13 +45,11 @@ try:
 except ImportError:
     correlation_analysis_page = None
 
-# Import data loaders
 from data_fetcher import load_reddit_data, add_sentiment, aggregate_sentiment, fetch_market_data
 from data_loader import load_economic_data
 
 def initialize_session_state():
     """Initialize all session state variables."""
-    # Set default page to GLOBAL MACRO category
     if 'current_page' not in st.session_state:
         st.session_state.current_page = "Economic Dashboard"  # First page in GLOBAL MACRO
     if 'current_category' not in st.session_state:
@@ -82,7 +77,6 @@ def initialize_session_state():
 
 
 def load_all_data():
-    """Enhanced data loading with a centralized status card."""
     st.markdown("### System Initialization")
     load_card = st.container(border=True)
     
@@ -123,17 +117,15 @@ def load_all_data():
         steps["market"].success("Market Data")
         progress_bar.progress(60)
 
-           # Step 4: Add sentiment (SIMPLIFIED - no chunking, no custom caching)
         status_message.text("Processing sentiment analysis...")
         
         if not posts_df.empty:
-            # Check if sentiment already exists
-            if 'sentiment' in posts_df.columns and posts_df['sentiment'].notna().any():
+            if 'sentiment' in posts_df.columns and posts_df['sentiment'].notna().any():# Check if sentiment already exists
                 st.session_state.posts_data = posts_df
                 st.session_state.sentiment_data = aggregate_sentiment(posts_df)
                 steps["sent"].success("Sentiment (cached)")
             else:
-                # Simple direct call - let the original function handle it
+               
                 posts_with_sentiment = add_sentiment(posts_df)
                 st.session_state.posts_data = posts_with_sentiment
                 st.session_state.sentiment_data = aggregate_sentiment(posts_with_sentiment)
@@ -143,7 +135,6 @@ def load_all_data():
         
         progress_bar.progress(80)
 
-        # Step 5: Load ML models (INSTANT - no training!)
         status_message.text("Loading ML models...")
 
         from text_analysis import get_preloaded_topics, get_preloaded_patterns, get_preloaded_model_results
@@ -167,7 +158,7 @@ def load_all_data():
     return st.session_state.data_loaded
 
 def render_page_content():
-    """Render the content based on selected category and page."""
+    
     category = st.session_state.current_category
     current_page = st.session_state.current_page
     
@@ -216,7 +207,6 @@ def render_page_content():
 
 
 def main():
-    """Main application entry point."""
     
     initialize_session_state()
     apply_theme()

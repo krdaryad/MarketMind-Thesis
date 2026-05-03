@@ -1,6 +1,3 @@
-"""
-Entity Analysis page - using matched_company from CSV.
-"""
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -13,14 +10,12 @@ def entity_analysis_page():
     st.markdown('<p class="text-muted">Named entity recognition and entity sentiment tracking</p>', unsafe_allow_html=True)
     st.markdown('<br>', unsafe_allow_html=True)
     
-    # Get data from session state
     posts_df = st.session_state.get('posts_data', pd.DataFrame())
     
     if posts_df.empty:
         st.warning("No data available. Please check your data source.")
         return
     
-    # Get company statistics
     company_counts = posts_df['company_standard'].value_counts()
     
     col1, col2 = st.columns(2)
@@ -30,7 +25,7 @@ def entity_analysis_page():
             <div class="card" data-tutorial="company-stats" style="padding: 0.5rem;">
                 <h4> Top Entities by Mention</h4>
             ''', unsafe_allow_html=True)
-        # Create bar chart
+       
         fig = go.Figure([go.Bar(
             x=company_counts.head(10).values, 
             y=company_counts.head(10).index, 
@@ -55,15 +50,15 @@ def entity_analysis_page():
             <div class="card" data-tutorial="company-stats" style="padding: 0.5rem;">
                 <h4> Entity Sentiment Over Time</h4>
             ''', unsafe_allow_html=True)
-        # Get sentiment data if available
+ 
         if 'compound' in posts_df.columns:
-            # Calculate sentiment per company over time
+            # sentiment per company over time
             sentiment_df = st.session_state.get('sentiment_data', pd.DataFrame())
             if not sentiment_df.empty:
                 dates = sentiment_df['date']
                 fig = go.Figure()
                 
-                # Show top 3 companies
+                #top 3 companies
                 top_companies = company_counts.head(3).index.tolist()
                 colors = ['#10B981', '#F59E0B', '#EF4444']
                 
@@ -103,7 +98,7 @@ def entity_analysis_page():
         <p class="text-muted">Shows which companies are discussed together in the same posts</p>
     ''', unsafe_allow_html=True)
 
-    # Get company statistics
+    # company statistics
     company_counts = posts_df['company_standard'].value_counts()
     top_entities = company_counts.head(8).index.tolist()
 
@@ -114,20 +109,18 @@ def entity_analysis_page():
         companies_in_post = row.get('company_standard', '')
         
         if companies_in_post and pd.notna(companies_in_post):
-            # Convert to string and split by comma (if multiple companies)
+            
             companies_str = str(companies_in_post)
             
-            # Split by comma, strip whitespace, remove empty strings
             companies = [c.strip() for c in companies_str.split(',') if c.strip()]
             
-            # Only process if we have at least 2 companies in this post
             if len(companies) >= 2:
                 for i, c1 in enumerate(companies):
                     for c2 in companies[i+1:]:
                         key = tuple(sorted([c1, c2]))
                         co_occurrence[key] = co_occurrence.get(key, 0) + 1
 
-    # Debug: Check if we found any co-occurrences
+    #debugging
     if not co_occurrence:
         st.info("ℹ No co-occurring company pairs found. Posts may only mention one company each.")
         st.markdown('</div>', unsafe_allow_html=True)
@@ -138,30 +131,28 @@ def entity_analysis_page():
             if c1 in top_entities and c2 in top_entities:
                 edges.append((c1, c2, weight))
         
-        # Sort by weight (highest first) - don't limit too aggressively
+        #sort by weight 
         edges = sorted(edges, key=lambda x: x[2], reverse=True)
         
-        # Show top 15 edges, or all if fewer
         display_edges = edges[:15] if len(edges) > 15 else edges
         
         fig = go.Figure()
         
-        # Position nodes in a circle
+        #positioning nodes in a circle
         pos = {}
         for i, node in enumerate(top_entities):
             angle = 2 * math.pi * i / len(top_entities)
             pos[node] = (math.cos(angle), math.sin(angle))
-        
-        # Add edges with visible colors
+
         for edge in display_edges:
-            # Calculate line width based on weight (thicker = more co-occurrences)
+            
             line_width = 1 + min(edge[2] / 5, 6)
             
             fig.add_trace(go.Scatter(
                 x=[pos[edge[0]][0], pos[edge[1]][0]],
                 y=[pos[edge[0]][1], pos[edge[1]][1]],
                 mode='lines',
-                line=dict(color='#F59E0B', width=line_width),  # BRIGHT ORANGE - visible!
+                line=dict(color='#F59E0B', width=line_width), 
                 opacity=0.7,
                 showlegend=False,
                 hoverinfo='text',
@@ -205,7 +196,7 @@ def entity_analysis_page():
             cooc_df = pd.DataFrame(display_edges, columns=['Entity 1', 'Entity 2', 'Co-occurrences'])
             st.dataframe(cooc_df, use_container_width=True)
             
-            # Add insight about co-occurrence
+            # insight about co-occurrence
             if len(display_edges) > 0:
                 top_pair = display_edges[0]
                 st.markdown(f"""
@@ -225,19 +216,17 @@ def entity_analysis_page():
         <p class="text-muted">Distribution of mentions across companies (single-company per post structure)</p>
     ''', unsafe_allow_html=True)
 
-    # Get company statistics
     company_counts = posts_df['company_standard'].value_counts()
     top_entities = company_counts.head(8).index.tolist()
 
     import plotly.express as px
 
-    # Prepare data for donut chart
+    #data for donut chart
     donut_data = pd.DataFrame({
         'Company': company_counts.index,
         'Mentions': company_counts.values
     })
 
-    # Create donut chart
     fig_donut = px.pie(
         donut_data, 
         values='Mentions', 
@@ -286,7 +275,6 @@ def entity_analysis_page():
         <p class="text-muted">Which companies generate the most discussion?</p>
     ''', unsafe_allow_html=True)
 
-    # Create bar chart for top 10 companies
     top_10_companies = company_counts.head(10)
 
     fig_bar = go.Figure()
@@ -340,12 +328,12 @@ def entity_analysis_page():
                 if 'num_comments' in entity_posts.columns:
                     st.metric("Total Comments", entity_posts['num_comments'].sum())
             
-            # Sentiment distribution for this company
+            #sent distribution for this company
             if 'sentiment' in entity_posts.columns:
                 st.markdown('<h4>Sentiment Distribution</h4>', unsafe_allow_html=True)
                 sent_counts = entity_posts['sentiment'].value_counts()
                 
-                # Sentiment pie chart for selected company
+                # sent  pie chart for selected company
                 sent_fig = go.Figure(data=[go.Pie(
                     labels=['Positive', 'Neutral', 'Negative'],
                     values=[
@@ -370,7 +358,6 @@ def entity_analysis_page():
             if 'sentiment' in recent_posts.columns:
                 display_cols.append('sentiment')
             
-            # Format datetime for better display
             if 'created' in recent_posts.columns:
                 recent_posts['created'] = pd.to_datetime(recent_posts['created']).dt.strftime('%Y-%m-%d %H:%M')
             

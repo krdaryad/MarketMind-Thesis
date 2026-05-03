@@ -1,6 +1,3 @@
-"""
-Global configuration, CSS, and constants.
-"""
 import streamlit as st
 from datetime import datetime
 import warnings
@@ -20,7 +17,7 @@ os.makedirs(MODELS_DIR, exist_ok=True)
 
 BASE_CSS = """
 <style>
-/* ===== 1. GLOBAL STYLES & GRID BACKGROUND ===== */
+/* GLOBAL STYLES & GRID BACKGROUND */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 .stApp {
@@ -29,7 +26,7 @@ BASE_CSS = """
     transition: all 0.3s ease;
 }
 
-/* ===== 2. SCANNING BAR ANIMATION ===== */
+/*  SCANNING BAR ANIMATION*/
 @keyframes global-scan {
     0% { transform: translateY(-100vh); }
     100% { transform: translateY(100vh); }
@@ -53,7 +50,7 @@ BASE_CSS = """
     animation: global-scan 10s linear infinite;
 }
 
-/* ===== 3. GLASS‑MORPHISM CARDS ===== */
+/* GLASS‑MORPHISM CARDS */
 .card, .metric-card {
     backdrop-filter: blur(15px);
     border-radius: 20px;
@@ -66,7 +63,7 @@ BASE_CSS = """
     transform: translateY(-5px);
 }
 
-/* ===== 4. PULSING LED NODE ===== */
+/* PULSING LED NODE */
 .led-node {
     height: 10px;
     width: 10px;
@@ -84,7 +81,7 @@ BASE_CSS = """
     100% { opacity: 1; transform: scale(1); }
 }
 
-/* ===== 5. TECH METRICS ===== */
+/* TECH METRICS */
 .tech-val {
     font-family: 'Courier New', monospace;
     font-size: 2.2rem;
@@ -99,14 +96,14 @@ BASE_CSS = """
     margin: 0;
 }
 
-/* ===== 6. SIDEBAR STYLING ===== */
+/* SIDeBAR STYLING  */
 [data-testid="stSidebar"] {
     backdrop-filter: blur(12px);
     border-right: 1px solid rgba(59, 130, 246, 0.2);
     transition: all 0.3s ease;
 }
 
-/* ===== 7. TOP MENU BUTTONS ===== */
+
 .top-menu {
     margin-bottom: 1rem;
 }
@@ -126,8 +123,6 @@ BASE_CSS = """
     font-weight: 600;
     box-shadow: 0 0 8px rgba(59,130,246,0.6);
 }
-
-/* ===== 8. LOADING SPINNER ===== */
 .loading-spinner {
     display: inline-block;
     width: 40px;
@@ -142,7 +137,6 @@ BASE_CSS = """
     to { transform: rotate(360deg); }
 }
 
-/* ===== 9. TOOLTIPS ===== */
 .tooltip {
     position: relative;
     display: inline-block;
@@ -166,7 +160,6 @@ BASE_CSS = """
     visibility: visible;
 }
 
-/* ===== 10. PROGRESS BAR ===== */
 .progress-bar {
     width: 100%;
     height: 6px;
@@ -180,7 +173,6 @@ BASE_CSS = """
     transition: width 0.3s ease;
 }
 
-/* ===== 11. ANOMALY ALERT ===== */
 .anomaly-alert {
     border-left: 4px solid #EF4444;
     border-radius: 8px;
@@ -188,7 +180,7 @@ BASE_CSS = """
     margin: 1rem 0;
 }
 
-/* ===== 12. PAGINATION ===== */
+
 .pagination {
     display: flex;
     justify-content: center;
@@ -196,18 +188,16 @@ BASE_CSS = """
     margin: 1rem 0;
 }
 
-/* ===== 13. DATA TABLE STYLING ===== */
+/*  DATA TABLE STYLING */
 .dataframe {
     border-radius: 12px;
     overflow: hidden;
 }
 
-/* ===== 14. TEXT MUTED ===== */
 .text-muted {
     font-size: 0.85rem;
 }
 
-/* ===== 15. CARD DESCRIPTION ===== */
 .card-description {
     font-size: 0.85rem;
     line-height: 1.5;
@@ -250,7 +240,6 @@ div.stButton > button:disabled {
     transform: none !important;
 }
 
-/* ===== SMALLER BUTTONS - GLOBAL OVERRIDE ===== */
 /* Sidebar buttons specifically */
 [data-testid="stSidebar"] .stButton > button {
     font-size: 0.65rem !important;
@@ -265,7 +254,7 @@ div.stButton > button:disabled {
     min-height: 24px !important;
 }
 
-/* ===== SIDEBAR TEXT-ONLY BUTTONS ===== */
+/*  SIDEBAR TEXT-ONLY BUTTONS  */
 [data-testid="stSidebar"] .stButton > button {
     background: transparent !important;
     border: none !important;
@@ -294,7 +283,7 @@ div.stButton > button:disabled {
     outline: none !important;
 }
 
-/* Primary buttons in sidebar (keep subtle) */
+/* Primary buttons in sidebar */
 [data-testid="stSidebar"] .stButton > button[kind="primary"] {
     background: transparent !important;
     color: #3B82F6 !important;
@@ -322,7 +311,7 @@ div.stButton > button:disabled {
     background: transparent !important;
 }
 
-/* ===== EXPANDER STYLING ===== */
+/*  EXPANDER STYLING  */
 .streamlit-expanderHeader {
     background: transparent !important;
     border: none !important;
@@ -427,7 +416,7 @@ DARK_CSS = """
     color: #E2E8F0;
 }
 
-/* Streamlit Buttons */
+/* Streamlit ButTons*/
 .stButton > button {
     background: rgba(59, 130, 246, 0.2);
     border: 1px solid rgba(59, 130, 246, 0.3);
@@ -446,7 +435,7 @@ DARK_CSS = """
     color: #E2E8F0;
 }
 
-/* Streamlit Metrics */
+/* SL Metrics */
 [data-testid="stMetricValue"] {
     color: #FFFFFF !important;
 }
@@ -455,7 +444,7 @@ DARK_CSS = """
     color: #8A8F99 !important;
 }
 
-/* Streamlit Tabs */
+/* SL Tabs */
 button[data-baseweb="tab"] p {
     color: #8A8F99 !important;
 }
@@ -464,20 +453,20 @@ button[aria-selected="true"] p {
     color: #3B82F6 !important;
 }
 
-/* Streamlit Expanders */
+/* SL Expanders */
 .streamlit-expanderHeader {
     background: rgba(10, 15, 25, 0.8);
     color: #E2E8F0;
     border-radius: 8px;
 }
 
-/* Streamlit DataFrames */
+/* SL DataFrames */
 [data-testid="stDataFrameResizable"], [data-testid="stTable"] {
     background-color: rgba(10, 15, 25, 0.8) !important;
     color: #E2E8F0 !important;
 }
 
-/* Streamlit Dropdown Menus */
+/* sl dropdown menus */
 div[data-baseweb="select"] > div {
     background-color: rgba(10, 15, 25, 0.9) !important;
     color: #E2E8F0 !important;
@@ -497,17 +486,16 @@ div[data-baseweb="popover"] li:hover {
     color: #3B82F6 !important;
 }
 
-/* Streamlit Info/Warning/Success */
+/* sl Info/Warning/Success */
 .stAlert {
     background: rgba(10, 15, 25, 0.9) !important;
 }
 
-/* Streamlit Spinner */
+/* sl spin */
 .stSpinner > div {
     border-color: #3B82F6 !important;
 }
 
-/* Top Menu Buttons */
 .top-menu button {
     background: rgba(10, 15, 25, 0.7) !important;
     border: 1px solid rgba(59, 130, 246, 0.3) !important;
@@ -544,7 +532,7 @@ div[data-baseweb="popover"] li:hover {
     color: #E2E8F0;
 }
 
-/* ===== THEME-AWARE TEXT CLASSES ===== */
+/*  THEME-AWARE TEXT CLASsES and backgrounds*/
 .theme-text-primary {
     color: #E2E8F0 !important;
 }
@@ -564,7 +552,6 @@ div[data-baseweb="popover"] li:hover {
     color: #F59E0B !important;
 }
 
-/* ===== THEME-AWARE BACKGROUNDS ===== */
 .theme-bg-card {
     background: rgba(10, 15, 25, 0.7) !important;
     border: 1px solid rgba(59, 130, 246, 0.2) !important;
@@ -582,7 +569,7 @@ div[data-baseweb="popover"] li:hover {
     background: rgba(59, 130, 246, 0.05) !important;
 }
 
-/* ===== THEME-AWARE BORDERS ===== */
+/* theme borders */
 .theme-border-positive {
     border-left: 3px solid #10B981 !important;
 }
@@ -596,7 +583,6 @@ div[data-baseweb="popover"] li:hover {
     border-left: 3px solid #3B82F6 !important;
 }
 
-/* ===== METRIC CARD STYLES ===== */
 .metric-value {
     font-size: 1.5rem;
     font-weight: bold;
@@ -628,7 +614,7 @@ div[data-baseweb="popover"] li:hover {
 
 LIGHT_CSS = """
 <style>
-/* 1. Global Background & Text */
+
 .stApp {
     background-color: #F1F5F9;
     background-image: 
@@ -637,8 +623,6 @@ LIGHT_CSS = """
     background-size: 40px 40px;
     color: #0F172A;
 }
-
-/* Text colors */
 .text-muted {
     color: #64748B !important;
 }
@@ -647,7 +631,6 @@ LIGHT_CSS = """
     color: #475569;
 }
 
-/* 2. Enhanced Card Visibility */
 .card, .metric-card {
     background: #FFFFFF !important;
     border: 1px solid #E2E8F0 !important;
@@ -660,7 +643,7 @@ LIGHT_CSS = """
     transform: translateY(-4px);
 }
 
-/* 3. Tech Metrics Contrast */
+/*  Tech Metrics Contrast */
 .tech-val {
     color: #1E40AF !important;
     text-shadow: none !important;
@@ -671,13 +654,12 @@ LIGHT_CSS = """
     font-weight: 600;
 }
 
-/* 4. Sidebar Light Mode */
 [data-testid="stSidebar"] {
     background-color: #FFFFFF !important;
     border-right: 1px solid #E2E8F0 !important;
 }
 
-/* 5. Streamlit Toolbar */
+
 [data-testid="stToolbar"] {
     background-color: #FFFFFF !important;
 }
@@ -686,7 +668,7 @@ LIGHT_CSS = """
     background: linear-gradient(90deg, #3B82F6, #F59E0B) !important;
 }
 
-/* 6. Inputs & Buttons */
+/* inputs & buttons */
 .stButton > button {
     background-color: #FFFFFF !important;
     color: #1E293B !important;
@@ -700,20 +682,19 @@ LIGHT_CSS = """
     background-color: #F8FAFC !important;
 }
 
-/* Primary buttons */
 .stButton button[data-testid="baseButton-primary"] {
     background-color: #3B82F6 !important;
     color: white !important;
     border: none !important;
 }
 
-/* 7. Form Inputs */
+/* Form Inputs */
 .stSelectbox > div, .stTextInput > div, .stNumberInput > div {
     background-color: #FFFFFF !important;
     border: 1px solid #E2E8F0 !important;
 }
 
-/* 8. Markdown Visibility */
+/* markdown vis */
 h1, h2, h3 {
     color: #0F172A !important;
 }
@@ -723,7 +704,7 @@ h1, h2, h3 {
     line-height: 1.6;
 }
 
-/* 9. Scanline Adjustment for Light Mode */
+/* scanline */
 .stApp::before {
     background: linear-gradient(to bottom, 
         transparent, 
@@ -733,7 +714,6 @@ h1, h2, h3 {
         transparent) !important;
 }
 
-/* 10. Streamlit Widgets Light Mode */
 [data-testid="stWidgetLabel"] p {
     color: #1E293B !important;
     font-weight: 600 !important;
@@ -747,7 +727,7 @@ h1, h2, h3 {
     color: #64748B !important;
 }
 
-/* 11. Tabs */
+/* Tabs */
 button[data-baseweb="tab"] p {
     color: #64748B !important;
 }
@@ -757,7 +737,6 @@ button[aria-selected="true"] p {
     font-weight: 700 !important;
 }
 
-/* 12. DataFrames */
 [data-testid="stTable"], [data-testid="stDataFrame"], [data-testid="stDataFrameResizable"] {
     background-color: #FFFFFF !important;
     color: #1E293B !important;
@@ -774,14 +753,12 @@ button[aria-selected="true"] p {
     background-color: #F1F5F9 !important;
 }
 
-/* 13. Expanders */
 .streamlit-expanderHeader {
     background-color: #FFFFFF !important;
     color: #1E293B !important;
     border-bottom: 1px solid #F1F5F9 !important;
 }
 
-/* 14. Dropdown Pickers */
 div[data-baseweb="select"] > div {
     background-color: #FFFFFF !important;
     color: #1E293B !important;
@@ -811,17 +788,14 @@ div[data-baseweb="select"] div[aria-hidden="true"] {
     color: #94A3B8 !important;
 }
 
-/* 15. Status Widgets */
 [data-testid="stStatusWidget"] {
     background-color: #FFFFFF !important;
 }
 
-/* 16. Alerts */
 .stAlert {
     background-color: #FFFFFF !important;
 }
 
-/* ===== THEME-AWARE TEXT CLASSES ===== */
 .theme-text-primary {
     color: #0F172A !important;
 }
@@ -841,7 +815,6 @@ div[data-baseweb="select"] div[aria-hidden="true"] {
     color: #D97706 !important;
 }
 
-/* ===== THEME-AWARE BACKGROUNDS ===== */
 .theme-bg-card {
     background: #FFFFFF !important;
     border: 1px solid #E2E8F0 !important;
@@ -873,7 +846,6 @@ div[data-baseweb="select"] div[aria-hidden="true"] {
     border-left: 3px solid #2563EB !important;
 }
 
-/* ===== METRIC CARD STYLES ===== */
 .metric-value {
     font-size: 1.5rem;
     font-weight: bold;
@@ -907,7 +879,7 @@ div[data-baseweb="select"] div[aria-hidden="true"] {
 
 MOBILE_CSS = """
 <style>
-/* Mobile Responsive Styles */
+
 @media (max-width: 768px) {
     .metric-card {
         padding: 0.75rem !important;
@@ -947,7 +919,7 @@ MOBILE_CSS = """
         margin-bottom: 0.5rem !important;
     }
     
-    /* Force sidebar to be collapsible and narrower */
+    /* forces sidebar to be collapsible and narrower */
     [data-testid="stSidebar"] {
         width: 280px !important;
         min-width: 280px !important;
@@ -964,13 +936,12 @@ MOBILE_CSS = """
         transform: translateX(0) !important;
     }
     
-    /* Main content takes full width */
     [data-testid="stMain"] {
         width: 100% !important;
         margin-left: 0 !important;
     }
     
-    /* Chart containers - prevent overflow */
+    /* this prevents overflow */
     .stPlotlyChart {
         overflow-x: auto !important;
     }
@@ -979,7 +950,7 @@ MOBILE_CSS = """
         min-width: 300px !important;
     }
     
-    /* Plotly legend - make horizontal on mobile */
+    /* Plotly legend! make! horizontal !on mobile */
     .legend {
         display: flex !important;
         flex-wrap: wrap !important;
@@ -992,14 +963,13 @@ MOBILE_CSS = """
         width: auto !important;
     }
     
-    /* Data tables - horizontal scroll */
+    /* ! horizontal scroll in data tables */
     .stDataFrame {
         overflow-x: auto !important;
         display: block !important;
         white-space: nowrap !important;
     }
     
-    /* Metric cards grid - apply to actual metrics */
     div[data-testid="stMetric"] {
         width: 48% !important;
         display: inline-block !important;
@@ -1013,32 +983,27 @@ MOBILE_CSS = """
         min-width: 100% !important;
     }
     
-    /* Reduce spacing between elements */
     .element-container {
         margin-bottom: 0.5rem !important;
     }
     
-    /* Hide less important elements on mobile (optional) */
     .system-kernel-footer {
         display: none !important;
     }
     
-    /* Make buttons full width on mobile */
     .stButton button {
         width: 100% !important;
     }
     
-    /* Adjust expander for touch */
     .streamlit-expanderHeader {
         padding: 0.75rem 0 !important;
     }
     
-    /* Better spacing for selectboxes */
     .stSelectbox label {
         font-size: 0.8rem !important;
     }
     
-    /* Make tabs scrollable horizontally */
+    /* too fix alter : make tabs scrollable horizontally ! done */
     .stTabs [data-baseweb="tab-list"] {
         display: flex !important;
         flex-wrap: nowrap !important;
@@ -1051,7 +1016,7 @@ MOBILE_CSS = """
         -webkit-overflow-scrolling: touch !important;
     }
     
-    /* Individual tab buttons */
+    
     .stTabs [data-baseweb="tab"] {
         flex: 0 0 auto !important;
         white-space: nowrap !important;
@@ -1059,13 +1024,11 @@ MOBILE_CSS = """
         font-size: 0.75rem !important;
         min-width: auto !important;
     }
-    
-    /* Tab content area */
     .stTabs [data-testid="stTabPanel"] {
         padding-top: 0.75rem !important;
     }
     
-    /* Hide scrollbar on Webkit browsers (optional - cleaner look) */
+    /* this would apparently hide scrollbar on Webkit browsers */
     .stTabs [data-baseweb="tab-list"]::-webkit-scrollbar {
         height: 3px !important;
     }
@@ -1081,9 +1044,9 @@ MOBILE_CSS = """
     }
 }
 
-/* Small phones (max-width: 480px) */
+/* Small phones (max-width: 480px) need to test this before defense r*/
 @media (max-width: 480px) {
-    /* Even smaller fonts */
+    
     h1 {
         font-size: 1.2rem !important;
     }
@@ -1092,18 +1055,16 @@ MOBILE_CSS = """
         font-size: 1rem !important;
     }
     
-    /* Single column for metrics */
     div[data-testid="stMetric"] {
         width: 100% !important;
         margin: 0.25rem 0 !important;
     }
-    
-    /* Hide secondary metrics row on very small screens */
+  
     .secondary-metrics {
         display: none !important;
     }
     
-    /* Reduce chart height further */
+  
     .js-plotly-plot {
         height: 250px !important;
     }
@@ -1119,7 +1080,7 @@ MOBILE_CSS = """
 
 
 def get_theme_css(is_dark=True):
-    """Return the appropriate CSS based on theme."""
+    
     base = BASE_CSS
     if is_dark:
         return base + DARK_CSS + MOBILE_CSS
@@ -1127,13 +1088,13 @@ def get_theme_css(is_dark=True):
         return base + LIGHT_CSS + MOBILE_CSS
 
 def apply_theme():
-    """Apply the current theme CSS to the app."""
+    
     is_dark = st.session_state.get('dark_mode', True)
     css = get_theme_css(is_dark)
     st.markdown(css, unsafe_allow_html=True)
 
 def get_plotly_template():
-    """Return the appropriate Plotly template based on current theme."""
+
     if st.session_state.get('dark_mode', True):
         return "plotly_dark"
     else:

@@ -1,7 +1,3 @@
-"""
-Sentiment Shock Detection - Identifies statistically significant sentiment regime shifts
-Using FRED economic data + Reddit sentiment for multi-source validation
-"""
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -17,7 +13,6 @@ def shock_detection_page():
     </div>
     """, unsafe_allow_html=True)
     
-    # Get data from session state
     sentiment_df = st.session_state.get('sentiment_data', pd.DataFrame())
     econ_df = st.session_state.get('econ_df', pd.DataFrame())
     
@@ -25,7 +20,7 @@ def shock_detection_page():
         st.warning("No sentiment data available. Please load data first.")
         return
     
-    # Standardize date columns
+    #standardizing
     sentiment_df = sentiment_df.copy()
     sentiment_df['date'] = pd.to_datetime(sentiment_df['date'])
     sentiment_df = sentiment_df.sort_values('date')
@@ -39,11 +34,9 @@ def shock_detection_page():
     sentiment_df['rolling_std'] = sentiment_df['avg_compound'].rolling(7, min_periods=1).std()
     sentiment_df['z_score'] = (sentiment_df['avg_compound'] - sentiment_df['rolling_mean']) / sentiment_df['rolling_std'].replace(0, 0.1)
     sentiment_df['is_shock'] = np.abs(sentiment_df['z_score']) > 2
+    sentiment_df['shock_cluster'] = (sentiment_df['is_shock'] != sentiment_df['is_shock'].shift()).cumsum()#identifies shock clusters (consecutive days)
     
-    # Identify shock clusters (consecutive days)
-    sentiment_df['shock_cluster'] = (sentiment_df['is_shock'] != sentiment_df['is_shock'].shift()).cumsum()
-    
-    # Extract shock events
+    #extracting shock events
     shocks = []
     for cluster, group in sentiment_df[sentiment_df['is_shock']].groupby('shock_cluster'):
         if len(group) >= 1:
@@ -92,7 +85,7 @@ def shock_detection_page():
             shared_xaxes=True
         )
         
-        # Row 1: Reddit Sentiment
+        #row1 reddit sentiment
         fig.add_trace(go.Scatter(
             x=sentiment_df['date'],
             y=sentiment_df['avg_compound'],
@@ -101,7 +94,7 @@ def shock_detection_page():
             line=dict(color='#3B82F6', width=2)
         ), row=1, col=1)
         
-        # Add shock markers for sentiment
+        #shock markers for sentiment
         shock_points = sentiment_df[sentiment_df['is_shock']]
         if not shock_points.empty:
             fig.add_trace(go.Scatter(
@@ -112,13 +105,12 @@ def shock_detection_page():
                 marker=dict(size=10, color='#EF4444', symbol='circle', line=dict(color='white', width=2))
             ), row=1, col=1)
         
-        # Add threshold lines for sentiment
         fig.add_hline(y=0.05, line_dash="dash", line_color="#10B981", row=1, col=1, 
                       annotation_text="Bullish Threshold")
         fig.add_hline(y=-0.05, line_dash="dash", line_color="#EF4444", row=1, col=1,
                       annotation_text="Bearish Threshold")
         
-        # Row 2+: FRED Indicators
+        #rows2+ FRED indicators
         row = 2
         if 'financial_stress' in econ_df.columns:
             fig.add_trace(go.Scatter(
@@ -206,7 +198,7 @@ def shock_detection_page():
         st.plotly_chart(fig, use_container_width=True)
         
     else:
-        # Fallback to sentiment-only mode
+        #fallback
         st.info("FRED data not available. Showing sentiment-only analysis.")
         
         fig = go.Figure()
@@ -218,8 +210,8 @@ def shock_detection_page():
             line=dict(color='#3B82F6', width=2)
         ))
         
-        # Add 2-standard deviation bands
-        fig.add_trace(go.Scatter(
+      
+        fig.add_trace(go.Scatter(  #adds 2-standard deviation bands
             x=sentiment_df['date'],
             y=sentiment_df['rolling_mean'] + 2 * sentiment_df['rolling_std'],
             mode='lines',
@@ -263,7 +255,7 @@ def shock_detection_page():
     st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown('<h3>Shock Statistics Summary</h3>', unsafe_allow_html=True)
     
-    # Calculate shock statistics
+    #calculatingshock statistics
     sentiment_shocks = sentiment_df['is_shock'].sum()
     sentiment_shock_pct = (sentiment_shocks / len(sentiment_df)) * 100
     
@@ -309,10 +301,9 @@ def shock_detection_page():
         st.markdown('<div class="card">', unsafe_allow_html=True)
         st.markdown('<h3>Thesis Insight: Multi-Source Validation</h3>', unsafe_allow_html=True)
         
-        # Find the most significant shock
         worst_shock = shock_df.loc[shock_df['peak_z'].idxmax()]
         
-        # Calculate correlation with FRED if available
+        #correlation with fred if possible 
         correlation_text = ""
         if not econ_df.empty and 'financial_stress' in econ_df.columns:
             merged_corr = pd.merge(

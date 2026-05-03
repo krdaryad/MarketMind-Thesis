@@ -1,6 +1,3 @@
-"""
-Volatility Trend Analysis - Rolling volatility and sentiment correlation
-"""
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -27,18 +24,16 @@ def volatility_analysis_page():
     sentiment_df['date'] = pd.to_datetime(sentiment_df['date'])
     sentiment_df = sentiment_df.sort_values('date')
     
-    # Calculate rolling volatility of sentiment
+    # counting rolling volatility of sentiment
     sentiment_df['sentiment_volatility'] = sentiment_df['avg_compound'].rolling(7, min_periods=3).std()
     sentiment_df['sentiment_volatility_30d'] = sentiment_df['avg_compound'].rolling(30, min_periods=10).std()
     
-    # Calculate volume volatility if available
+    #volume volatility if available
     if 'post_count' in sentiment_df.columns:
         sentiment_df['volume_volatility'] = sentiment_df['post_count'].rolling(7, min_periods=3).std()
     
-    # Get sentiment date strings for event filtering
     sentiment_date_strings = set(sentiment_df['date'].dt.strftime('%Y-%m-%d'))
     
-    # Create figure with subplots
     fig = make_subplots(
         rows=3, cols=1,
         subplot_titles=('Sentiment Score', 'Sentiment Volatility (7-day rolling)', 'Post Volume Volatility'),
@@ -46,7 +41,7 @@ def volatility_analysis_page():
         shared_xaxes=True
     )
     
-    # Row 1: Sentiment Score
+    #score
     fig.add_trace(go.Scatter(
         x=sentiment_df['date'],
         y=sentiment_df['avg_compound'],
@@ -62,7 +57,7 @@ def volatility_analysis_page():
     fig.add_hline(y=-0.05, line_dash="dash", line_color="#EF4444", row=1, col=1,
                   annotation_text="Bearish Threshold")
     
-    # Row 2: Sentiment Volatility
+    # volatility
     fig.add_trace(go.Scatter(
         x=sentiment_df['date'],
         y=sentiment_df['sentiment_volatility'],
@@ -74,12 +69,10 @@ def volatility_analysis_page():
         hovertemplate='<b>%{x|%b %d, %Y}</b><br>Volatility: %{y:.4f}<extra></extra>'
     ), row=2, col=1)
     
-    # Add high volatility threshold
     high_vol_threshold = sentiment_df['sentiment_volatility'].quantile(0.75)
     fig.add_hline(y=high_vol_threshold, line_dash="dash", line_color="#EF4444", row=2, col=1,
                   annotation_text=f"High Volatility (>{high_vol_threshold:.3f})")
     
-    # Row 3: Volume Volatility
     if 'volume_volatility' in sentiment_df.columns:
         fig.add_trace(go.Scatter(
             x=sentiment_df['date'],
@@ -96,10 +89,9 @@ def volatility_analysis_page():
     for date_str, event in MARKET_EVENTS.items():
         event_date = pd.to_datetime(date_str)
         
-        # Check if event date is in our data range
         if date_str in sentiment_date_strings:
             
-            # Get sentiment value at this date for marker position
+            #sentiment value at this date for marker position
             event_row = sentiment_df[sentiment_df['date'].dt.strftime('%Y-%m-%d') == date_str]
             if not event_row.empty:
                 y_pos_row1 = event_row['avg_compound'].iloc[0]
@@ -108,9 +100,8 @@ def volatility_analysis_page():
                 
                 color = get_event_color(event['category'])
                 
-                # Add vertical line to all rows
                 for row in range(1, 4):
-                    fig.add_vline(
+                    fig.add_vline( #vertical line
                         x=event_date,
                         line_dash="dash",
                         line_color=color,
@@ -119,7 +110,7 @@ def volatility_analysis_page():
                         row=row, col=1
                     )
                 
-                # Add marker dot to Row 1 (Sentiment Score)
+                #adding marker SS
                 fig.add_trace(go.Scatter(
                     x=[event_date],
                     y=[y_pos_row1],
@@ -138,7 +129,7 @@ def volatility_analysis_page():
                     showlegend=False
                 ), row=1, col=1)
                 
-                # Add marker dot to Row 2 (Volatility)
+                # adding marker volatility
                 fig.add_trace(go.Scatter(
                     x=[event_date],
                     y=[y_pos_row2],
@@ -157,7 +148,7 @@ def volatility_analysis_page():
                     showlegend=False
                 ), row=2, col=1)
                 
-                # Add marker dot to Row 3 (Volume Volatility) if available
+                # adding marker volume volatility
                 if y_pos_row3 is not None:
                     fig.add_trace(go.Scatter(
                         x=[event_date],
@@ -200,12 +191,10 @@ def volatility_analysis_page():
         volatility_sentiment_corr = sentiment_df['sentiment_volatility'].corr(sentiment_df['avg_compound'].abs())
         st.metric("Volatility-Sentiment Correlation", f"{volatility_sentiment_corr:.3f}")
     
-    # Find highest volatility event
     max_vol_idx = sentiment_df['sentiment_volatility'].idxmax()
     max_vol_date = sentiment_df.loc[max_vol_idx, 'date']
     max_vol_date_str = max_vol_date.strftime('%Y-%m-%d')
     
-    # Check if this date has an event
     if max_vol_date_str in MARKET_EVENTS:
         event = MARKET_EVENTS[max_vol_date_str]
         st.markdown(f"""

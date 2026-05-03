@@ -671,7 +671,7 @@ def economic_dashboard_page():
         paper_bgcolor='rgba(0,0,0,0)',
         font=dict(color='#8A8F99', size=11)
     )
-    
+    #
     st.plotly_chart(fig, use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
    

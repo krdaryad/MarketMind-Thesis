@@ -1,5 +1,4 @@
 """
-Financial Analysis Module - Phase 3 Market Analysis
 Handles financial data, market regimes, and emotion detection
 """
 import pandas as pd
@@ -18,26 +17,24 @@ class FinancialAnalyzer:
         self.behavioral_features = None
         
     def load_financial_data(self, filepath):
-        """Load financial forecasting dataset"""
+        """loading financial forecasting dataset"""
         self.financial_data = pd.read_csv(filepath)
         self.financial_data['Date'] = pd.to_datetime(self.financial_data['Date'])
         return self.financial_data
     
     def analyze_market_regimes(self, ticker='AAPL'):
-        """Analyze market regimes from financial data"""
+        """analysign market regimes"""
         ticker_data = self.financial_data[self.financial_data['Ticker'] == ticker].copy()
         
-        # Technical indicators
+        #technical indicators
         ticker_data['Daily_Return'] = ticker_data['Close'].pct_change() * 100
         ticker_data['Volatility_5day'] = ticker_data['Daily_Return'].rolling(window=5).std()
         ticker_data['MA_20'] = ticker_data['Close'].rolling(window=20).mean()
         
-        # Market regime classification
         ticker_data['Market_Regime'] = 'Neutral'
-        ticker_data.loc[ticker_data['Daily_Return'] > 2, 'Market_Regime'] = 'Euphoric'
+        ticker_data.loc[ticker_data['Daily_Return'] > 2, 'Market_Regime'] = 'Euphoric' # classyfying 
         ticker_data.loc[ticker_data['Daily_Return'] < -2, 'Market_Regime'] = 'Fearful'
         
-        # Stress classification
         ticker_data['Stress_Level'] = 'Low'
         ticker_data.loc[ticker_data['Market Stress Level'] > 0.5, 'Stress_Level'] = 'Medium'
         ticker_data.loc[ticker_data['Market Stress Level'] > 0.8, 'Stress_Level'] = 'High'
@@ -46,7 +43,7 @@ class FinancialAnalyzer:
         return ticker_data
     
     def detect_market_emotions(self, ticker_data):
-        """Detect market emotions from financial indicators"""
+        """ market emotions from financial indicators"""
         emotions = []
         for idx, row in ticker_data.iterrows():
             daily_return = row.get('Daily_Return', 0)
@@ -71,17 +68,15 @@ class FinancialAnalyzer:
         return ticker_data
     
     def cluster_behavioral_emotions(self, behavioral_features, n_clusters=4):
-        """Cluster behavioral data to find emotional patterns"""
+        """clustering behavioral data to find emotional patterns"""
         from sklearn.preprocessing import StandardScaler
         
         # Prepare features (exclude labels)
-        clustering_features = behavioral_features.select_dtypes(include=[np.number])
+        clustering_features = behavioral_features.select_dtypes(include=[np.number]) # features pero no labels
         
-        # Standardize
         scaler = StandardScaler()
         scaled_features = scaler.fit_transform(clustering_features.fillna(0))
         
-        # Cluster
         kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
         clusters = kmeans.fit_predict(scaled_features)
         

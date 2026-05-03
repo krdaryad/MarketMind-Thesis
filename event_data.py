@@ -1,9 +1,3 @@
-"""
-Event Data - Real-world market events for contextual tooltips
-Used across all pages to provide narrative context to sentiment spikes
-Includes February AND March 2021 events
-"""
-
 MARKET_EVENTS = {
    
     '2021-02-01': {
@@ -123,7 +117,7 @@ MARKET_EVENTS = {
 }
 
 def get_event_for_date(date):
-    """Get event info for a specific date."""
+    
     if hasattr(date, 'strftime'):
         date_str = date.strftime('%Y-%m-%d')
     else:
@@ -131,7 +125,7 @@ def get_event_for_date(date):
     return MARKET_EVENTS.get(date_str, None)
 
 def get_event_color(category):
-    """Return color based on event category."""
+    
     colors = {
         'positive': '#10B981',
         'negative': '#EF4444',
@@ -141,7 +135,7 @@ def get_event_color(category):
     return colors.get(category, '#8A8F99')
 
 def add_event_hover_text(df, date_col='date'):
-    """Add event information columns to dataframe for hover tooltips."""
+    
     df = df.copy()
     events = df[date_col].apply(get_event_for_date)
     df['event_title'] = events.apply(lambda x: x['title'] if x else '')

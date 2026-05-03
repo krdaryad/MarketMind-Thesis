@@ -1,6 +1,5 @@
 """
-Data Processing Module - Phase 1 & 2 Analysis
-Handles data loading, cleaning, feature engineering, and transformation
+data loading, cleaning, feature engineering, and transformation
 """
 import pandas as pd
 import numpy as np
@@ -22,19 +21,16 @@ class DataProcessor:
         self.tfidf_df = None
         
     def load_data(self, filepath):
-        """Load and prepare the dataset"""
         self.df = pd.read_csv(filepath)
-       # print(f"Loaded dataset: {self.df.shape}")
         
-        # Create main dataframe with text and label
         X = self.df[['text', 'label']].copy()
         X['label_name'] = X['label'].map({1.0: 'positive', 0.0: 'neutral', -1.0: 'negative'})
         
-        # Clean data
+        # cleaning
         X = X.dropna(subset=['text'])
         X = X.drop_duplicates(subset=['text'])
         
-        # Create sample
+        # sampling
         self.X_sample = X.sample(n=min(500, len(X)), random_state=42)
         
         return self.X_sample
@@ -44,7 +40,7 @@ class DataProcessor:
         if df is None:
             df = self.X_sample
             
-        # Feature creation
+        # creating features
         df['text_length'] = df['text'].str.len()
         df['word_count'] = df['text'].str.split().str.len()
         df['avg_word_length'] = df['text_length'] / df['word_count']
@@ -57,7 +53,7 @@ class DataProcessor:
         return df
     
     def create_term_document_matrix(self, df=None, max_features=1000):
-        """Create term-document matrix using CountVectorizer"""
+
         if df is None:
             df = self.X_sample
             
@@ -67,13 +63,12 @@ class DataProcessor:
         terms = self.count_vect.get_feature_names_out()
         self.tdm_df = pd.DataFrame(X_counts.toarray(), columns=terms, index=df.index)
         
-        # Calculate term frequencies
         term_frequencies = np.asarray(X_counts.sum(axis=0)).flatten()
         
         return self.tdm_df, term_frequencies, self.count_vect
     
     def create_tfidf_matrix(self, df=None, max_features=1000):
-        """Create TF-IDF matrix"""
+    
         if df is None:
             df = self.X_sample
             
@@ -86,7 +81,7 @@ class DataProcessor:
         return self.tfidf_df, self.tfidf_vect
     
     def reduce_dimensions(self, X, method='pca', n_components=2):
-        """Reduce dimensionality for visualization"""
+        
         if method == 'pca':
             reducer = PCA(n_components=n_components, random_state=42)
         elif method == 'svd':

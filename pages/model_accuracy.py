@@ -1,6 +1,3 @@
-"""
-Model Accuracy page.
-"""
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -16,29 +13,26 @@ def model_accuracy_page():
         <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
             <span style="font-size: 2rem;"></span>
             <h1 class="theme-text-primary" style="margin: 0;">Model Accuracy</h1>
-           
         </div>
         <p class="text-muted">ROC curves, classifier benchmarks, and clustering evaluation</p>
     </div>
-    """, unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
-    # Get posts data from session state
     posts_df = st.session_state.get('posts_data', pd.DataFrame())
     
     
     model_results = st.session_state.get('model_results', pd.DataFrame())
     
-    # If model_results is empty, try loading from pkl file
-    if model_results.empty and os.path.exists('model_results.pkl'):
+    if model_results.empty and os.path.exists('model_results.pkl'): #fallback
         try:
             model_results = joblib.load('model_results.pkl')
             st.session_state.model_results = model_results
         except Exception as e:
             st.warning(f"Could not load model_results.pkl: {e}")
     
-    # Use actual data from your trained models
+    
     if not model_results.empty:
-        # Extract actual values from your data
+        # actual values
         models = []
         for _, row in model_results.iterrows():
             model_name = row.get('Model', '')
@@ -47,7 +41,6 @@ def model_accuracy_page():
             recall = row.get('Recall', 0)
             auc = row.get('AUC', None)
             
-            # Assign inference speeds (these are still estimates - update with real values if you have them)
             if 'Naive Bayes' in model_name:
                 inference = "2.1ms"
             elif 'Decision Tree' in model_name:
@@ -64,12 +57,12 @@ def model_accuracy_page():
                 "accuracy": accuracy,
                 "precision": precision,
                 "recall": recall,
-                "auc": auc if auc else (accuracy + 0.05),  # Fallback if AUC missing
+                "auc": auc if auc else (accuracy + 0.05),  #fallback if AUC missing
                 "inference": inference,
                 "highlight": model_name == "SVM" or model_name == "Random Forest"
             })
     else:
-        # Fallback to your ACTUAL numbers (not hardcoded wrong ones!)
+        #fallback but my numbers
         models = [
             {"name": "Gaussian Naive Bayes", "accuracy": 0.768, "auc": 0.78, "precision": 0.780, "recall": 0.77, "inference": "2.1ms", "highlight": False},
             {"name": "Decision Tree", "accuracy": 0.712, "auc": 0.71, "precision": 0.720, "recall": 0.71, "inference": "1.8ms", "highlight": False},
@@ -77,12 +70,10 @@ def model_accuracy_page():
             {"name": "Random Forest", "accuracy": 0.824, "auc": 0.84, "precision": 0.840, "recall": 0.82, "inference": "8.6ms", "highlight": False},
         ]
 
-    # Create two columns for the top section
     col1, col2 = st.columns(2)
 
     with col1:
         
-        # Header with educational popup
         header_col1, header_col2 = st.columns([4, 1])
         with header_col1:
             st.markdown('<h3 class="theme-text-primary" style="margin: 0;"> ROC & Precision-Recall Curves</h3>', unsafe_allow_html=True)
@@ -100,7 +91,6 @@ def model_accuracy_page():
                 **Example:** AUC of 0.84 (SVM) means it correctly ranks a random positive above a random negative 84% of the time.
                 """)
         
-        # Display ROC curves
         fig = create_roc_curves()
         fig.update_layout(template=get_plotly_template())
         st.plotly_chart(fig, use_container_width=True)
@@ -108,15 +98,14 @@ def model_accuracy_page():
     with col2:
         st.markdown('<h3 class="theme-text-primary">Classifier Performance</h3>', unsafe_allow_html=True)
         
-        # Initialize selected model in session state if not exists
         if 'selected_model' not in st.session_state:
             st.session_state.selected_model = "SVM"
         
-        # Display model buttons
+        #model buttons
         for model in models:
             is_selected = st.session_state.selected_model == model["name"]
             
-            # Create button with custom styling
+            #buttons with custom styling
             if st.button(
                 f"**{model['name']}**  \n{model['inference']}",
                 key=f"model_{model['name']}",
@@ -126,7 +115,7 @@ def model_accuracy_page():
                 st.session_state.selected_model = model["name"]
                 st.rerun()
             
-            # Display metrics for the selected model
+            #metrics for the selected model
             if is_selected:
                 st.markdown(f"""
                 <div class="theme-bg-info-light" style="margin-top: -0.5rem; margin-bottom: 1rem; padding: 0.5rem; border-radius: 8px;">
@@ -146,8 +135,7 @@ def model_accuracy_page():
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
-        
-        # Insight note (using your actual best model)
+       
         best_model = max(models, key=lambda x: x['accuracy'])
         st.markdown(f"""
         <div class="theme-bg-warning-light theme-border-warning" style="border-radius: 12px; padding: 0.75rem; margin-top: 1rem;">
@@ -163,7 +151,6 @@ def model_accuracy_page():
     st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown('<h3 class="theme-text-primary">Model Performance Summary</h3>', unsafe_allow_html=True)
     
-    # Create a clean dataframe from your actual data
     performance_df = pd.DataFrame([{
         'Model': m['name'],
         'Accuracy': f"{m['accuracy']:.1%}",
@@ -177,7 +164,6 @@ def model_accuracy_page():
     st.markdown('</div>', unsafe_allow_html=True)
 
     
-    # Header with educational popup
     header_col1, header_col2 = st.columns([4, 1])
     with header_col1:
         st.markdown('<h3 class="theme-text-primary"> K-Means Silhouette Score Analysis</h3>', unsafe_allow_html=True)
@@ -194,8 +180,6 @@ def model_accuracy_page():
             **Example:** k=5 with score 0.55 means posts are well-separated into 5 sentiment/topic clusters.
             """)
     
-    
-    # Silhouette data (HARDCODED - for display only)
     silhouette_data = [
         {"k": 2, "score": 0.41, "label": "Too broad"},
         {"k": 3, "score": 0.52, "label": "Good"},
@@ -205,7 +189,6 @@ def model_accuracy_page():
         {"k": 7, "score": 0.39, "label": "Too granular"},
     ]
     
-    # Create a grid of metric cards (FIXED THEME)
     cols = st.columns(6)
     for idx, data in enumerate(silhouette_data):
         with cols[idx]:
@@ -219,7 +202,7 @@ def model_accuracy_page():
             </div>
             """, unsafe_allow_html=True)
     
-    # Progress bars for silhouette scores (FIXED THEME)
+    #progress bars for silhouette scores
     st.markdown('<div style="margin: 1.5rem 0 1rem 0;">', unsafe_allow_html=True)
     for data in silhouette_data:
         is_optimal = data["k"] == 5
@@ -245,7 +228,7 @@ def model_accuracy_page():
         from sklearn.cluster import KMeans
         from sklearn.preprocessing import StandardScaler
         
-        # Prepare data
+        #prepare data
         feature_cols = ['compound', 'score', 'num_comments']
         available_cols = [c for c in feature_cols if c in posts_df.columns]
         
@@ -254,7 +237,7 @@ def model_accuracy_page():
             scaler = StandardScaler()
             X_scaled = scaler.fit_transform(X)
             
-            # Calculate Davies-Bouldin for different k values (LIVE CALCULATION)
+            #calculating Davies-Bouldin for different k values
             k_values = range(2, 8)
             db_scores = []
             sil_scores = []
@@ -265,7 +248,6 @@ def model_accuracy_page():
                 db_scores.append(davies_bouldin_score(X_scaled, labels))
                 sil_scores.append(silhouette_score(X_scaled, labels))
             
-            # Display results
             col1, col2 = st.columns(2)
             
             with col1:
@@ -315,20 +297,18 @@ def model_accuracy_page():
                 
                 optimal_k_sil = k_values[sil_scores.index(max(sil_scores))]
                 st.caption(f"Optimal k by Silhouette: {optimal_k_sil}")
-            
-            # Manual validation - show sample posts from each cluster
+       
             st.markdown('<h4 class="theme-text-primary">Manual Cluster Validation (Sample Posts)</h4>', unsafe_allow_html=True)
             
-            # Use optimal k from Silhouette
             optimal_k = optimal_k_sil
             kmeans_opt = KMeans(n_clusters=optimal_k, random_state=42, n_init=10)
             labels_opt = kmeans_opt.fit_predict(X_scaled)
             
-            # Add cluster labels to dataframe
+            
             posts_with_clusters = posts_df.loc[X.index].copy()
             posts_with_clusters['cluster'] = labels_opt
             
-            # Show sample posts from each cluster
+            #sample posts from each cluster
             for i in range(optimal_k):
                 cluster_posts = posts_with_clusters[posts_with_clusters['cluster'] == i]
                 avg_sentiment = cluster_posts['compound'].mean()
@@ -376,15 +356,15 @@ def model_accuracy_page():
         from sklearn.cluster import KMeans
         from sklearn.metrics import silhouette_score
         
-        # Prepare features for clustering
+        #features for clustering
         feature_cols = ['compound', 'score', 'num_comments']
         available_cols = [c for c in feature_cols if c in posts_df.columns]
         
         if len(available_cols) >= 2:
-            # Extract features
+            #extrecting features
             X = posts_df[available_cols].dropna()
             
-            # Standardize
+            #standardize
             scaler = StandardScaler()
             X_scaled = scaler.fit_transform(X)
             
@@ -392,11 +372,10 @@ def model_accuracy_page():
             pca = PCA(n_components=2)
             X_pca = pca.fit_transform(X_scaled)
             
-            # K-means clustering
+            #K-means clustering
             kmeans = KMeans(n_clusters=4, random_state=42, n_init=10)
             clusters = kmeans.fit_predict(X_scaled)
             
-            # Create cluster labels based on sentiment
             cluster_labels = {}
             for i in range(4):
                 cluster_sentiment = posts_df.loc[X.index[clusters == i], 'compound'].mean()
@@ -412,7 +391,6 @@ def model_accuracy_page():
                     label = "Fear/Panic"
                 cluster_labels[i] = label
             
-            # Create visualization
             fig = go.Figure()
             
             colors = ['#10B981', '#3B82F6', '#8A8F99', '#EF4444']
@@ -434,7 +412,7 @@ def model_accuracy_page():
                     hovertemplate='Title: %{text}<br>Cluster: ' + cluster_labels[i] + '<extra></extra>'
                 ))
             
-            # Add cluster centers
+            #cluster centers
             centers_pca = pca.transform(scaler.transform(kmeans.cluster_centers_))
             fig.add_trace(go.Scatter(
                 x=centers_pca[:, 0],
@@ -458,7 +436,7 @@ def model_accuracy_page():
             
             st.plotly_chart(fig, use_container_width=True)
             
-            # Add cluster statistics
+            #cluster statistics
             st.markdown('<h4 class="theme-text-primary">Cluster Statistics</h4>', unsafe_allow_html=True)
             cluster_stats = []
             for i in range(4):
@@ -471,7 +449,6 @@ def model_accuracy_page():
                 })
             st.dataframe(pd.DataFrame(cluster_stats), use_container_width=True)
             
-            # Silhouette Score
             sil_score = silhouette_score(X_scaled, clusters)
             st.metric("Silhouette Score (Cluster Cohesion)", f"{sil_score:.3f}", 
                       help="Closer to 1 = well-separated clusters")
@@ -482,7 +459,6 @@ def model_accuracy_page():
 
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # Insight note (FIXED THEME)
     st.markdown("""
     <div class="theme-bg-info-light theme-border-info" style="border-radius: 12px; padding: 0.75rem; margin-top: 1rem;">
         <p class="text-muted" style="font-size: 0.75rem; margin: 0;">

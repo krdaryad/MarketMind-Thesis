@@ -4,7 +4,6 @@ import pandas as pd
 def glossary_page():
     st.set_page_config(page_title="Interactive Glossary", layout="wide")
 
-    # Custom CSS to make expander label match definition text colour
     st.markdown("""
     <style>
         details.streamlit-expander summary {
@@ -16,9 +15,8 @@ def glossary_page():
     </style>
     """, unsafe_allow_html=True)
 
-    # --- 1. DATASET (original + new multimedia/design terms) ---
     glossary = [
-        # Original entries
+        
         {"term": "ARIMA", "category": "stats", "definition": "Auto-Regressive Integrated Moving Average. A time-series forecasting model.", "formula": r"Y_t = c + \sum \phi_i Y_{t-i} + \sum \theta_j \epsilon_{t-j} + \epsilon_t", "related": ["RMSE", "Stationarity"]},
         {"term": "AUC", "category": "ml", "definition": "Area Under the (ROC) Curve. Measures overall classifier performance.", "related": ["ROC Curve", "TPR", "FPR"]},
         {"term": "Bag of Words", "category": "nlp", "definition": "A text representation that counts word occurrences, ignoring grammar.", "related": ["TF-IDF", "TDM"]},
@@ -46,8 +44,6 @@ def glossary_page():
         {"term": "TPR", "category": "ml", "definition": "Proportion of actual positives correctly identified.", "formula": r"TPR = \frac{TP}{TP + FN}", "related": ["FPR"]},
         {"term": "VIX", "category": "finance", "definition": "Volatility Index measuring market 'fear' gauge.", "formula": r"VIX \approx \sigma \sqrt{\frac{365}{30}} 100", "related": ["S&P 500"]},
         {"term": "Word Cloud", "category": "stats", "definition": "Visual showing word size based on frequency.", "related": ["Bag of Words"]},
-        
-        # NEW: Multimedia, Design, UX terms
         {"term": "Gestalt Principles", "category": "design", "definition": "Laws of human perception (proximity, similarity, continuity) used to group related data metrics in the UI.", "related": ["Pre-attentive Attributes", "Visual Hierarchy"]},
         {"term": "Pre-attentive Attributes", "category": "design", "definition": "Visual properties processed before conscious attention (<250ms), essential for instant 'Market Panic' red alerts.", "related": ["Color Theory", "Gestalt Principles"]},
         {"term": "Glassmorphism", "category": "design", "definition": "UI style using frosted glass, background blur, and semi‑transparency to create depth and visual hierarchy without clutter.", "related": ["Visual Semiotics", "CSS"]},
@@ -63,13 +59,11 @@ def glossary_page():
         {"term": "Black Box Problem", "category": "ml", "definition": "The challenge of AI models being too complex for humans to see 'inside' – which this design explicitly solves.", "related": ["Explainable AI", "Model Transparency"]}
     ]
 
-    # --- 2. SIDEBAR (SEARCH & FILTER) ---
     with st.sidebar:
         st.header(" Controls")
         
         search_query = st.text_input("Search terms...", placeholder="Type to filter...")
         
-        # Category filter – put Design/UX/Multimedia on top (as requested)
         cat_options = {
             "All Categories": None,
             "Design": "design",
@@ -102,11 +96,11 @@ def glossary_page():
                 use_container_width=True
             )
 
-    # --- 3. MAIN UI ---
+
     st.title(" Knowledge Glossary")
     st.write(f"Showing **{len(filtered_glossary)}** matching terms")
 
-    # Layout colours – updated with new categories (pink, cyan, orange)
+    
     styles = {
         "ml": {"c": "#3B82F6", "bg": "rgba(59,130,246,0.1)"},
         "nlp": {"c": "#F59E0B", "bg": "rgba(245,158,11,0.1)"},
@@ -117,7 +111,6 @@ def glossary_page():
         "multimedia": {"c": "#F97316", "bg": "rgba(249,115,22,0.1)"}
     }
 
-    # Grid Rendering (3 columns)
     cols = st.columns(3)
     for idx, item in enumerate(filtered_glossary):
         with cols[idx % 3]:

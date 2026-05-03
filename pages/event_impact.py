@@ -1,6 +1,3 @@
-"""
-Event Impact Assessment - Analyzing market reactions to specific events
-"""
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -26,7 +23,6 @@ def event_impact_page():
     sentiment_df = sentiment_df.copy()
     sentiment_df['date'] = pd.to_datetime(sentiment_df['date'])
     
-    # Define key events (you can modify these)
     events = {
         'GameStop Peak': '2021-01-28',
         'Fed Rate Decision': '2021-03-17',
@@ -46,11 +42,10 @@ def event_impact_page():
     
     event_date = pd.to_datetime(events[selected_event])
     
-    # Calculate date range
+    # date range
     start_date = event_date - timedelta(days=event_window)
     end_date = event_date + timedelta(days=event_window)
     
-    # Filter data
     event_sentiment = sentiment_df[(sentiment_df['date'] >= start_date) & 
                                    (sentiment_df['date'] <= end_date)].copy()
     
@@ -61,7 +56,7 @@ def event_impact_page():
     
     event_sentiment['days_from_event'] = (event_sentiment['date'] - event_date).dt.days
     
-    # Calculate pre and post averages
+    # pre and post averages
     pre_event = event_sentiment[event_sentiment['days_from_event'] < 0]
     post_event = event_sentiment[event_sentiment['days_from_event'] > 0]
     day_of_event = event_sentiment[event_sentiment['days_from_event'] == 0]
@@ -70,7 +65,6 @@ def event_impact_page():
     post_avg = post_event['avg_compound'].mean() if not post_event.empty else 0
     event_day_avg = day_of_event['avg_compound'].mean() if not day_of_event.empty else 0
     
-    # Create visualization
     fig = go.Figure()
     
     fig.add_trace(go.Scatter(
@@ -82,11 +76,11 @@ def event_impact_page():
         marker=dict(size=8, color='#3B82F6')
     ))
     
-    # Add event marker
+    # this adds an event marker
     fig.add_vline(x=0, line_dash="dash", line_color="#EF4444",
                   annotation_text=selected_event, annotation_position="top")
     
-    # Add pre/post averages
+    # adds pre/post averages
     fig.add_hline(y=pre_avg, line_dash="dot", line_color="#F59E0B",
                   annotation_text=f"Pre-Event Avg: {pre_avg:.3f}")
     fig.add_hline(y=post_avg, line_dash="dot", line_color="#10B981",
@@ -104,7 +98,6 @@ def event_impact_page():
     
     st.plotly_chart(fig, use_container_width=True)
     
-    # Impact metrics
     st.markdown('<h4>Event Impact Metrics</h4>', unsafe_allow_html=True)
     
     col1, col2, col3, col4 = st.columns(4)
@@ -119,7 +112,7 @@ def event_impact_page():
     with col4:
         st.metric("Post-Event Avg", f"{post_avg:.3f}")
     
-    # Impact classification
+    #impact classification
     if delta > 0.1:
         impact = "Strong Positive"
         color = "#10B981"

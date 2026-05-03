@@ -1,6 +1,3 @@
-"""
-Sentiment Trends page - using CSV data with tutorial highlights.
-"""
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -23,7 +20,6 @@ def sentiment_trends_page():
         st.warning("No sentiment data available. Please check your data source.")
         return
 
-    # Ensure date column is datetime
     sentiment_df['date'] = pd.to_datetime(sentiment_df['date'])
 
     companies = get_companies_list(posts_df) if not posts_df.empty else []
@@ -46,10 +42,10 @@ def sentiment_trends_page():
                 <h4> Sentiment with Real-World Events</h4>
             ''', unsafe_allow_html=True)
     st.markdown('<p class="text-muted">Hover over markers to see what caused sentiment spikes</p>', unsafe_allow_html=True)
-    # Create base figure
+    
     fig_events = go.Figure()
 
-    # Add main sentiment line
+    #main sentiment line
     fig_events.add_trace(go.Scatter(
         x=sentiment_df['date'],
         y=sentiment_df['avg_compound'],
@@ -59,23 +55,20 @@ def sentiment_trends_page():
         hovertemplate='<b>%{x|%b %d, %Y}</b><br>Sentiment: %{y:.3f}<extra></extra>'
     ))
 
-    # Convert sentiment_df dates to string for easier comparison
-    sentiment_date_strings = set(sentiment_df['date'].dt.strftime('%Y-%m-%d'))
+    sentiment_date_strings = set(sentiment_df['date'].dt.strftime('%Y-%m-%d')) #this convert sentiment_df dates to string
 
-    # Add event markers
+    #adding event markers
     for date_str, event in MARKET_EVENTS.items():
         event_date = pd.to_datetime(date_str)
         
-        # Check if event date is in our data range
         if date_str in sentiment_date_strings:
-            # Get sentiment value at this exact date
+     
             event_row = sentiment_df[sentiment_df['date'].dt.strftime('%Y-%m-%d') == date_str]
             if not event_row.empty:
                 y_pos = event_row['avg_compound'].iloc[0]
                 
                 color = get_event_color(event['category'])
                 
-                # Add vertical line
                 fig_events.add_vline(
                     x=event_date,
                     line_dash="dash",
@@ -84,7 +77,6 @@ def sentiment_trends_page():
                     opacity=0.5
                 )
                 
-                # Add marker dot
                 fig_events.add_trace(go.Scatter(
                     x=[event_date],
                     y=[y_pos],

@@ -352,7 +352,7 @@ def learning_hub_page():
             if completed_count < total_count:
                 st.info(" You've reached the end. Continue practicing to complete all lessons.")
     
-    # Survey section (unchanged)
+    # Survey section
     if not st.session_state.survey_submitted:
         st.markdown("---")
         st.markdown("### System Evaluation Survey")

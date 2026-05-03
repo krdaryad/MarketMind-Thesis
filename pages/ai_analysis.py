@@ -28,7 +28,7 @@ def ai_analysis_page():
 
     with col1:
         
-        # header + educational popup
+        # header + educational popupp
         header_col1, header_col2 = st.columns([4, 1])
         with header_col1:
             st.markdown('<h3 class="theme-text-primary">Discovered Topics (LDA)</h3>', unsafe_allow_html=True)

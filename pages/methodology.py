@@ -1,12 +1,11 @@
 import streamlit as st
 
 def methodology_page():
-    # Page Header
+
     st.title("Methodology")
     st.markdown('<p style="color: #64748b; font-size: 1.1rem;">Data pipeline, feature engineering, and analysis methods</p>', unsafe_allow_html=True)
     st.divider()
     
-    # Summary Metrics for Data Statistics
     posts_df = st.session_state.get('posts_data', None)
     if posts_df is not None and not posts_df.empty:
         total_posts = len(posts_df)
@@ -18,7 +17,7 @@ def methodology_page():
         m2.metric("Companies", unique_companies)
         m3.metric("Avg Score", f"{avg_score:.1f}")
     
-    st.write("##")  # Spacer
+    st.write("##")  
 
     col1, col2 = st.columns(2, gap="large")
     
@@ -72,8 +71,7 @@ def methodology_page():
             """)
 
     st.write("##")
-    
-   # Future Roadmap & Multimedia Evolution
+
     with st.expander("Future Roadmap: From Data Visualization to Immersive Experience", expanded=True):
         c1, c2 = st.columns(2)
         
