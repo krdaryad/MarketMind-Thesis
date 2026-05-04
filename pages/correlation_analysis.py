@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import numpy as np  
@@ -365,14 +364,19 @@ def correlation_analysis_page():
             
             confusion = pd.crosstab(aligned['sentiment_direction'], aligned['market_direction'])
             
+            if st.session_state.get('dark_mode', True):
+                text_color = '#E2E8F0'   # light grey (dark theme)
+            else:
+                text_color = '#475569'   # dark grey (light theme)
+
             fig = go.Figure(data=go.Heatmap(
                 z=confusion.values,
                 x=confusion.columns,
                 y=confusion.index,
-                colorscale='Viridis',
+                colorscale='Blues',          # Only shades of Blue – one accent colour
                 text=confusion.values,
                 texttemplate='%{text}',
-                textfont={"size": 14}
+                textfont={"size": 14, "color": text_color}
             ))
             
             fig.update_layout(
@@ -430,72 +434,7 @@ def correlation_analysis_page():
 
     st.markdown('</div>', unsafe_allow_html=True)
     
-    st.markdown('<h3>Economic Indicator Matrix</h3>', unsafe_allow_html=True)
-    st.markdown('<p class="text-muted">Multi-indicator correlation matrix for economic analysis</p>', unsafe_allow_html=True)
-
-    econ_df = st.session_state.get('econ_df', pd.DataFrame())
-
-    if not econ_df.empty:
-        
-        econ_cols = ['gdp', 'inflation', 'interest_rate', 'unemployment', 'consumer_sentiment', 
-                     'financial_stress', 'vix', 'close']
-        available_econ_cols = [c for c in econ_cols if c in econ_df.columns]
-        
-        if len(available_econ_cols) >= 2:
-            corr_matrix = econ_df[available_econ_cols].corr()
-            
-            display_names = {
-                'gdp': 'GDP Growth',
-                'inflation': 'Inflation',
-                'interest_rate': 'Fed Rate',
-                'unemployment': 'Unemployment',
-                'consumer_sentiment': 'Consumer Sentiment',
-                'financial_stress': 'Financial Stress',
-                'vix': 'VIX',
-                'close': 'Stock Price'
-            }
-            
-            rename_dict = {k: v for k, v in display_names.items() if k in corr_matrix.columns}
-            corr_matrix = corr_matrix.rename(index=rename_dict, columns=rename_dict)
-            
-            fig = go.Figure(data=go.Heatmap(
-                z=corr_matrix.values,
-                x=corr_matrix.columns,
-                y=corr_matrix.index,
-                colorscale='RdBu',
-                zmid=0,
-                text=np.round(corr_matrix.values, 2),
-                texttemplate='%{text}',
-                textfont={"size": 10},
-                hoverongaps=False
-            ))
-            
-            fig.update_layout(
-                title="Economic Indicator Correlation Matrix",
-                height=500,
-                plot_bgcolor='rgba(0,0,0,0)',
-                paper_bgcolor='rgba(0,0,0,0)',
-                font=dict(color='#8A8F99')
-            )
-            
-            st.plotly_chart(fig, use_container_width=True)
-            
-            st.markdown("""
-            <div style="margin-top: 1rem; background: rgba(59,130,246,0.05); border-radius: 8px; padding: 0.75rem;">
-                <p style="font-size: 0.75rem; margin: 0;">
-                    <strong>Key Economic Relationships:</strong><br>
-                    • Red = Positive correlation (move together)<br>
-                    • Blue = Negative correlation (move opposite)<br>
-                    • Values near 0 indicate no linear relationship
-                </p>
-            </div>
-            """, unsafe_allow_html=True)
-        else:
-            st.info("Not enough economic indicators for matrix")
-    else:
-        st.info("Economic data not available. Run Economic Dashboard first.")
-
-    st.markdown('</div>', unsafe_allow_html=True)
+    
     
     st.markdown('<h3>Summary Statistics</h3>', unsafe_allow_html=True)
     

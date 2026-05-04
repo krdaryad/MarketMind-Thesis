@@ -131,18 +131,24 @@ def sentiment_trends_page():
             merged = pd.merge(sentiment_copy, market_copy, left_on='date', right_on='date', how='inner')
             if not merged.empty:
                 merged['sentiment_ratio'] = merged['positive'] / (merged['positive'] + merged['negative'] + 1)
-                
+                custom_colorscale = [
+                    [0.0, '#EF4444'],   # Red
+                    [0.5, '#8A8F99'],   # Gray (neutral)
+                    [1.0, '#10B981']    # Green
+                ]
+
                 fig = go.Figure()
                 fig.add_trace(go.Scatter(
                     x=merged['vix'], 
                     y=merged['sentiment_ratio'],
                     mode='markers',
                     marker=dict(
-                        size=10, 
-                        color=merged['anomaly_score'] if 'anomaly_score' in merged.columns else merged['sentiment_ratio'], 
-                        colorscale='Viridis', 
+                        size=5 + 15 * merged['anomaly_score'].fillna(0),  # scale 5-20
+                        
+                        color=merged['sentiment_ratio'],   # continuous variable
+                        colorscale=custom_colorscale, 
                         showscale=True,
-                        colorbar=dict(title="Anomaly Score")
+                        colorbar=dict(title="Sentiment Ratio")
                     ),
                     text=merged['date'].dt.strftime('%Y-%m-%d'),
                     hovertemplate='Date: %{text}<br>VIX: %{x:.1f}<br>Sentiment Ratio: %{y:.2f}<extra></extra>'
@@ -299,7 +305,7 @@ def sentiment_trends_page():
                     level_color = "#8A8F99"
                 elif current_level > 0.35:
                     level_text = "Mildly Negative"
-                    level_color = "#F97316"
+                    level_color = "#F59E0B"
                 else:
                     level_text = "Depressed / Fearful"
                     level_color = "#EF4444"
@@ -343,10 +349,35 @@ def sentiment_trends_page():
                 if len(clean_word) > 2 and clean_word not in stop_words:
                     word_freq[clean_word] += 1
             
-            display_word_cloud(dict(word_freq.most_common(100)))
+            from wordcloud import WordCloud
+            import matplotlib.pyplot as plt
+            
+            def single_color_func(word, font_size, position, orientation, random_state=None, **kwargs):
+                return "#3B82F6"  # Blue – primary accent
+            
+            wordcloud = WordCloud(
+                width=800,
+                height=400,
+                background_color='#05070A',      # match dark theme background
+                color_func=single_color_func,
+                max_words=100
+            ).generate_from_frequencies(dict(word_freq.most_common(100)))
+            
+            # Create figure with no padding and matching background
+            fig, ax = plt.subplots(figsize=(10, 5), facecolor='#05070A')
+            ax.imshow(wordcloud, interpolation='bilinear')
+            ax.axis('off')
+            # Remove all spines and set margins to zero
+            ax.spines['top'].set_visible(False)
+            ax.spines['right'].set_visible(False)
+            ax.spines['bottom'].set_visible(False)
+            ax.spines['left'].set_visible(False)
+            ax.set_facecolor('#05070A')
+            fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
+            st.pyplot(fig, use_container_width=True)
+            plt.close(fig)
         else:
             st.info("No posts to display.")
         st.markdown('</div>', unsafe_allow_html=True)
-
 if __name__ == "__main__":
     sentiment_trends_page()

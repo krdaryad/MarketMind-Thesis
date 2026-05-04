@@ -116,7 +116,12 @@ def ai_analysis_page():
                 'GNB': [0.768, 0.780, 0.77, 0.775, 0.9],
                 'Decision Tree': [0.712, 0.720, 0.71, 0.715, 0.8],
             }
-        
+        model_colors = {
+        'Random Forest': '#3B82F6',
+        'SVM': '#10B981',
+        'GNB': '#EF4444',
+        'Decision Tree': '#F59E0B'
+    }
         #  radar chart using Plotly
         fig = go.Figure()
         categories = ['Accuracy', 'Precision', 'Recall', 'F1 Score', 'Inference Speed']
@@ -127,13 +132,14 @@ def ai_analysis_page():
             categories_closed = categories + [categories[0]]
             
             fig.add_trace(go.Scatterpolar(
-                r=values_closed,
-                theta=categories_closed,
-                fill='toself',
-                name=model_name,
-                line=dict(width=2),
-                opacity=0.7
-            ))
+            r=values_closed,
+            theta=categories_closed,
+            fill='toself',
+            name=model_name,
+            line=dict(width=2, color=model_colors.get(model_name, '#3B82F6')),
+            opacity=0.7,
+            marker=dict(color=model_colors.get(model_name, '#3B82F6'))
+        ))
         
         fig.update_layout(
             polar=dict(
@@ -199,7 +205,7 @@ def ai_analysis_page():
             {"range": "Strongly Positive (>0.5)", "count": int(pos_total * 0.3) if pos_total > 0 else 0, "color": "#059669"},
             {"range": "Positive (0.05 to 0.5)", "count": int(pos_total * 0.7) if pos_total > 0 else 0, "color": "#10B981"},
             {"range": "Neutral (-0.05 to 0.05)", "count": neu_total, "color": "#8A8F99"},
-            {"range": "Negative (-0.5 to -0.05)", "count": int(neg_total * 0.7) if neg_total > 0 else 0, "color": "#F97316"},
+            {"range": "Negative (-0.5 to -0.05)", "count": int(neg_total * 0.7) if neg_total > 0 else 0, "color": "#F59E0B"},
             {"range": "Strongly Negative (< -0.5)", "count": int(neg_total * 0.3) if neg_total > 0 else 0, "color": "#EF4444"},
         ]
         
@@ -214,7 +220,7 @@ def ai_analysis_page():
             {"range": "Strongly Positive (>0.5)", "count": 91, "color": "#059669"},
             {"range": "Positive (0.05 to 0.5)", "count": 189, "color": "#10B981"},
             {"range": "Neutral (-0.05 to 0.05)", "count": 312, "color": "#8A8F99"},
-            {"range": "Negative (-0.5 to -0.05)", "count": 145, "color": "#F97316"},
+            {"range": "Negative (-0.5 to -0.05)", "count": 145, "color": "#F59E0B"},
             {"range": "Strongly Negative (< -0.5)", "count": 87, "color": "#EF4444"},
         ]
         avg_compound = 0.08

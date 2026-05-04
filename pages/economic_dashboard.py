@@ -155,7 +155,7 @@ def economic_dashboard_page():
                     y=merged_sentiment['consumer_sentiment_norm'],
                     mode='lines',
                     name='UMich Consumer Sentiment (normalized)',
-                    line=dict(color='#EC4899', width=2, dash='dot')
+                    line=dict(color='#3B82F6', width=2, dash='dot')
                 ), secondary_y=True)
                 
                 fig_sentiment.add_trace(go.Scatter(
@@ -622,7 +622,7 @@ def economic_dashboard_page():
         fig.add_trace(go.Scatter(
             x=econ_df['date'], y=econ_df['unemployment'], 
             mode='lines', name='Unemployment',
-            line=dict(color='#8B5CF6', width=2),
+            line=dict(color='#3B82F6', width=2),
             fill='tozeroy'
         ), row=2, col=2)
         fig.add_hline(y=5, line_dash="dash", line_color="#10B981", row=2, col=2, annotation_text="Full Employment")
@@ -631,7 +631,7 @@ def economic_dashboard_page():
         fig.add_trace(go.Scatter(
             x=econ_df['date'], y=econ_df['consumer_sentiment'], 
             mode='lines+markers', name='Consumer Sentiment',
-            line=dict(color='#EC4899', width=2),
+            line=dict(color='#3B82F6', width=2),
             marker=dict(size=4)
         ), row=3, col=1)
         fig.add_hline(y=100, line_dash="dash", line_color="#10B981", row=3, col=1, annotation_text="Optimistic")

@@ -148,7 +148,7 @@ def model_accuracy_page():
         """, unsafe_allow_html=True)
 
     
-    st.markdown('<div class="card">', unsafe_allow_html=True)
+   
     st.markdown('<h3 class="theme-text-primary">Model Performance Summary</h3>', unsafe_allow_html=True)
     
     performance_df = pd.DataFrame([{
@@ -219,8 +219,6 @@ def model_accuracy_page():
         """, unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
-
-    st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown('<h3 class="theme-text-primary">Advanced Cluster Validation</h3>', unsafe_allow_html=True)
 
     if not posts_df.empty and 'compound' in posts_df.columns:

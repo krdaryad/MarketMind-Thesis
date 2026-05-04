@@ -13,7 +13,7 @@ from utils import (
 )
 st.set_page_config(
     page_title="MarketMind AI",
-    page_icon="📊",
+    page_icon="images/logo_for_tab.png",
     layout="wide",
   
 )

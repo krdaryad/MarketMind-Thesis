@@ -387,7 +387,7 @@ DARK_CSS = """
 }
 
 .tech-label {
-    color: #64748B;
+    color: #8DA0B6;
 }
 
 /* Streamlit Sidebar */
@@ -650,7 +650,7 @@ LIGHT_CSS = """
 }
 
 .tech-label {
-    color: #64748B !important;
+    color: #8DA0B6 !important;
     font-weight: 600;
 }
 

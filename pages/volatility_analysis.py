@@ -79,7 +79,7 @@ def volatility_analysis_page():
             y=sentiment_df['volume_volatility'],
             mode='lines',
             name='Volume Volatility',
-            line=dict(color='#EC4899', width=2),
+            line=dict(color='#3B82F6', width=2),
             fill='tozeroy',
             fillcolor='rgba(236,72,153,0.2)',
             hovertemplate='<b>%{x|%b %d, %Y}</b><br>Volume Volatility: %{y:.1f}<extra></extra>'

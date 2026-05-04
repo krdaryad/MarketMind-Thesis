@@ -227,13 +227,14 @@ def entity_analysis_page():
         'Mentions': company_counts.values
     })
 
+    approved_colors = ['#3B82F6', '#10B981', '#EF4444', '#F59E0B', '#8A8F99']  
     fig_donut = px.pie(
-        donut_data, 
-        values='Mentions', 
-        names='Company', 
+        donut_data,
+        values='Mentions',
+        names='Company',
         hole=0.4,
         title='Share of Conversation by Company',
-        color_discrete_sequence=px.colors.qualitative.Set2
+        color_discrete_sequence=approved_colors
     )
 
     fig_donut.update_layout(
